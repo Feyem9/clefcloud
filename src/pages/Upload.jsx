@@ -11,10 +11,13 @@ const MESSE_PARTS = [
   'Gloria',
   'Psaume',
   'Alleluia',
+  'Credo',
+  'Priere universelle',
   'Offertoire',
   'Sanctus',
   'Agnus Dei',
   'Communion',
+  'Meditation',
   'Sortie'
 ];
 

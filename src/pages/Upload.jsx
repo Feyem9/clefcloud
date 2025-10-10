@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { db, storage } from '../firebase/config';
+import { db } from '../firebase/config';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { supabase } from '../supabase/config';
 
 const MESSE_PARTS = [
   'Entrée',
@@ -80,13 +80,40 @@ const Upload = () => {
     setSuccess('');
 
     try {
-      // Upload du fichier vers Firebase Storage
+      // Upload du fichier vers Supabase Storage (sans authentification - bucket public)
       const fileExtension = formData.file.name.split('.').pop();
       const fileName = `${Date.now()}_${formData.title.replace(/\s+/g, '_')}.${fileExtension}`;
-      const storageRef = ref(storage, `partitions/${currentUser.uid}/${fileName}`);
+      const filePath = `${currentUser.uid}/${fileName}`;
       
-      await uploadBytes(storageRef, formData.file);
-      const downloadURL = await getDownloadURL(storageRef);
+      // Créer un client Supabase anonyme pour upload public
+      const { createClient } = await import('@supabase/supabase-js');
+      const supabasePublic = createClient(
+        'https://moiojsgocanyxxvrmcnz.supabase.co',
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1vaW9qc2dvY2FueXh4dnJtY256Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwODg0NzgsImV4cCI6MjA3NTY2NDQ3OH0.aOt1rqJVO_xg17LR_DrkuVO5WiFFngy_KeHAcC9qakw',
+        {
+          auth: {
+            persistSession: false
+          }
+        }
+      );
+      
+      const { data: uploadData, error: uploadError } = await supabasePublic.storage
+        .from('Partitions')
+        .upload(filePath, formData.file, {
+          cacheControl: '3600',
+          upsert: false
+        });
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      // Obtenir l'URL publique
+      const { data: { publicUrl } } = supabase.storage
+        .from('Partitions')
+        .getPublicUrl(filePath);
+      
+      const downloadURL = publicUrl;
 
       // Créer le document dans Firestore
       const partitionData = {
@@ -99,6 +126,7 @@ const Upload = () => {
         storagePath: `partitions/${currentUser.uid}/${fileName}`,
         downloadURL: downloadURL,
         createdBy: currentUser.uid,
+        createdByEmail: currentUser.email,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
       };
@@ -273,7 +301,7 @@ const Upload = () => {
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 bg-primary-600 text-white py-2 px-4 rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 bg-green-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Ajout en cours...' : 'Ajouter la partition'}
             </button>

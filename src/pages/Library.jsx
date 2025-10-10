@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { db } from '../firebase/config';
 import { collection, query, where, orderBy, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
+import PDFViewer from '../components/PDFViewer';
 
 const Library = () => {
   const { currentUser } = useAuth();
@@ -11,13 +12,15 @@ const Library = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [messePartFilter, setMessePartFilter] = useState('all');
+  const [ownerFilter, setOwnerFilter] = useState('all'); // 'all' ou 'mine'
+  const [viewingPDF, setViewingPDF] = useState(null);
 
   useEffect(() => {
     if (!currentUser) return;
 
+    // Récupérer toutes les partitions (pas seulement les miennes)
     const q = query(
       collection(db, 'partitions'),
-      where('createdBy', '==', currentUser.uid),
       orderBy('createdAt', 'desc')
     );
 
@@ -49,8 +52,9 @@ const Library = () => {
                          (partition.composer && partition.composer.toLowerCase().includes(searchTerm.toLowerCase()));
     const matchesCategory = categoryFilter === 'all' || partition.category === categoryFilter;
     const matchesMessePart = messePartFilter === 'all' || partition.messePart === messePartFilter;
+    const matchesOwner = ownerFilter === 'all' || partition.createdBy === currentUser.uid;
     
-    return matchesSearch && matchesCategory && matchesMessePart;
+    return matchesSearch && matchesCategory && matchesMessePart && matchesOwner;
   });
 
   if (loading) {
@@ -64,7 +68,7 @@ const Library = () => {
   return (
     <div>
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Ma Bibliothèque</h1>
+        <h1 className="text-3xl font-bold text-gray-900">Bibliothèque de Partitions</h1>
         <Link
           to="/upload"
           className="bg-primary-600 text-white px-6 py-2 rounded-lg hover:bg-primary-700 transition flex items-center gap-2"
@@ -78,7 +82,7 @@ const Library = () => {
 
       {/* Filtres */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Rechercher
@@ -90,6 +94,20 @@ const Library = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Propriétaire
+            </label>
+            <select
+              value={ownerFilter}
+              onChange={(e) => setOwnerFilter(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+            >
+              <option value="all">Toutes les partitions</option>
+              <option value="mine">Mes partitions uniquement</option>
+            </select>
           </div>
 
           <div>
@@ -203,21 +221,56 @@ const Library = () => {
                   </div>
                 )}
 
+                {/* Afficher le créateur */}
+                <div className="flex items-center gap-2 mb-4 pb-4 border-t pt-4">
+                  <div className="w-6 h-6 bg-primary-600 rounded-full flex items-center justify-center text-white text-xs font-semibold">
+                    {partition.createdByEmail?.[0]?.toUpperCase() || '?'}
+                  </div>
+                  <span className="text-sm text-gray-600">
+                    {partition.createdBy === currentUser.uid ? (
+                      <span className="font-semibold text-primary-600">Vous</span>
+                    ) : (
+                      <span>{partition.createdByEmail || 'Utilisateur'}</span>
+                    )}
+                  </span>
+                </div>
+
                 <div className="flex gap-2 mt-4">
-                  <a
-                    href={partition.downloadURL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex-1 bg-primary-600 text-white text-center py-2 rounded-lg hover:bg-primary-700 transition text-sm"
-                  >
-                    Ouvrir
-                  </a>
-                  <button
-                    onClick={() => handleDelete(partition.id)}
-                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition text-sm"
-                  >
-                    Supprimer
-                  </button>
+                  {partition.downloadURL && partition.downloadURL.includes('supabase') ? (
+                    <>
+                      <button
+                        onClick={() => setViewingPDF(partition.downloadURL)}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm flex items-center justify-center gap-2"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                        Voir
+                      </button>
+                      <a
+                        href={partition.downloadURL}
+                        download
+                        className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-sm flex items-center justify-center gap-2"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                      </a>
+                    </>
+                  ) : (
+                    <div className="flex-1 bg-gray-400 text-white text-center py-2 rounded-lg text-sm cursor-not-allowed">
+                      Fichier non disponible
+                    </div>
+                  )}
+                  {partition.createdBy === currentUser.uid && (
+                    <button
+                      onClick={() => handleDelete(partition.id)}
+                      className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition text-sm"
+                    >
+                      Supprimer
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
@@ -228,6 +281,11 @@ const Library = () => {
       <div className="mt-6 text-center text-gray-600">
         {filteredPartitions.length} partition{filteredPartitions.length > 1 ? 's' : ''} trouvée{filteredPartitions.length > 1 ? 's' : ''}
       </div>
+
+      {/* PDF Viewer Modal */}
+      {viewingPDF && (
+        <PDFViewer url={viewingPDF} onClose={() => setViewingPDF(null)} />
+      )}
     </div>
   );
 };

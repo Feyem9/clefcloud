@@ -3,9 +3,8 @@ service firebase.storage {
   match /b/{bucket}/o {
     // Règles pour les partitions
     match /partitions/{userId}/{fileName} {
-      // Permettre la lecture seulement si l'utilisateur est authentifié
-      // et que c'est son propre dossier
-      allow read: if request.auth != null && request.auth.uid == userId;
+      // Permettre la lecture à tous les utilisateurs authentifiés (lecture publique)
+      allow read: if request.auth != null;
       
       // Permettre l'écriture (upload) seulement si l'utilisateur est authentifié
       // et que c'est son propre dossier

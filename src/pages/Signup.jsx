@@ -35,19 +35,19 @@ const Signup = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-cyan-50 to-blue-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full">
         <div className="bg-white/80 backdrop-blur-lg p-8 sm:p-10 rounded-2xl shadow-2xl border border-white/20 transition-all duration-300 hover:shadow-3xl">
           <div>
             <div className="flex justify-center">
               <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-primary-400 to-purple-500 rounded-full blur-xl opacity-50 animate-pulse"></div>
+                <div className="absolute inset-0 bg-primary-400 rounded-full blur-xl opacity-50 animate-pulse"></div>
                 <svg className="relative w-20 h-20 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
                 </svg>
               </div>
             </div>
-            <h2 className="mt-8 text-center text-4xl font-bold bg-gradient-to-r from-primary-600 to-purple-600 bg-clip-text text-transparent">
+            <h2 className="mt-8 text-center text-4xl font-bold text-primary-600">
               Créer un compte
             </h2>
             <p className="mt-3 text-center text-base text-gray-600">
@@ -143,7 +143,7 @@ const Signup = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="group relative w-full flex justify-center py-3.5 px-4 border border-transparent text-base font-semibold rounded-xl text-white bg-gradient-to-r from-primary-600 to-purple-600 hover:from-primary-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed transform transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl"
+                className="group relative w-full flex justify-center py-3.5 px-4 border border-transparent text-base font-semibold rounded-xl text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed transform transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl"
               >
                 {loading ? (
                   <>
@@ -163,7 +163,7 @@ const Signup = () => {
           <div className="mt-8 text-center">
             <p className="text-sm text-gray-600">
               Déjà un compte ?{' '}
-              <Link to="/login" className="font-semibold text-transparent bg-gradient-to-r from-primary-600 to-purple-600 bg-clip-text hover:from-primary-700 hover:to-purple-700 transition-all duration-200">
+              <Link to="/login" className="font-semibold text-primary-600 hover:text-primary-700 transition-all duration-200">
                 Connectez-vous
               </Link>
             </p>

@@ -81,15 +81,15 @@ const Profile = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-cyan-50 to-blue-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* En-tête du profil */}
         <div className="bg-white/80 backdrop-blur-lg rounded-2xl shadow-2xl border border-white/20 overflow-hidden mb-8">
-          <div className="relative h-48 bg-gradient-to-r from-primary-600 via-purple-600 to-pink-600">
-            <div className="absolute inset-0 bg-black/20"></div>
+          <div className="relative h-48 bg-primary-600">
+            <div className="absolute inset-0 bg-green-600 rounded-t-2xl"></div>
             <div className="absolute -bottom-16 left-8">
               <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-primary-400 to-purple-500 rounded-full blur-xl opacity-50 animate-pulse"></div>
+                <div className="absolute inset-0 bg-green-400 rounded-full blur-xl opacity-50 animate-pulse"></div>
                 <div className="relative w-32 h-32 bg-white rounded-full border-4 border-white shadow-xl flex items-center justify-center">
                   <svg className="w-16 h-16 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -102,7 +102,7 @@ const Profile = () => {
           <div className="pt-20 pb-8 px-8">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-primary-600 to-purple-600 bg-clip-text text-transparent">
+                <h1 className="text-3xl font-bold text-primary-600">
                   {currentUser?.displayName || 'Utilisateur'}
                 </h1>
                 <p className="text-gray-600 mt-1 flex items-center gap-2">
@@ -114,7 +114,7 @@ const Profile = () => {
               </div>
               <button
                 onClick={handleLogout}
-                className="px-6 py-2.5 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl font-semibold hover:from-red-600 hover:to-red-700 transition-all duration-200 transform hover:scale-105 shadow-lg flex items-center gap-2"
+                className="px-6 py-2.5 bg-red-600 text-white rounded-xl font-semibold hover:bg-red-700 transition-all duration-200 transform hover:scale-105 shadow-lg flex items-center gap-2"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -131,11 +131,11 @@ const Profile = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-600 text-sm font-medium">Total Partitions</p>
-                <p className="text-4xl font-bold bg-gradient-to-r from-primary-600 to-purple-600 bg-clip-text text-transparent mt-2">
+                <p className="text-4xl font-bold text-primary-600 mt-2">
                   {stats.total}
                 </p>
               </div>
-              <div className="w-16 h-16 bg-gradient-to-br from-primary-100 to-purple-100 rounded-2xl flex items-center justify-center">
+              <div className="w-16 h-16 bg-primary-100 rounded-2xl flex items-center justify-center">
                 <svg className="w-8 h-8 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
                 </svg>
@@ -147,12 +147,12 @@ const Profile = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-600 text-sm font-medium">Messe</p>
-                <p className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent mt-2">
+                <p className="text-4xl font-bold text-cyan-600 mt-2">
                   {stats.messe}
                 </p>
               </div>
-              <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-cyan-100 rounded-2xl flex items-center justify-center">
-                <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-16 h-16 bg-cyan-100 rounded-2xl flex items-center justify-center">
+                <svg className="w-8 h-8 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                 </svg>
               </div>
@@ -163,12 +163,12 @@ const Profile = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-600 text-sm font-medium">Concert</p>
-                <p className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mt-2">
+                <p className="text-4xl font-bold text-green-600 mt-2">
                   {stats.concert}
                 </p>
               </div>
-              <div className="w-16 h-16 bg-gradient-to-br from-purple-100 to-pink-100 rounded-2xl flex items-center justify-center">
-                <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center">
+                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -180,12 +180,12 @@ const Profile = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-600 text-sm font-medium">Autre</p>
-                <p className="text-4xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent mt-2">
+                <p className="text-4xl font-bold text-yellow-600 mt-2">
                   {stats.autre}
                 </p>
               </div>
-              <div className="w-16 h-16 bg-gradient-to-br from-green-100 to-emerald-100 rounded-2xl flex items-center justify-center">
-                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-16 h-16 bg-yellow-100 rounded-2xl flex items-center justify-center">
+                <svg className="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                 </svg>
               </div>
@@ -196,13 +196,13 @@ const Profile = () => {
         {/* Partitions récentes */}
         <div className="bg-white/80 backdrop-blur-lg rounded-2xl shadow-2xl border border-white/20 p-8">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold bg-gradient-to-r from-primary-600 to-purple-600 bg-clip-text text-transparent">
+            <h2 className="text-2xl font-bold text-primary-600">
               Partitions Récentes
             </h2>
             <button
               onClick={() => navigate('/library')}
-              className="px-4 py-2 bg-gradient-to-r from-primary-600 to-purple-600 text-white rounded-xl font-semibold hover:from-primary-700 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 shadow-lg flex items-center gap-2"
-            >
+              className="bg-green-400 text-white px-8 py-3 rounded-lg font-semibold hover:bg-green-50 hover:scale-105 hover:text-green-600 transition-all shadow-lgext-green-400 hover:scale-105 transition-all shadow-lg"
+              >
               Voir tout
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -219,8 +219,8 @@ const Profile = () => {
               <p className="text-gray-500 mb-6">Commencez par ajouter votre première partition</p>
               <button
                 onClick={() => navigate('/upload')}
-                className="px-6 py-3 bg-gradient-to-r from-primary-600 to-purple-600 text-white rounded-xl font-semibold hover:from-primary-700 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 shadow-lg"
-              >
+                className="bg-green-400 text-white px-8 py-3 rounded-lg font-semibold hover:bg-green-50 hover:scale-105 hover:text-green-600 transition-all shadow-lgext-green-400 hover:scale-105 transition-all shadow-lg"
+                >
                 Ajouter une partition
               </button>
             </div>
@@ -229,11 +229,11 @@ const Profile = () => {
               {stats.recentUploads.map((partition) => (
                 <div
                   key={partition.id}
-                  className="group bg-gradient-to-r from-white to-gray-50 rounded-xl p-5 border-2 border-gray-100 hover:border-primary-300 transition-all duration-300 hover:shadow-lg"
+                  className="group bg-white rounded-xl p-5 border-2 border-gray-100 hover:border-primary-300 transition-all duration-300 hover:shadow-lg"
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4 flex-1">
-                      <div className="w-14 h-14 bg-gradient-to-br from-primary-100 to-purple-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                      <div className="w-14 h-14 bg-primary-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                         <svg className="w-7 h-7 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
                         </svg>
@@ -263,18 +263,27 @@ const Profile = () => {
                         </div>
                       </div>
                     </div>
-                    <a
-                      href={partition.downloadURL}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-5 py-2.5 bg-gradient-to-r from-primary-600 to-purple-600 text-white rounded-xl font-semibold hover:from-primary-700 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 shadow-lg flex items-center gap-2"
-                    >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                      </svg>
-                      Ouvrir
-                    </a>
+                    {partition.downloadURL && partition.downloadURL.includes('supabase') ? (
+                      <a
+                        href={partition.downloadURL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-5 py-2.5 bg-primary-600 text-white rounded-xl font-semibold hover:bg-primary-700 transition-all duration-200 transform hover:scale-105 shadow-lg flex items-center gap-2"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                        Ouvrir
+                      </a>
+                    ) : (
+                      <div className="px-5 py-2.5 bg-gray-400 text-white rounded-xl font-semibold cursor-not-allowed flex items-center gap-2">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                        </svg>
+                        Non disponible
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}

@@ -1,0 +1,130 @@
+### Tests des nouvelles fonctionnalités ClefCloud
+### Utilisez l'extension REST Client dans VS Code
+
+@baseUrl = http://localhost:3000
+@token = YOUR_JWT_TOKEN_HERE
+
+### ========== AUTHENTIFICATION ==========
+
+### 1. Connexion pour obtenir un token
+# @name signin
+POST {{baseUrl}}/auth/signin
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "password": "Password123!"
+}
+
+### Extraire le token (automatique avec REST Client)
+@token = {{signin.response.body.accessToken}}
+
+### 2. Vérifier le profil (route protégée)
+GET {{baseUrl}}/auth/me
+Authorization: Bearer {{token}}
+
+### ========== PARTITIONS ==========
+
+### 3. Liste de toutes les partitions
+GET {{baseUrl}}/partitions?limit=10&offset=0
+
+### 4. Recherche de partitions
+GET {{baseUrl}}/partitions?search=Ave&category=messe
+
+### 5. Détails d'une partition
+GET {{baseUrl}}/partitions/1
+
+### 6. Upload d'une partition (nécessite un fichier)
+POST {{baseUrl}}/partitions/upload
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary
+
+------WebKitFormBoundary
+Content-Disposition: form-data; name="title"
+
+Ave Maria
+------WebKitFormBoundary
+Content-Disposition: form-data; name="composer"
+
+Schubert
+------WebKitFormBoundary
+Content-Disposition: form-data; name="category"
+
+messe
+------WebKitFormBoundary
+Content-Disposition: form-data; name="file"; filename="partition.pdf"
+Content-Type: application/pdf
+
+< ./test-files/partition.pdf
+------WebKitFormBoundary--
+
+### 7. Obtenir l'URL de téléchargement
+GET {{baseUrl}}/partitions/1/download
+
+### 8. Supprimer une partition
+DELETE {{baseUrl}}/partitions/1
+Authorization: Bearer {{token}}
+
+### ========== FAVORIS ==========
+
+### 9. Ajouter une partition aux favoris
+POST {{baseUrl}}/partitions/1/favorite
+Authorization: Bearer {{token}}
+
+### 10. Liste des favoris de l'utilisateur
+GET {{baseUrl}}/partitions/favorites/list?limit=20&offset=0
+Authorization: Bearer {{token}}
+
+### 11. Retirer une partition des favoris
+DELETE {{baseUrl}}/partitions/1/favorite
+Authorization: Bearer {{token}}
+
+### ========== STATISTIQUES ==========
+
+### 12. Statistiques de l'utilisateur connecté
+GET {{baseUrl}}/partitions/stats/user
+Authorization: Bearer {{token}}
+
+### 13. Partitions les plus populaires (public)
+GET {{baseUrl}}/partitions/stats/popular?limit=10
+
+### 14. Top 5 des partitions populaires
+GET {{baseUrl}}/partitions/stats/popular?limit=5
+
+### ========== UTILISATEURS ==========
+
+### 15. Profil utilisateur
+GET {{baseUrl}}/users/1
+
+### 16. Partitions d'un utilisateur
+GET {{baseUrl}}/users/1/partitions?limit=10&offset=0
+
+### 17. Mettre à jour le profil
+PATCH {{baseUrl}}/users/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "John Doe"
+}
+
+### ========== TESTS DE SÉCURITÉ ==========
+
+### 18. Accès à une route protégée sans token (devrait retourner 401)
+GET {{baseUrl}}/partitions/stats/user
+
+### 19. Tentative de suppression d'une partition d'un autre utilisateur (devrait retourner 403)
+DELETE {{baseUrl}}/partitions/999
+Authorization: Bearer {{token}}
+
+### 20. Ajouter deux fois la même partition aux favoris (devrait retourner 409)
+POST {{baseUrl}}/partitions/1/favorite
+Authorization: Bearer {{token}}
+
+### ========== HEALTH CHECK ==========
+
+### 21. Vérifier l'état de l'API
+GET {{baseUrl}}/health
+
+### 22. Vérifier la connexion à la base de données
+GET {{baseUrl}}/health/db

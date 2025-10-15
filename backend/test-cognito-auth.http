@@ -1,0 +1,68 @@
+### Fichier de test pour l'authentification Cognito
+### Utilisez l'extension REST Client dans VS Code ou copiez dans Postman
+
+@baseUrl = http://localhost:3000
+@email = test@example.com
+@password = TestPassword123!
+@username = testuser
+
+### 1. Inscription d'un nouvel utilisateur
+POST {{baseUrl}}/auth/signup
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "{{password}}",
+  "username": "{{username}}"
+}
+
+### 2. Confirmer l'inscription (code reçu par email)
+POST {{baseUrl}}/auth/confirm-signup
+Content-Type: application/json
+
+{
+  "username": "{{username}}",
+  "code": "123456"
+}
+
+### 3. Connexion
+# @name signin
+POST {{baseUrl}}/auth/signin
+Content-Type: application/json
+
+{
+  "username": "{{username}}",
+  "password": "{{password}}"
+}
+
+### 4. Extraire le token (automatique avec REST Client)
+@accessToken = {{signin.response.body.accessToken}}
+
+### 5. Récupérer le profil (route protégée)
+GET {{baseUrl}}/auth/profile
+Authorization: Bearer {{accessToken}}
+
+### 6. Récupérer les informations utilisateur (route protégée)
+GET {{baseUrl}}/auth/me
+Authorization: Bearer {{accessToken}}
+
+### 7. Test sans token (devrait retourner 401)
+GET {{baseUrl}}/auth/profile
+
+### 8. Mot de passe oublié
+POST {{baseUrl}}/auth/forgot-password
+Content-Type: application/json
+
+{
+  "username": "{{username}}"
+}
+
+### 9. Confirmer le nouveau mot de passe
+POST {{baseUrl}}/auth/confirm-forgot-password
+Content-Type: application/json
+
+{
+  "username": "{{username}}",
+  "code": "123456",
+  "newPassword": "NewPassword123!"
+}

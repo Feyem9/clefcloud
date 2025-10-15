@@ -1,0 +1,17 @@
+# Exemple de fichier de variables Terraform
+# Copiez ce fichier vers terraform.tfvars et remplissez avec vos valeurs
+
+# Configuration générale
+aws_region   = "eu-west-1"
+environment  = "dev"
+project_name = "clefcloud"
+
+# Configuration VPC
+vpc_cidr = "10.0.0.0/16"
+
+# Configuration RDS
+db_username = "clefcloud_admin"
+db_password = "CHANGE_ME_STRONG_PASSWORD"
+
+# Note: Ne commitez JAMAIS le fichier terraform.tfvars avec des valeurs sensibles
+# Utilisez plutôt des variables d'environnement ou un gestionnaire de secrets

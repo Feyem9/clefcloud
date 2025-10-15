@@ -83,10 +83,25 @@ const Upload = () => {
     setSuccess('');
 
     try {
+      console.log('🚀 Début de l\'upload...');
+      console.log('📄 Fichier:', formData.file.name, 'Taille:', formData.file.size);
+      
       // Upload du fichier vers Supabase Storage (sans authentification - bucket public)
       const fileExtension = formData.file.name.split('.').pop();
-      const fileName = `${Date.now()}_${formData.title.replace(/\s+/g, '_')}.${fileExtension}`;
+      
+      // Nettoyer le nom du fichier : enlever les caractères spéciaux
+      const cleanTitle = formData.title
+        .normalize('NFD') // Décomposer les caractères accentués
+        .replace(/[\u0300-\u036f]/g, '') // Enlever les accents
+        .replace(/[^a-zA-Z0-9\s]/g, '') // Enlever les caractères spéciaux
+        .replace(/\s+/g, '_') // Remplacer les espaces par des underscores
+        .toLowerCase(); // Mettre en minuscules
+      
+      const fileName = `${Date.now()}_${cleanTitle}.${fileExtension}`;
       const filePath = `${currentUser.uid}/${fileName}`;
+      
+      console.log('📝 Nom nettoyé:', fileName);
+      console.log('📂 Chemin:', filePath);
       
       // Créer un client Supabase anonyme pour upload public
       const { createClient } = await import('@supabase/supabase-js');
@@ -100,6 +115,7 @@ const Upload = () => {
         }
       );
       
+      console.log('☁️ Upload vers Supabase...');
       const { data: uploadData, error: uploadError } = await supabasePublic.storage
         .from('Partitions')
         .upload(filePath, formData.file, {
@@ -108,8 +124,11 @@ const Upload = () => {
         });
 
       if (uploadError) {
+        console.error('❌ Erreur Supabase:', uploadError);
         throw uploadError;
       }
+      
+      console.log('✅ Upload réussi!');
 
       // Obtenir l'URL publique
       const { data: { publicUrl } } = supabase.storage
@@ -156,7 +175,19 @@ const Upload = () => {
 
     } catch (err) {
       console.error('Erreur lors de l\'upload:', err);
-      setError('Erreur lors de l\'ajout de la partition. Réessayez.');
+      
+      // Afficher un message d'erreur plus détaillé
+      let errorMessage = 'Erreur lors de l\'ajout de la partition. ';
+      
+      if (err.message) {
+        errorMessage += err.message;
+      } else if (err.error) {
+        errorMessage += err.error;
+      } else {
+        errorMessage += 'Vérifiez votre connexion et réessayez.';
+      }
+      
+      setError(errorMessage);
     }
 
     setLoading(false);
@@ -289,13 +320,17 @@ const Upload = () => {
               id="file"
               name="file"
               required
-              accept=".pdf,.png,.jpg,.jpeg"
+              accept="application/pdf,image/png,image/jpeg,image/jpg"
+              capture="environment"
               onChange={handleFileChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100"
             />
             {formData.file && (
-              <p className="mt-2 text-sm text-gray-600">
-                Fichier sélectionné: {formData.file.name}
+              <p className="mt-2 text-sm text-green-600 font-medium flex items-center gap-2">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                {formData.file.name} ({(formData.file.size / 1024 / 1024).toFixed(2)} MB)
               </p>
             )}
           </div>

@@ -1,0 +1,125 @@
+### Test d'authentification simple - ClefCloud
+### Ce fichier teste le workflow complet d'authentification
+
+@baseUrl = http://localhost:3000/api
+# @email = pasyves43@gmail.com
+@email = testuser@example.com
+@password = Password123!
+@phone = +237683845543
+
+
+
+
+### ========================================
+### ÉTAPE 0 : Inscription (si utilisateur n'existe pas encore)
+### ========================================
+
+### @name signup
+POST {{baseUrl}}/auth/signup
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "{{password}}",
+  "phone": "{{phone}}"
+}
+
+
+### ========================================
+### ÉTAPE 0.1 : Confirmation admin (DEV ONLY)
+### ========================================
+
+POST {{baseUrl}}/auth/admin-confirm-signup
+Content-Type: application/json
+
+{
+  "email": "{{email}}"
+}
+
+### ========================================
+### ÉTAPE 1 : Connexion (si utilisateur déjà confirmé)
+### ========================================
+
+
+
+# @name login
+POST {{baseUrl}}/auth/signin
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "{{password}}"
+}
+
+### ========================================
+### ÉTAPE 2 : Extraction automatique du token
+### ========================================
+
+@accessToken = {{login.response.body.tokens.accessToken}}
+@idToken = {{login.response.body.tokens.idToken}}
+@refreshToken = {{login.response.body.tokens.refreshToken}}
+
+### ========================================
+### ÉTAPE 3 : Test du token - Récupérer le profil
+### ========================================
+
+GET {{baseUrl}}/auth/me
+Authorization: Bearer {{accessToken}}
+
+### ========================================
+### ÉTAPE 4 : Test du token - Récupérer le profil (version 2)
+### ========================================
+
+GET {{baseUrl}}/auth/profile
+Authorization: Bearer {{accessToken}}
+
+### ========================================
+### ALTERNATIVE : Si l'extraction ne fonctionne pas
+### Décommentez et collez votre token manuellement
+### ========================================
+
+# @accessToken = eyJraWQiOiI...COLLEZ_VOTRE_TOKEN_ICI
+
+### ========================================
+### TEST : Vérifier les statistiques utilisateur
+### ========================================
+
+GET {{baseUrl}}/partitions/stats/user
+Authorization: Bearer {{accessToken}}
+
+### ========================================
+### TEST : Rafraîchir le token
+### ========================================
+
+POST {{baseUrl}}/auth/refresh-token
+Content-Type: application/json
+
+{
+  "refreshToken": "{{refreshToken}}",
+  "email": "{{email}}"
+}
+
+### ========================================
+### WORKFLOW COMPLET (si utilisateur n'existe pas encore)
+### ========================================
+
+### 1. Inscription
+# @name signup
+POST {{baseUrl}}/auth/signup
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "{{password}}",
+  "phone": "{{phone}}"
+}
+
+### 2. Confirmation admin (DEV ONLY)
+POST {{baseUrl}}/auth/admin-confirm-signup
+Content-Type: application/json
+
+{
+  "email": "{{email}}"
+}
+
+### 3. Connexion (retour à l'étape 1)

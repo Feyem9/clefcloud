@@ -1,6 +1,34 @@
 # 🎵 ClefCloud - Sauvegarde de Partitions Musicales
 
-ClefCloud est une application web de gestion et sauvegarde de partitions musicales dans le cloud, spécialement conçue pour les pianistes et organistes.
+ClefCloud est une application web complète de gestion et sauvegarde de partitions musicales dans le cloud, avec authentification AWS Cognito et backend NestJS.
+
+## 📁 Structure du projet
+
+```
+ClefCloud/
+├── backend/          # API NestJS + AWS Cognito + PostgreSQL + S3
+├── frontend/         # Interface React + Vite + TailwindCSS
+├── terraform/        # Infrastructure as Code (AWS)
+└── scripts/          # Scripts utilitaires
+```
+
+## 🚀 Démarrage rapide
+
+### Backend
+```bash
+cd backend
+npm install
+npm run start:dev
+# API disponible sur http://localhost:3000
+```
+
+### Frontend
+```bash
+cd frontend
+npm install
+npm run dev
+# App disponible sur http://localhost:5173
+```
 
 ## ✨ Fonctionnalités
 

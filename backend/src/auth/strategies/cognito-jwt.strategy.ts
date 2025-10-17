@@ -13,7 +13,8 @@ export class CognitoJwtStrategy extends PassportStrategy(Strategy, 'cognito-jwt'
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      audience: configService.get<string>('COGNITO_CLIENT_ID'),
+      // Ne pas vérifier l'audience car l'accessToken Cognito n'a pas toujours ce claim
+      // audience: configService.get<string>('COGNITO_CLIENT_ID'),
       issuer: `https://cognito-idp.${region}.amazonaws.com/${userPoolId}`,
       algorithms: ['RS256'],
       secretOrKeyProvider: passportJwtSecret({

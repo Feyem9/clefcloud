@@ -1,10 +1,63 @@
+### ========================================
 ### Tests des nouvelles fonctionnalités ClefCloud
-### Utilisez l'extension REST Client dans VS Code
+### ========================================
+### 
+### 📋 GUIDE D'UTILISATION:
+### 1. Assurez-vous que le serveur est démarré: npm run start:dev
+### 2. Exécutez les requêtes dans l'ordre (0 → 0.2 → 1 → 2...)
+### 3. Les tokens sont extraits automatiquement avec REST Client
+### 4. Si l'extraction ne fonctionne pas, copiez manuellement le token
+###
+### ⚠️ PRÉREQUIS:
+### - Extension REST Client installée dans VS Code
+### - USER_PASSWORD_AUTH activé dans AWS Cognito
+### - Serveur backend démarré sur http://localhost:3000
+###
+### 🔑 WORKFLOW RAPIDE:
+### 1. Exécutez "0. Inscription" (si nouvel utilisateur)
+### 2. Exécutez "0.2. Confirmation admin" (DEV ONLY)
+### 3. Exécutez "1. Connexion" → Les tokens sont extraits automatiquement
+### 4. Testez les autres endpoints avec le token
+###
+### ========================================
 
-@baseUrl = http://localhost:3000
+@baseUrl = http://localhost:3000/api
 @token = YOUR_JWT_TOKEN_HERE
+@email = testuser@example.com
+@password = NewPassword123!
+@phone = +237683845543
 
-### ========== AUTHENTIFICATION ==========
+### ========================================
+### AUTHENTIFICATION
+### ========================================
+
+### 0. Inscription (à faire en premier si l'utilisateur n'existe pas)
+# @name signup
+POST {{baseUrl}}/auth/signup
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "{{password}}",
+  "phone": "{{phone}}"
+}
+
+### 0.1. Confirmer l'inscription (code reçu par email)
+POST {{baseUrl}}/auth/confirm-signup
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "code": "REMPLACER_PAR_CODE_EMAIL"
+}
+
+### 0.2. OU Confirmer l'inscription SANS code (DEV ONLY - nécessite credentials AWS admin)
+POST {{baseUrl}}/auth/admin-confirm-signup
+Content-Type: application/json
+
+{
+  "email": "{{email}}"
+}
 
 ### 1. Connexion pour obtenir un token
 # @name signin
@@ -12,18 +65,61 @@ POST {{baseUrl}}/auth/signin
 Content-Type: application/json
 
 {
-  "username": "testuser",
-  "password": "Password123!"
+  "email": "{{email}}",
+  "password": "{{password}}"
 }
 
 ### Extraire le token (automatique avec REST Client)
-@token = {{signin.response.body.accessToken}}
+# IMPORTANT: Après avoir exécuté la requête signin ci-dessus, 
+# ces variables seront automatiquement remplies
+@token = {{signin.response.body.tokens.accessToken}}
+@refreshToken = {{signin.response.body.tokens.refreshToken}}
+
+### OU copiez manuellement le token ici si l'extraction automatique ne fonctionne pas
+# @token = COLLEZ_VOTRE_ACCESS_TOKEN_ICI
 
 ### 2. Vérifier le profil (route protégée)
 GET {{baseUrl}}/auth/me
 Authorization: Bearer {{token}}
 
-### ========== PARTITIONS ==========
+### 2.1. Rafraîchir le token
+POST {{baseUrl}}/auth/refresh-token
+Content-Type: application/json
+
+{
+  "refreshToken": "{{refreshToken}}",
+  "email": "{{email}}"
+}
+
+### 2.2. Renvoyer le code de confirmation
+POST {{baseUrl}}/auth/resend-confirmation-code
+Content-Type: application/json
+
+{
+  "email": "{{email}}"
+}
+
+### 2.3. Changer le mot de passe
+POST {{baseUrl}}/auth/change-password
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "oldPassword": "Password123!",
+  "newPassword": "NewPassword123!"
+}
+
+### 2.4. Déconnexion
+POST {{baseUrl}}/auth/signout
+Authorization: Bearer {{token}}
+
+### 2.5. Supprimer le compte
+DELETE {{baseUrl}}/auth/account
+Authorization: Bearer {{token}}
+
+### ========================================
+### PARTITIONS
+### ========================================
 
 ### 3. Liste de toutes les partitions
 GET {{baseUrl}}/partitions?limit=10&offset=0
@@ -65,7 +161,9 @@ GET {{baseUrl}}/partitions/1/download
 DELETE {{baseUrl}}/partitions/1
 Authorization: Bearer {{token}}
 
-### ========== FAVORIS ==========
+### ========================================
+### FAVORIS
+### ========================================
 
 ### 9. Ajouter une partition aux favoris
 POST {{baseUrl}}/partitions/1/favorite
@@ -79,7 +177,9 @@ Authorization: Bearer {{token}}
 DELETE {{baseUrl}}/partitions/1/favorite
 Authorization: Bearer {{token}}
 
-### ========== STATISTIQUES ==========
+### ========================================
+### STATISTIQUES
+### ========================================
 
 ### 12. Statistiques de l'utilisateur connecté
 GET {{baseUrl}}/partitions/stats/user
@@ -91,7 +191,9 @@ GET {{baseUrl}}/partitions/stats/popular?limit=10
 ### 14. Top 5 des partitions populaires
 GET {{baseUrl}}/partitions/stats/popular?limit=5
 
-### ========== UTILISATEURS ==========
+### ========================================
+### UTILISATEURS
+### ========================================
 
 ### 15. Profil utilisateur
 GET {{baseUrl}}/users/1
@@ -108,7 +210,9 @@ Content-Type: application/json
   "name": "John Doe"
 }
 
-### ========== TESTS DE SÉCURITÉ ==========
+### ========================================
+### TESTS DE SÉCURITÉ
+### ========================================
 
 ### 18. Accès à une route protégée sans token (devrait retourner 401)
 GET {{baseUrl}}/partitions/stats/user
@@ -121,10 +225,12 @@ Authorization: Bearer {{token}}
 POST {{baseUrl}}/partitions/1/favorite
 Authorization: Bearer {{token}}
 
-### ========== HEALTH CHECK ==========
+### ========================================
+### HEALTH CHECK
+### ========================================
 
 ### 21. Vérifier l'état de l'API
 GET {{baseUrl}}/health
 
-### 22. Vérifier la connexion à la base de données
-GET {{baseUrl}}/health/db
+### 22. Test d'envoi d'email
+GET {{baseUrl}}/health/test-email

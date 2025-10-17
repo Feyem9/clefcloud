@@ -1,14 +1,14 @@
 import { Controller, Get } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { InjectConnection } from '@nestjs/typeorm';
-import { Connection } from 'typeorm';
+import { InjectDataSource } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
 import { MailService } from './mail.service';
 
 @ApiTags('health')
 @Controller('health')
 export class HealthController {
   constructor(
-    @InjectConnection() private connection: Connection,
+    @InjectDataSource() private dataSource: DataSource,
     private mailService: MailService,
   ) {}
 
@@ -28,7 +28,7 @@ export class HealthController {
 
     try {
       // Check database connection
-      await this.connection.query('SELECT 1');
+      await this.dataSource.query('SELECT 1');
       health.services.database = 'connected';
     } catch (error) {
       health.services.database = 'disconnected';

@@ -1,4 +1,4 @@
-import { Controller, Post, Body, HttpCode, HttpStatus, Get, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, HttpStatus, Get, UseGuards, Delete, Req } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { SignUpDto } from './dto/signup.dto';
@@ -6,9 +6,13 @@ import { SignInDto } from './dto/signin.dto';
 import { ConfirmSignUpDto } from './dto/confirm-signup.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ConfirmForgotPasswordDto } from './dto/confirm-forgot-password.dto';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
+import { ResendCodeDto } from './dto/resend-code.dto';
 import { CognitoJwtAuthGuard } from './guards/cognito-jwt-auth.guard';
 import { CurrentUser, CognitoUser } from './decorators/current-user.decorator';
 import { Public } from './decorators/public.decorator';
+import { Request } from 'express';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -83,5 +87,89 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Non authentifié' })
   async getCurrentUser(@CurrentUser() user: CognitoUser) {
     return user;
+  }
+
+  @Public()
+  @Post('refresh-token')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Rafraîchir le token d\'accès' })
+  @ApiResponse({ status: 200, description: 'Token rafraîchi avec succès' })
+  @ApiResponse({ status: 401, description: 'Refresh token invalide' })
+  async refreshToken(@Body() refreshTokenDto: RefreshTokenDto) {
+    return this.authService.refreshToken(refreshTokenDto.refreshToken, refreshTokenDto.email);
+  }
+
+  @Post('signout')
+  @HttpCode(HttpStatus.OK)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Déconnexion (invalide tous les tokens)' })
+  @ApiResponse({ status: 200, description: 'Déconnexion réussie' })
+  @ApiResponse({ status: 401, description: 'Non authentifié' })
+  async signOut(@Req() request: Request) {
+    const token = request.headers.authorization?.replace('Bearer ', '');
+    return this.authService.signOut(token);
+  }
+
+  @Post('change-password')
+  @HttpCode(HttpStatus.OK)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Changer le mot de passe (utilisateur connecté)' })
+  @ApiResponse({ status: 200, description: 'Mot de passe changé avec succès' })
+  @ApiResponse({ status: 400, description: 'Ancien mot de passe incorrect' })
+  @ApiResponse({ status: 401, description: 'Non authentifié' })
+  async changePassword(
+    @Body() changePasswordDto: ChangePasswordDto,
+    @Req() request: Request,
+  ) {
+    const token = request.headers.authorization?.replace('Bearer ', '');
+    return this.authService.changePassword(
+      token,
+      changePasswordDto.oldPassword,
+      changePasswordDto.newPassword,
+    );
+  }
+
+  @Delete('account')
+  @HttpCode(HttpStatus.OK)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Supprimer le compte utilisateur' })
+  @ApiResponse({ status: 200, description: 'Compte supprimé avec succès' })
+  @ApiResponse({ status: 401, description: 'Non authentifié' })
+  async deleteAccount(
+    @CurrentUser() user: CognitoUser,
+    @Req() request: Request,
+  ) {
+    const token = request.headers.authorization?.replace('Bearer ', '');
+    return this.authService.deleteAccount(token, user.username);
+  }
+
+  @Public()
+  @Post('resend-confirmation-code')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Renvoyer le code de confirmation' })
+  @ApiResponse({ status: 200, description: 'Code renvoyé avec succès' })
+  @ApiResponse({ status: 400, description: 'Utilisateur déjà confirmé ou introuvable' })
+  async resendConfirmationCode(@Body() resendCodeDto: ResendCodeDto) {
+    return this.authService.resendConfirmationCode(resendCodeDto.email);
+  }
+
+  @Public()
+  @Post('admin-confirm-signup')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Confirmer un utilisateur sans code (DEV ONLY)' })
+  @ApiResponse({ status: 200, description: 'Utilisateur confirmé avec succès' })
+  @ApiResponse({ status: 400, description: 'Erreur de confirmation' })
+  async adminConfirmSignUp(@Body() body: { email: string }) {
+    return this.authService.adminConfirmSignUp(body.email);
+  }
+
+  @Public()
+  @Post('admin-reset-password')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Réinitialiser le mot de passe sans code (DEV ONLY)' })
+  @ApiResponse({ status: 200, description: 'Mot de passe réinitialisé avec succès' })
+  @ApiResponse({ status: 400, description: 'Erreur de réinitialisation' })
+  async adminResetPassword(@Body() body: { email: string; newPassword: string }) {
+    return this.authService.adminResetPassword(body.email, body.newPassword);
   }
 }

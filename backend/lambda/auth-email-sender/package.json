@@ -1,0 +1,9 @@
+{
+  "name": "auth-email-sender",
+  "version": "1.0.0",
+  "description": "Lambda function to send authentication emails from RabbitMQ",
+  "main": "index.js",
+  "dependencies": {
+    "nodemailer": "^6.9.7"
+  }
+}

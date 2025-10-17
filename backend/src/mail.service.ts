@@ -1,12 +1,33 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
 import { User } from './users/entities/user.entity';
+import { ConfigService } from '@nestjs/config';
+import * as brevo from '@getbrevo/brevo';
 
 @Injectable()
 export class MailService {
   private readonly logger = new Logger(MailService.name);
+  private readonly brevoClient: brevo.TransactionalEmailsApi;
+  private readonly fromEmail: string;
+  private readonly fromName: string;
 
-  constructor(private readonly mailerService: MailerService) {}
+  constructor(
+    private readonly mailerService: MailerService,
+    private readonly configService: ConfigService,
+  ) {
+    this.fromEmail = this.configService.get('MAIL_FROM_EMAIL', 'pasyves43@gmail.com');
+    this.fromName = this.configService.get('MAIL_FROM_NAME', 'ClefCloud');
+    
+    const brevoApiKey = this.configService.get('BREVO_API_KEY');
+    
+    if (brevoApiKey) {
+      this.brevoClient = new brevo.TransactionalEmailsApi();
+      this.brevoClient.setApiKey(brevo.TransactionalEmailsApiApiKeys.apiKey, brevoApiKey);
+      this.logger.log(`📧 Brevo Client initialized - From: ${this.fromName} <${this.fromEmail}>`);
+    } else {
+      this.logger.warn('⚠️  BREVO_API_KEY not configured, emails will not be sent');
+    }
+  }
 
   async sendTestEmail(to: string) {
     this.logger.log(`Sending test email to ${to}`);
@@ -37,6 +58,36 @@ export class MailService {
       });
     } catch (error) {
       this.logger.error(`Failed to send welcome email to ${email}`, error.stack);
+    }
+  }
+
+  async sendVerificationEmail(email: string, code: string) {
+    this.logger.log(`📧 Envoi du code de vérification à ${email} via Gmail SMTP`);
+
+    try {
+      const htmlBody = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #8C48FF;">Bienvenue sur ClefCloud !</h2>
+          <p>Merci de vous être inscrit. Voici votre code de vérification :</p>
+          <div style="background: #f5f5f5; padding: 20px; text-align: center; font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #8C48FF; margin: 20px 0;">
+            ${code}
+          </div>
+          <p>Ce code expire dans 24 heures.</p>
+          <p style="color: #666; font-size: 12px;">Si vous n'avez pas demandé ce code, ignorez cet email.</p>
+        </div>
+      `;
+
+      await this.mailerService.sendMail({
+        to: email,
+        subject: '🎵 Bienvenue sur ClefCloud - Code de vérification',
+        html: htmlBody,
+        text: `Bienvenue sur ClefCloud ! Votre code de vérification est : ${code}. Ce code expire dans 24 heures.`,
+      });
+
+      this.logger.log(`✅ Code de vérification envoyé à ${email}`);
+    } catch (error) {
+      this.logger.error(`❌ Échec de l'envoi du code à ${email}`, error.stack);
+      throw error;
     }
   }
 }

@@ -16,8 +16,7 @@ export class SignUpDto {
   @IsString()
   name?: string;
 
-  @ApiProperty({ example: '1234567890', required: false })
-  @IsOptional()
+  @ApiProperty({ example: '+33612345678', description: 'Numéro de téléphone au format international (ex: +33612345678)' })
   @IsString()
   phone: string;
 }

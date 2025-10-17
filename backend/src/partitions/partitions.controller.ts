@@ -56,7 +56,10 @@ export class PartitionsController {
       throw new BadRequestException('File too large. Maximum size is 10MB.');
     }
 
-    return this.partitionsService.create(createPartitionDto, file, req.user.id);
+    // req.user vient du JWT guard et contient userId (Cognito sub)
+    // On doit récupérer l'ID de la DB à partir du Cognito sub
+    const cognitoSub = req.user.userId;
+    return this.partitionsService.createFromCognitoSub(createPartitionDto, file, cognitoSub);
   }
 
   @Get()

@@ -7,6 +7,7 @@ import { UsersModule } from './users/users.module';
 import { AwsModule } from './aws/aws.module';
 import { HealthModule } from './health/health.module';
 import { MailModule } from './mail.module';
+import { VerificationModule } from './verification/verification.module';
 
 @Module({
   imports: [
@@ -25,11 +26,15 @@ import { MailModule } from './mail.module';
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME || 'clefcloud',
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: process.env.NODE_ENV === 'development', // Désactiver en production
+      synchronize: true,
       ssl: {
         rejectUnauthorized: false,
       },
       logging: process.env.NODE_ENV === 'development',
+      extra: {
+        max: 10,
+        connectionTimeoutMillis: 5000,
+      },
     }),
 
     // Feature modules
@@ -39,6 +44,7 @@ import { MailModule } from './mail.module';
     UsersModule,
     HealthModule,
     MailModule,
+    VerificationModule,
   ],
 })
 export class AppModule {}

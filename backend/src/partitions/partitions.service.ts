@@ -22,6 +22,23 @@ export class PartitionsService {
     private s3Service: S3Service,
   ) {}
 
+  /**
+   * Créer une partition à partir du Cognito sub
+   */
+  async createFromCognitoSub(
+    createPartitionDto: CreatePartitionDto,
+    file: Express.Multer.File,
+    cognitoSub: string,
+  ) {
+    // Récupérer l'utilisateur à partir du Cognito sub
+    const user = await this.userRepository.findOne({ where: { cognito_sub: cognitoSub } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return this.create(createPartitionDto, file, user.id);
+  }
+
   async create(
     createPartitionDto: CreatePartitionDto,
     file: Express.Multer.File,
@@ -143,7 +160,8 @@ export class PartitionsService {
     this.logger.log(`Partition ${id} downloaded by user ${userId || 'anonymous'}`);
 
     return {
-      downloadUrl: signedUrl,
+      url: signedUrl,
+      downloadUrl: signedUrl, // Alias pour compatibilité
       expiresIn: 3600,
     };
   }

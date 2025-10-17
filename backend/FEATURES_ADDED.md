@@ -27,6 +27,162 @@ Ajout de nouveaux champs :
 
 ## 📋 Nouvelles fonctionnalités
 
+### 🔐 Authentification complète avec AWS Cognito
+
+#### Routes d'authentification disponibles
+
+| Méthode | Route | Description | Auth |
+|---------|-------|-------------|------|
+| POST | `/auth/signup` | Inscription d'un nouvel utilisateur | ❌ Public |
+| POST | `/auth/confirm-signup` | Confirmer l'inscription avec le code | ❌ Public |
+| POST | `/auth/signin` | Connexion utilisateur | ❌ Public |
+| POST | `/auth/forgot-password` | Demander un code de réinitialisation | ❌ Public |
+| POST | `/auth/confirm-forgot-password` | Confirmer le nouveau mot de passe | ❌ Public |
+| POST | `/auth/refresh-token` | Rafraîchir le token d'accès | ❌ Public |
+| POST | `/auth/resend-confirmation-code` | Renvoyer le code de confirmation | ❌ Public |
+| GET | `/auth/profile` | Récupérer le profil utilisateur | ✅ |
+| GET | `/auth/me` | Informations utilisateur connecté | ✅ |
+| POST | `/auth/change-password` | Changer le mot de passe | ✅ |
+| POST | `/auth/signout` | Déconnexion (invalide tous les tokens) | ✅ |
+| DELETE | `/auth/account` | Supprimer le compte utilisateur | ✅ |
+
+#### Exemples d'utilisation
+
+**1. Inscription**
+```bash
+POST /auth/signup
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "Password123!",
+  "name": "John Doe",
+  "phone": "+33612345678"
+}
+```
+
+**Réponse**
+```json
+{
+  "message": "User created successfully. Please check your email for verification code.",
+  "userSub": "abc123-def456-...",
+  "userConfirmed": false
+}
+```
+
+**2. Confirmation d'inscription**
+```bash
+POST /auth/confirm-signup
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "code": "123456"
+}
+```
+
+**3. Connexion**
+```bash
+POST /auth/signin
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "Password123!"
+}
+```
+
+**Réponse**
+```json
+{
+  "tokens": {
+    "accessToken": "eyJraWQiOiJ...",
+    "idToken": "eyJraWQiOiJ...",
+    "refreshToken": "eyJjdHkiOiJ...",
+    "expiresIn": 3600
+  },
+  "user": {
+    "id": 1,
+    "email": "user@example.com",
+    "name": "John Doe",
+    "cognitoSub": "abc123-def456-..."
+  }
+}
+```
+
+**4. Rafraîchir le token**
+```bash
+POST /auth/refresh-token
+Content-Type: application/json
+
+{
+  "refreshToken": "eyJjdHkiOiJ...",
+  "email": "user@example.com"
+}
+```
+
+**Réponse**
+```json
+{
+  "message": "Token refreshed successfully",
+  "tokens": {
+    "accessToken": "eyJraWQiOiJ...",
+    "idToken": "eyJraWQiOiJ...",
+    "expiresIn": 3600
+  }
+}
+```
+
+**5. Changer le mot de passe**
+```bash
+POST /auth/change-password
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "oldPassword": "OldPassword123!",
+  "newPassword": "NewPassword123!"
+}
+```
+
+**6. Déconnexion**
+```bash
+POST /auth/signout
+Authorization: Bearer <token>
+```
+
+**Réponse**
+```json
+{
+  "message": "Signed out successfully"
+}
+```
+
+**7. Supprimer le compte**
+```bash
+DELETE /auth/account
+Authorization: Bearer <token>
+```
+
+**Réponse**
+```json
+{
+  "message": "Account deleted successfully"
+}
+```
+
+**8. Renvoyer le code de confirmation**
+```bash
+POST /auth/resend-confirmation-code
+Content-Type: application/json
+
+{
+  "email": "user@example.com"
+}
+```
+
+---
+
 ### 🔐 Synchronisation Cognito → Base de données
 
 **Service** : `UsersService`
@@ -371,8 +527,17 @@ Sections ajoutées :
 
 **Entités modifiées** : 2 (User, Partition)  
 **Nouvelles entités** : 1 (Favorite)  
-**Nouvelles routes** : 5  
-**Nouvelles fonctionnalités** : 3 (Favoris, Statistiques, Sync Cognito)  
-**Lignes de code ajoutées** : ~400
+**Routes d'authentification** : 12  
+**Routes de partitions** : 8  
+**Nouvelles fonctionnalités** : 6 (Auth complète, Favoris, Statistiques, Sync Cognito, Refresh Token, Gestion de compte)  
+**Lignes de code ajoutées** : ~700
 
-Votre application ClefCloud dispose maintenant d'un système complet de gestion de partitions musicales avec favoris, statistiques et authentification sécurisée ! 🎵✨
+### 🆕 Dernières fonctionnalités ajoutées (15 Oct 2025)
+
+- ✅ **Rafraîchissement de token** : Permet de renouveler l'access token sans se reconnecter
+- ✅ **Déconnexion globale** : Invalide tous les tokens de l'utilisateur
+- ✅ **Changement de mot de passe** : Pour les utilisateurs connectés
+- ✅ **Suppression de compte** : Supprime le compte Cognito et les données en base
+- ✅ **Renvoi du code de confirmation** : Si l'utilisateur n'a pas reçu le code initial
+
+Votre application ClefCloud dispose maintenant d'un système complet de gestion de partitions musicales avec favoris, statistiques et authentification sécurisée ultra-complète ! 🎵✨

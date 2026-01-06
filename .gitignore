@@ -31,3 +31,23 @@ dist-ssr
 .env
 .env.local
 .env.production
+
+
+# Ignorer les fichiers et dossiers Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+terraform.tfvars
+tfplan
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Keys and secrets - NEVER commit these!
+key/
+*.json.key
+*-key.json
+*service-account*.json
+

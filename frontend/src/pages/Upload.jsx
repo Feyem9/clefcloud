@@ -104,38 +104,32 @@ const Upload = () => {
     setUploadProgress(0);
 
     try {
-      console.log('🚀 Début de l\'upload vers AWS S3...');
+      console.log('🚀 Début de l\'upload vers le backend...');
       console.log('📄 Fichier:', formData.file.name, 'Taille:', formData.file.size);
-      
-      // Préparer les données du formulaire
+
+      // Préparer les données du formulaire pour le backend
       const uploadFormData = new FormData();
       uploadFormData.append('file', formData.file);
       uploadFormData.append('title', formData.title);
       uploadFormData.append('composer', formData.composer || '');
       uploadFormData.append('key', formData.key || '');
       uploadFormData.append('category', formData.category);
-      
+
       if (formData.category === 'messe' && formData.messePart) {
         uploadFormData.append('messePart', formData.messePart);
       }
-      
+
       if (formData.tags) {
-        // Convertir la string en array (séparé par virgules)
-        const tagsArray = formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag);
+        const tagsArray = formData.tags
+          .split(',')
+          .map((tag) => tag.trim())
+          .filter((tag) => tag);
         uploadFormData.append('tags', JSON.stringify(tagsArray));
       }
-      
-      console.log('☁️ Upload vers le backend AWS...');
-      
-      // Envoyer au backend qui va uploader vers S3
-      const result = await apiService.uploadPartition(uploadFormData, (progressEvent) => {
-        const percentCompleted = Math.round(
-          (progressEvent.loaded * 100) / progressEvent.total
-        );
-        setUploadProgress(percentCompleted);
-      });
-      
-      console.log('✅ Upload réussi!', result);
+
+      const result = await apiService.uploadPartition(uploadFormData);
+
+      console.log('✅ Upload réussi !', result);
 
       toast.success('🎵 Partition ajoutée avec succès !', {
         position: 'top-right',

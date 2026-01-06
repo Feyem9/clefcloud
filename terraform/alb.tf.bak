@@ -53,9 +53,8 @@ resource "aws_lb_target_group" "app" {
   }
 }
 
-# HTTP Listener (redirect to HTTPS) - only for non-dev
+# HTTP Listener (redirect to HTTPS)
 resource "aws_lb_listener" "http" {
-  count             = var.environment != "dev" ? 1 : 0
   load_balancer_arn = aws_lb.main.arn
   port              = "80"
   protocol          = "HTTP"

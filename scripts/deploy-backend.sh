@@ -19,7 +19,7 @@ if [ -z "$EC2_HOST" ]; then
 fi
 
 echo "📦 Construction de l'application..."
-cd backend
+cd ../backend
 npm run build
 
 echo "📤 Upload des fichiers vers EC2..."

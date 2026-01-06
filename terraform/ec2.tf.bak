@@ -38,7 +38,7 @@ resource "aws_launch_template" "app" {
 
   user_data = base64encode(templatefile("${path.module}/user_data.sh", {
     environment     = var.environment
-    s3_bucket       = data.aws_s3_bucket.partitions.id
+    s3_bucket       = aws_s3_bucket.partitions.id
     rds_endpoint    = aws_db_instance.main.endpoint
     db_name         = aws_db_instance.main.db_name
     db_username     = var.db_username
@@ -62,7 +62,7 @@ resource "aws_launch_template" "app" {
 # Instance EC2 unique (pour dev/test)
 resource "aws_instance" "app_server" {
   ami           = data.aws_ami.ubuntu.id
-  instance_type = "t4.micro"
+  instance_type = "t3.micro"
   key_name      = aws_key_pair.deployer.key_name
 
   subnet_id                   = aws_subnet.public_1.id
@@ -73,7 +73,7 @@ resource "aws_instance" "app_server" {
 
   user_data = base64encode(templatefile("${path.module}/user_data.sh", {
     environment     = var.environment
-    s3_bucket       = data.aws_s3_bucket.partitions.id
+    s3_bucket       = aws_s3_bucket.partitions.id
     rds_endpoint    = aws_db_instance.main.endpoint
     db_name         = aws_db_instance.main.db_name
     db_username     = var.db_username

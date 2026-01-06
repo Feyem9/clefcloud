@@ -454,7 +454,7 @@ const Library = () => {
 
                     {/* Propriétaire */}
                     <div className="flex items-center gap-2 mb-4 pb-4 border-t pt-4 border-gray-200 dark:border-gray-700">
-                      <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center text-white text-sm font-semibold shadow-md">
+                      <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center text-blue-800 text-sm font-semibold shadow-md">
                         {partition.user?.email?.[0]?.toUpperCase() || currentUser.email?.[0]?.toUpperCase() || '?'}
                       </div>
                       <div>

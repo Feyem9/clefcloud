@@ -6,6 +6,7 @@ import { Partition } from './entities/partition.entity';
 import { Favorite } from './entities/favorite.entity';
 import { User } from '../users/entities/user.entity';
 import { AuthModule } from '../auth/auth.module';
+import { FirebaseService } from '../firebase/firebase.service';
 
 @Module({
   imports: [
@@ -13,7 +14,7 @@ import { AuthModule } from '../auth/auth.module';
     AuthModule,
   ],
   controllers: [PartitionsController],
-  providers: [PartitionsService],
+  providers: [PartitionsService, FirebaseService],
   exports: [PartitionsService],
 })
 export class PartitionsModule {}

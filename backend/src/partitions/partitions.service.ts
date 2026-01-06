@@ -7,6 +7,7 @@ import { Favorite } from './entities/favorite.entity';
 import { User } from '../users/entities/user.entity';
 import { CreatePartitionDto } from './dto/create-partition.dto';
 import { QueryPartitionDto } from './dto/query-partition.dto';
+import { FirebaseService } from '../firebase/firebase.service';
 
 @Injectable()
 export class PartitionsService {
@@ -20,6 +21,7 @@ export class PartitionsService {
     @InjectRepository(User)
     private userRepository: Repository<User>,
     private s3Service: S3Service,
+    private firebaseService: FirebaseService,
   ) {}
 
   /**
@@ -58,22 +60,32 @@ export class PartitionsService {
       .replace(/\s+/g, '_')
       .toLowerCase();
 
-    const fileExtension = file.originalname.split('.').pop();
-    const fileName = `${Date.now()}_${cleanTitle}.${fileExtension}`;
-    const filePath = `partitions/${userId}/${fileName}`;
+    let storagePath: string;
+    let downloadUrl: string;
 
-    // Upload vers S3
-    const { url } = await this.s3Service.uploadFile(file, filePath, {
-      title: createPartitionDto.title,
-      category: createPartitionDto.category,
-      uploadedBy: userId.toString(),
-    });
+    // Upload vers Firebase Storage si configuré, sinon fallback S3
+    if (this.firebaseService && this.firebaseService.isEnabled) {
+      const result = await this.firebaseService.uploadPartitionFile(user.id, file, cleanTitle);
+      storagePath = result.storagePath;
+      downloadUrl = result.downloadUrl;
+    } else {
+      const fileExtension = file.originalname.split('.').pop();
+      const fileName = `${Date.now()}_${cleanTitle}.${fileExtension}`;
+      storagePath = `partitions/${userId}/${fileName}`;
 
-    // Créer la partition dans la base de données
+      const { url } = await this.s3Service.uploadFile(file, storagePath, {
+        title: createPartitionDto.title,
+        category: createPartitionDto.category,
+        uploadedBy: userId.toString(),
+      });
+      downloadUrl = url;
+    }
+
+    // Créer la partition dans la base de données (PostgreSQL) en utilisant le chemin/URL de stockage
     const partition = this.partitionRepository.create({
       ...createPartitionDto,
-      storage_path: filePath,
-      download_url: url,
+      storage_path: storagePath,
+      download_url: downloadUrl,
       file_size: file.size,
       file_type: file.mimetype,
       created_by: userId,
@@ -155,13 +167,18 @@ export class PartitionsService {
     partition.download_count += 1;
     await this.partitionRepository.save(partition);
 
-    const signedUrl = await this.s3Service.getSignedUrl(partition.storage_path, 3600);
+    let url = partition.download_url;
+
+    // Si aucune URL n'est stockée (anciennes données), fallback S3 signé
+    if (!url && partition.storage_path) {
+      url = await this.s3Service.getSignedUrl(partition.storage_path, 3600);
+    }
 
     this.logger.log(`Partition ${id} downloaded by user ${userId || 'anonymous'}`);
 
     return {
-      url: signedUrl,
-      downloadUrl: signedUrl, // Alias pour compatibilité
+      url,
+      downloadUrl: url,
       expiresIn: 3600,
     };
   }
@@ -181,8 +198,14 @@ export class PartitionsService {
       throw new ForbiddenException('You are not authorized to delete this partition');
     }
 
-    // Supprimer de S3
-    await this.s3Service.deleteFile(partition.storage_path);
+    // Supprimer du stockage Firebase (si activé) puis de S3 (compatibilité)
+    if (this.firebaseService && this.firebaseService.isEnabled && partition.storage_path) {
+      await this.firebaseService.deleteFile(partition.storage_path);
+    }
+
+    if (partition.storage_path) {
+      await this.s3Service.deleteFile(partition.storage_path);
+    }
 
     // Supprimer de la base de données
     await this.partitionRepository.remove(partition);

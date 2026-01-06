@@ -1,6 +1,11 @@
 # S3 Bucket pour les partitions
 data "aws_s3_bucket" "partitions" {
   bucket = "${var.project_name}-partitions-${var.environment}"
+
+  tags = {
+    Name        = "${var.project_name}-partitions-${var.environment}"
+    Purpose     = "Store music sheet partitions"
+  }
 }
 
 # Versioning
@@ -54,10 +59,6 @@ resource "aws_s3_bucket_lifecycle_configuration" "partitions" {
     id     = "transition-to-ia"
     status = "Enabled"
 
-    filter {
-      prefix = ""
-    }
-
     transition {
       days          = 90
       storage_class = "STANDARD_IA"
@@ -73,10 +74,6 @@ resource "aws_s3_bucket_lifecycle_configuration" "partitions" {
     id     = "delete-old-versions"
     status = "Enabled"
 
-    filter {
-      prefix = ""
-    }
-
     noncurrent_version_expiration {
       noncurrent_days = 90
     }
@@ -85,7 +82,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "partitions" {
 
 # Bucket policy pour accès public en lecture
 resource "aws_s3_bucket_policy" "partitions" {
-  bucket = data.aws_s3_bucket.partitions.id
+  bucket = aws_s3_bucket.partitions.id
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -130,10 +127,6 @@ resource "aws_s3_bucket_lifecycle_configuration" "logs" {
     id     = "delete-old-logs"
     status = "Enabled"
 
-    filter {
-      prefix = ""
-    }
-
     expiration {
       days = 30
     }
@@ -172,7 +165,7 @@ resource "aws_s3_bucket" "backups" {
 
 # Versioning pour les backups
 resource "aws_s3_bucket_versioning" "backups" {
-  bucket = aws_s3_bucket.backups.id
+  bucket =aws_s3_bucket.backups.id
 
   versioning_configuration {
     status = "Enabled"

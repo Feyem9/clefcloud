@@ -52,7 +52,7 @@ const Header = () => {
                   Contact
                 </Link>
                 <Link to="/profile" className="flex items-center space-x-2 group">
-                  <div className="w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center text-white font-semibold shadow-md group-hover:scale-110 transition-transform active:scale-95">
+                  <div className="w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center text-blue-600 font-semibold shadow-md group-hover:scale-110 transition-transform active:scale-95">
                     {currentUser.email?.[0].toUpperCase()}
                   </div>
                   <span className="text-gray-700 dark:text-gray-300 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition font-medium">
@@ -65,12 +65,12 @@ const Header = () => {
                 <Link to="/contact" className="text-gray-700 hover:text-purple-600 transition font-medium active:scale-95">
                   Contact
                 </Link>
-                <Link to="/login" className="text-gray-700 hover:text-primary-600 transition font-medium active:scale-95">
+                <Link to="/login" className="text-gray-700 hover:text-purple-600 transition font-medium active:scale-95">
                   Connexion
                 </Link>
                 <Link
                   to="/signup"
-                  className="text-white bg-primary-600 hover:bg-primary-700 px-4 py-2 rounded-lg transition font-medium shadow-md active:scale-95"
+                  className="text-gray-700 hover:text-purple-600 transition font-medium active:scale-95bg-primary-600 hover:bg-primary-700 px-4 py-2 rounded-lg transition font-medium shadow-md active:scale-95"
                 >
                   Inscription
                 </Link>

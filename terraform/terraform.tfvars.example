@@ -10,8 +10,8 @@ project_name = "clefcloud"
 vpc_cidr = "10.0.0.0/16"
 
 # Configuration RDS
-db_username = "clefcloud_admin"
-db_password = "CHANGE_ME_STRONG_PASSWORD"
+db_username = "clefcloud"
+db_password = "Qwerty1!#-55"
 
 # Note: Ne commitez JAMAIS le fichier terraform.tfvars avec des valeurs sensibles
 # Utilisez plutôt des variables d'environnement ou un gestionnaire de secrets

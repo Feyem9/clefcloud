@@ -192,7 +192,7 @@ resource "aws_iam_role_policy" "authenticated" {
           "s3:GetObject",
           "s3:PutObject"
         ]
-        Resource = "${data.aws_s3_bucket.partitions.arn}/$${cognito-identity.amazonaws.com:sub}/*"
+        Resource = "${aws_s3_bucket.partitions.arn}/$${cognito-identity.amazonaws.com:sub}/*"
       }
     ]
   })

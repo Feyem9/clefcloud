@@ -1,15 +1,15 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { initializeApp, cert, App as FirebaseApp } from 'firebase-admin/app';
-import { getStorage, Storage } from 'firebase-admin/storage';
+import * as admin from 'firebase-admin';
 
 @Injectable()
-export class FirebaseService {
+export class FirebaseService implements OnModuleInit {
   private readonly logger = new Logger(FirebaseService.name);
-  private app: FirebaseApp;
-  private storage: Storage['bucket'];
+  private firebaseApp: admin.app.App;
 
-  constructor(private readonly configService: ConfigService) {
+  constructor(private readonly configService: ConfigService) {}
+
+  onModuleInit() {
     const projectId = this.configService.get<string>('FIREBASE_PROJECT_ID');
     const clientEmail = this.configService.get<string>('FIREBASE_CLIENT_EMAIL');
     const privateKey = this.configService
@@ -17,80 +17,84 @@ export class FirebaseService {
       ?.replace(/\\n/g, '\n');
     const storageBucket = this.configService.get<string>('FIREBASE_STORAGE_BUCKET');
 
-    if (!projectId || !clientEmail || !privateKey || !storageBucket) {
-      this.logger.warn('Firebase configuration is incomplete. FirebaseService will be disabled.');
+    if (!projectId || !clientEmail || !privateKey) {
+      this.logger.error('❌ Configuration Firebase incomplète dans le .env !');
       return;
     }
 
-    this.app = initializeApp(
-      {
-        credential: cert({
+    try {
+      this.firebaseApp = admin.initializeApp({
+        credential: admin.credential.cert({
           projectId,
           clientEmail,
           privateKey,
         }),
         storageBucket,
-      },
-      'clefcloud-backend-app',
-    );
-
-    this.storage = getStorage(this.app).bucket();
-    this.logger.log(`Firebase initialized with project ${projectId} and bucket ${storageBucket}`);
+      });
+      this.logger.log(`✅ Firebase Admin initialisé pour le projet : ${projectId}`);
+    } catch (error) {
+      this.logger.error(`❌ Erreur d'initialisation Firebase : ${error.message}`);
+    }
   }
 
-  get isEnabled(): boolean {
-    return !!this.app && !!this.storage;
+  get auth() {
+    return admin.auth(this.firebaseApp);
   }
 
-  async uploadPartitionFile(
+  get storage() {
+    return admin.storage(this.firebaseApp).bucket();
+  }
+
+  /**
+   * Vérifie un token ID Firebase envoyé par le frontend
+   */
+  async verifyIdToken(token: string) {
+    try {
+      return await this.auth.verifyIdToken(token);
+    } catch (error) {
+      this.logger.error(`Token verification failed: ${error.message}`);
+      throw error;
+    }
+  }
+
+  /**
+   * Upload d'un fichier (Partition ou Audio)
+   */
+  async uploadFile(
     userId: number,
     file: Express.Multer.File,
-    cleanTitle: string,
+    cleanPath: string,
   ): Promise<{ storagePath: string; downloadUrl: string }> {
-    if (!this.isEnabled) {
-      throw new Error('Firebase is not configured correctly');
-    }
-
-    const timestamp = Date.now();
-    const fileExtension = file.originalname.split('.').pop();
-    const safeTitle = cleanTitle || 'partition';
-    const fileName = `${timestamp}_${safeTitle}.${fileExtension}`;
-    const storagePath = `partitions/${userId}/${fileName}`;
-
-    const fileRef = this.storage.file(storagePath);
+    const bucket = this.storage;
+    const fileRef = bucket.file(cleanPath);
 
     await fileRef.save(file.buffer, {
       contentType: file.mimetype,
       metadata: {
         metadata: {
           uploadedBy: String(userId),
-          title: safeTitle,
         },
       },
     });
 
-    // Rendre le fichier publiquement lisible (simple pour commencer)
+    // Rendre le fichier public (standard pour ClefCloud)
     await fileRef.makePublic();
     const downloadUrl = fileRef.publicUrl();
 
-    this.logger.log(`File uploaded to Firebase Storage: ${storagePath}`);
+    this.logger.log(`Fichier uploadé : ${cleanPath}`);
 
-    return { storagePath, downloadUrl };
+    return { storagePath: cleanPath, downloadUrl };
   }
 
+  /**
+   * Suppression d'un fichier
+   */
   async deleteFile(storagePath: string): Promise<void> {
-    if (!this.isEnabled) {
-      this.logger.warn('Firebase is not enabled, skip deleteFile');
-      return;
-    }
-
     try {
-      const fileRef = this.storage.file(storagePath);
-      await fileRef.delete();
-      this.logger.log(`File deleted from Firebase Storage: ${storagePath}`);
+      await this.storage.file(storagePath).delete();
+      this.logger.log(`Fichier supprimé : ${storagePath}`);
     } catch (error) {
-      this.logger.error(`Failed to delete Firebase file ${storagePath}: ${error.message}`);
-      // On ne propage pas forcément l'erreur pour ne pas casser la suppression côté API
+      this.logger.error(`Erreur suppression fichier ${storagePath}: ${error.message}`);
     }
   }
 }

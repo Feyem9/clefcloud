@@ -85,11 +85,11 @@ const Library = () => {
   const sortedAndFilteredPartitions = partitions
     .filter(partition => {
       const matchesSearch = partition.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           (partition.composer && partition.composer.toLowerCase().includes(searchTerm.toLowerCase()));
+        (partition.composer && partition.composer.toLowerCase().includes(searchTerm.toLowerCase()));
       const matchesCategory = categoryFilter === 'all' || partition.category === categoryFilter;
       const matchesMessePart = messePartFilter === 'all' || partition.messePart === messePartFilter;
       const matchesOwner = ownerFilter === 'all' || partition.created_by === currentUser.id;
-      
+
       return matchesSearch && matchesCategory && matchesMessePart && matchesOwner;
     })
     .sort((a, b) => {
@@ -147,17 +147,16 @@ const Library = () => {
             {partitions.length} partition{partitions.length > 1 ? 's' : ''} au total
           </p>
         </div>
-        
+
         <div className="flex gap-3">
           {/* Toggle View Mode */}
           <div className="flex bg-gray-200 dark:bg-gray-700 rounded-lg p-1">
             <button
               onClick={() => setViewMode('grid')}
-              className={`p-2 rounded transition-all ${
-                viewMode === 'grid'
+              className={`p-2 rounded transition-all ${viewMode === 'grid'
                   ? 'bg-white dark:bg-gray-600 shadow-sm'
                   : 'text-gray-500 dark:text-gray-400'
-              }`}
+                }`}
               title="Vue grille"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -166,11 +165,10 @@ const Library = () => {
             </button>
             <button
               onClick={() => setViewMode('list')}
-              className={`p-2 rounded transition-all ${
-                viewMode === 'list'
+              className={`p-2 rounded transition-all ${viewMode === 'list'
                   ? 'bg-white dark:bg-gray-600 shadow-sm'
                   : 'text-gray-500 dark:text-gray-400'
-              }`}
+                }`}
               title="Vue liste"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -200,7 +198,7 @@ const Library = () => {
           </svg>
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Filtres</h2>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           {/* Recherche */}
           <div className="lg:col-span-2">
@@ -361,7 +359,7 @@ const Library = () => {
               Aucune partition trouvée
             </h3>
             <p className="text-gray-500 dark:text-gray-400 mb-6">
-              {partitions.length === 0 
+              {partitions.length === 0
                 ? "Commencez par ajouter votre première partition à la bibliothèque"
                 : "Aucune partition ne correspond à vos critères de recherche. Essayez de modifier les filtres."
               }
@@ -385,13 +383,13 @@ const Library = () => {
           {viewMode === 'grid' && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
               {sortedAndFilteredPartitions.map((partition) => (
-                <div 
-                  key={partition.id} 
+                <div
+                  key={partition.id}
                   className="bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 flex flex-col border border-gray-200 dark:border-gray-700 overflow-hidden group"
                 >
                   {/* Header coloré */}
                   <div className="h-2 bg-gradient-to-r from-primary-500 to-primary-600"></div>
-                  
+
                   <div className="p-6 flex-1 flex flex-col">
                     {/* Titre et catégorie */}
                     <div className="flex justify-between items-start mb-3 gap-3">
@@ -437,8 +435,8 @@ const Library = () => {
                     {partition.tags && partition.tags.length > 0 && (
                       <div className="flex flex-wrap gap-2 mb-4">
                         {partition.tags.slice(0, 3).map((tag, index) => (
-                          <span 
-                            key={index} 
+                          <span
+                            key={index}
                             className={`px-2 py-1 ${getTagColor(index)} text-xs font-medium rounded-full border transition-all hover:scale-105 shadow-sm`}
                           >
                             #{tag}
@@ -468,6 +466,19 @@ const Library = () => {
                         <p className="text-xs text-gray-400">{new Date(partition.created_at).toLocaleDateString()}</p>
                       </div>
                     </div>
+
+                    {/* Lecteur Audio */}
+                    {partition.audio_url && (
+                      <div className="mb-4">
+                        <audio
+                          controls
+                          className="w-full h-8 accent-primary-600"
+                          src={partition.audio_url}
+                        >
+                          Votre navigateur ne supporte pas l'élément audio.
+                        </audio>
+                      </div>
+                    )}
 
                     {/* Actions */}
                     <div className="flex gap-2 justify-end">

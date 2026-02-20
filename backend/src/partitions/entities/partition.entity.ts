@@ -32,11 +32,23 @@ export class Partition {
   @Column('text', { array: true, default: [] })
   tags: string[];
 
-  @Column()
+  // Fichier PDF / Image de la partition
+  @Column({ nullable: true })
   storage_path: string;
 
-  @Column()
+  @Column({ nullable: true })
   download_url: string;
+
+  // Fichier Audio
+  @Column({ nullable: true })
+  audio_url: string;
+
+  @Column({ nullable: true })
+  audio_storage_path: string;
+
+  // Image de couverture optionnelle
+  @Column({ nullable: true })
+  cover_url: string;
 
   @Column({ nullable: true })
   file_size: number;

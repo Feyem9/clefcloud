@@ -1,9 +1,0 @@
-{
-  "name": "cognito-post-confirmation",
-  "version": "1.0.0",
-  "description": "Lambda trigger for Cognito post confirmation",
-  "main": "index.js",
-  "dependencies": {
-    "amqplib": "^0.10.3"
-  }
-}

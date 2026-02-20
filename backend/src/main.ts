@@ -43,10 +43,10 @@ async function bootstrap() {
   const port = process.env.PORT || 3000;
   await app.listen(port, '0.0.0.0');
 
-  logger.log(`🚀 Application running on: http://localhost:${port}`);
-  logger.log(`📚 Swagger documentation: http://localhost:${port}/api/docs`);
-  logger.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
-  logger.log(`☁️  AWS Region: ${process.env.AWS_REGION || 'eu-west-1'}`);
+  const url = `http://localhost:${port}`;
+  logger.log(`🚀 Application is running on: ${url}/api`);
+  logger.log(`📚 Swagger documentation: ${url}/api/docs`);
+  logger.log(`🛠️ Environment: ${process.env.NODE_ENV}`);
 }
 
 bootstrap();

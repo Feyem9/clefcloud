@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.75.0",
+    "axios": "^1.13.5",
     "firebase": "^12.4.0",
     "pdfjs-dist": "^5.4.296",
     "react": "^19.1.1",

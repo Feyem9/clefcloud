@@ -25,7 +25,7 @@ export class AuthGuard implements CanActivate {
     }
 
     try {
-      const user = await this.authService.validateToken(token);
+      const user = await this.authService.validateFirebaseUser(token);
       
       if (!user) {
         throw new UnauthorizedException('User not found');

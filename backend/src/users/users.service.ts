@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { Partition } from '../partitions/entities/partition.entity';
-import { CognitoUser } from '../auth/decorators/current-user.decorator';
 
 @Injectable()
 export class UsersService {
@@ -17,37 +16,11 @@ export class UsersService {
   ) {}
 
   /**
-   * Trouve ou crée un utilisateur à partir des informations Cognito
+   * Trouve un utilisateur à partir de son UID Firebase (stocké dans cognito_sub)
    */
-  async findOrCreateFromCognito(cognitoUser: CognitoUser): Promise<User> {
-    let user = await this.userRepository.findOne({
-      where: { cognito_sub: cognitoUser.userId },
-    });
-
-    if (!user) {
-      user = this.userRepository.create({
-        cognito_sub: cognitoUser.userId,
-        email: cognitoUser.email,
-        username: cognitoUser.username,
-        is_active: true,
-      });
-      user = await this.userRepository.save(user);
-      this.logger.log(`New user created from Cognito: ${user.email}`);
-    } else {
-      // Mettre à jour last_login
-      user.last_login = new Date();
-      await this.userRepository.save(user);
-    }
-
-    return user;
-  }
-
-  /**
-   * Trouve un utilisateur par son cognito_sub
-   */
-  async findByCognitoSub(cognitoSub: string): Promise<User | null> {
+  async findByFirebaseUid(uid: string): Promise<User | null> {
     return this.userRepository.findOne({
-      where: { cognito_sub: cognitoSub },
+      where: { cognito_sub: uid },
     });
   }
 
@@ -58,17 +31,15 @@ export class UsersService {
     });
 
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException('Utilisateur introuvable');
     }
 
     return user;
   }
 
   async findPartitions(id: number, limit: number = 50, offset: number = 0) {
-    const user = await this.findOne(id);
-
     const [partitions, total] = await this.partitionRepository.findAndCount({
-      where: { created_by: id },
+      where: { user: { id } },
       order: { created_at: 'DESC' },
       take: limit,
       skip: offset,
@@ -90,7 +61,7 @@ export class UsersService {
 
     const updatedUser = await this.userRepository.save(user);
 
-    this.logger.log(`User updated: ${id}`);
+    this.logger.log(`Utilisateur mis à jour : ${id}`);
 
     return {
       id: updatedUser.id,

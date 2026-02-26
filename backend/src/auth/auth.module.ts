@@ -8,6 +8,7 @@ import { FirebaseModule } from '../firebase/firebase.module';
 import { MailModule } from '../mail.module';
 import { FirebaseAuthStrategy } from './strategies/firebase-auth.strategy';
 import { FirebaseAuthGuard } from './guards/firebase-auth.guard';
+import { AuthRabbitMQConsumer } from './rabbitmq.consumer';
 
 @Global()
 @Module({
@@ -21,6 +22,7 @@ import { FirebaseAuthGuard } from './guards/firebase-auth.guard';
     AuthService,
     FirebaseAuthStrategy,
     FirebaseAuthGuard,
+    AuthRabbitMQConsumer,
   ],
   controllers: [AuthController],
   exports: [AuthService, FirebaseAuthGuard, PassportModule],

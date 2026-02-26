@@ -45,8 +45,8 @@ export class PartitionsController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Récupérer une partition par ID' })
-  async findOne(@Param('id') id: string) {
-    return this.partitionsService.findOne(+id);
+  async findOne(@Param('id') id: string, @Req() req) {
+    return this.partitionsService.findOne(+id, req.user);
   }
 
   @Delete(':id')

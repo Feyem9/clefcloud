@@ -4,6 +4,16 @@ import { Strategy, ExtractJwt } from 'passport-jwt';
 import { passportJwtSecret } from 'jwks-rsa';
 import { ConfigService } from '@nestjs/config';
 
+interface CognitoPayload {
+  sub: string;
+  email: string;
+  email_verified: boolean;
+  'cognito:username'?: string;
+  username?: string;
+  'cognito:groups'?: string[];
+  token_use: string;
+}
+
 @Injectable()
 export class CognitoJwtStrategy extends PassportStrategy(Strategy, 'cognito-jwt') {
   constructor(private configService: ConfigService) {
@@ -26,7 +36,7 @@ export class CognitoJwtStrategy extends PassportStrategy(Strategy, 'cognito-jwt'
     });
   }
 
-  async validate(payload: any) {
+  async validate(payload: CognitoPayload) {
     if (!payload) {
       throw new UnauthorizedException('Invalid token');
     }

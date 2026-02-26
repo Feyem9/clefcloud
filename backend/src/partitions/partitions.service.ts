@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Partition } from './entities/partition.entity';
 import { CreatePartitionDto } from './dto/create-partition.dto';
 import { User } from '../users/entities/user.entity';
+import { UserPartition } from '../users/entities/user-partition.entity';
 import { FirebaseService } from '../firebase/firebase.service';
 
 @Injectable()
@@ -13,6 +14,8 @@ export class PartitionsService {
   constructor(
     @InjectRepository(Partition)
     private partitionRepository: Repository<Partition>,
+    @InjectRepository(UserPartition)
+    private userPartitionRepository: Repository<UserPartition>,
     private firebaseService: FirebaseService,
   ) {}
 
@@ -73,13 +76,44 @@ export class PartitionsService {
     });
   }
 
-  async findOne(id: number) {
+  async findOne(id: number, user?: User) {
     const partition = await this.partitionRepository.findOne({
       where: { id },
       relations: ['user'],
     });
+
     if (!partition) throw new NotFoundException('Partition non trouvée');
-    return partition;
+
+    // Vérification des droits d'accès
+    let hasAccess = false;
+
+    if (user) {
+      // 1. Il est l'auteur
+      if (partition.created_by === user.id) hasAccess = true;
+      // 2. Il est Premium
+      if (user.is_premium && (!user.premium_until || user.premium_until > new Date())) hasAccess = true;
+      // 3. Il a acheté cette partition
+      if (!hasAccess) {
+        const purchase = await this.userPartitionRepository.findOneBy({
+          user_id: user.id,
+          partition_id: partition.id,
+        });
+        if (purchase) hasAccess = true;
+      }
+    }
+
+    // Si pas d'accès, on cache les URLs de téléchargement et audio
+    if (!hasAccess) {
+      delete partition.audio_url;
+      delete partition.download_url;
+      delete partition.storage_path;
+      delete partition.audio_storage_path;
+    }
+
+    return {
+      ...partition,
+      hasAccess,
+    };
   }
 
   async remove(id: number, user: User) {

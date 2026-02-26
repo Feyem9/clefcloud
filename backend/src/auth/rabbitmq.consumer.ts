@@ -1,13 +1,13 @@
 import { Injectable, Logger, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import * as amqp from 'amqplib';
+import { Connection, Channel, ConsumeMessage, connect } from 'amqplib';
 import { MailService } from '../mail.service';
 
 @Injectable()
 export class AuthRabbitMQConsumer implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(AuthRabbitMQConsumer.name);
-  private connection: any;
-  private channel: any;
+  private connection: Connection | null = null;
+  private channel: Channel | null = null;
   private readonly queueName = 'auth-verification-codes';
 
   constructor(
@@ -19,14 +19,15 @@ export class AuthRabbitMQConsumer implements OnModuleInit, OnModuleDestroy {
     const rabbitmqUrl = this.configService.get<string>('RABBITMQ_URL');
 
     if (!rabbitmqUrl) {
-      this.logger.warn('⚠️  RABBITMQ_URL not configured, consumer disabled');
+      this.logger.warn('⚠️  RABBITMQ_URL non configuré, consommateur désactivé');
       return;
     }
 
     try {
       await this.connect(rabbitmqUrl);
-    } catch (error) {
-      this.logger.error('❌ Failed to connect to RabbitMQ:', error);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      this.logger.error(`❌ Échec de la connexion à RabbitMQ : ${errorMessage}`);
     }
   }
 
@@ -37,8 +38,10 @@ export class AuthRabbitMQConsumer implements OnModuleInit, OnModuleDestroy {
   private async connect(url: string) {
     this.logger.log(`🐰 Connexion à RabbitMQ: ${url.replace(/\/\/.*@/, '//***@')}`);
 
-    this.connection = await amqp.connect(url);
-    this.channel = await this.connection.createChannel();
+    this.connection = await connect(url) as unknown as Connection;
+    // On utilise un cast vers 'unknown' puis vers le type désiré pour éviter 'any' direct
+    // si le compilateur râle sur la compatibilité structurelle.
+    this.channel = await (this.connection as unknown as { createChannel(): Promise<Channel> }).createChannel();
 
     // Créer la queue si elle n'existe pas
     await this.channel.assertQueue(this.queueName, { durable: true });
@@ -52,7 +55,7 @@ export class AuthRabbitMQConsumer implements OnModuleInit, OnModuleDestroy {
     // Consommer les messages
     await this.channel.consume(
       this.queueName,
-      async (msg: any) => {
+      async (msg: ConsumeMessage | null) => {
         if (msg) {
           await this.handleMessage(msg);
         }
@@ -61,39 +64,45 @@ export class AuthRabbitMQConsumer implements OnModuleInit, OnModuleDestroy {
     );
   }
 
-  private async handleMessage(msg: any) {
+  private async handleMessage(msg: ConsumeMessage) {
     try {
       const content = msg.content.toString();
-      const data = JSON.parse(content);
+      const data = JSON.parse(content) as { email: string; code: string };
 
-      this.logger.log(`📨 Message reçu: ${data.email}`);
+      this.logger.log(`📨 Message reçu : ${data.email}`);
 
       // Envoyer l'email
       await this.mailService.sendVerificationEmail(data.email, data.code);
 
       // Acknowledger le message (succès)
-      this.channel.ack(msg);
-      this.logger.log(`✅ Message traité avec succès: ${data.email}`);
+      if (this.channel) {
+        this.channel.ack(msg);
+      }
+      this.logger.log(`✅ Message traité avec succès : ${data.email}`);
 
-    } catch (error) {
-      this.logger.error('❌ Erreur lors du traitement du message:', error);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      this.logger.error(`❌ Erreur lors du traitement du message : ${errorMessage}`);
 
       // Rejeter le message et le remettre dans la queue
-      this.channel.nack(msg, false, true);
+      if (this.channel) {
+        this.channel.nack(msg, false, true);
+      }
     }
   }
 
   private async disconnect() {
     try {
       if (this.channel) {
-        await this.channel.close();
+        await (this.channel as unknown as { close(): Promise<void> }).close();
       }
       if (this.connection) {
-        await this.connection.close();
+        await (this.connection as unknown as { close(): Promise<void> }).close();
       }
       this.logger.log('🔌 Déconnecté de RabbitMQ');
-    } catch (error) {
-      this.logger.error('❌ Erreur lors de la déconnexion:', error);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      this.logger.error(`❌ Erreur lors de la déconnexion : ${errorMessage}`);
     }
   }
 }

@@ -7,6 +7,8 @@ import PartitionCardSkeleton from '../components/PartitionCardSkeleton';
 import { MESSE_PARTS } from '../constants';
 import { toast } from 'react-toastify';
 
+const PREMIUM_PRICE_LABEL = '5 000 FCFA/mois';
+
 const Library = () => {
   const { currentUser } = useAuth();
   const [partitions, setPartitions] = useState([]);
@@ -17,6 +19,7 @@ const Library = () => {
   const [ownerFilter, setOwnerFilter] = useState('all');
   const [sortOrder, setSortOrder] = useState('date_desc');
   const [viewingPDF, setViewingPDF] = useState(null);
+  const [buyingId, setBuyingId] = useState(null);
   // Mémoriser la vue dans le localStorage
   const [viewMode, setViewMode] = useState(
     () => localStorage.getItem('clefcloud_view_mode') || 'grid'
@@ -80,6 +83,34 @@ const Library = () => {
       console.error('Erreur:', error);
       toast.error('Impossible de télécharger le fichier');
     }
+  };
+
+  const handleBuyPartition = async (partition) => {
+    setBuyingId(partition.id);
+    try {
+      const response = await apiService.checkoutPartition(partition.id);
+      if (response.transaction_url) {
+        window.location.href = response.transaction_url;
+      } else {
+        toast.error('Erreur lors de l\'initialisation du paiement');
+      }
+    } catch (error) {
+      console.error('Erreur achat partition:', error);
+      toast.error('Impossible d\'initier le paiement');
+    } finally {
+      setBuyingId(null);
+    }
+  };
+
+  // Vérifie si l'utilisateur a accès au contenu d'une partition
+  const hasAccess = (partition) => {
+    // L'auteur a toujours accès
+    if (partition.created_by === currentUser?.id) return true;
+    // Si la partition a des URLs de contenu, le backend a validé l'accès
+    if (partition.storage_path || partition.audio_url) return true;
+    // Pas de prix = gratuit = accès pour tous
+    if (!partition.price || partition.price === 0) return true;
+    return false;
   };
 
   const sortedAndFilteredPartitions = partitions
@@ -154,8 +185,8 @@ const Library = () => {
             <button
               onClick={() => setViewMode('grid')}
               className={`p-2 rounded transition-all ${viewMode === 'grid'
-                  ? 'bg-white dark:bg-gray-600 shadow-sm'
-                  : 'text-gray-500 dark:text-gray-400'
+                ? 'bg-white dark:bg-gray-600 shadow-sm'
+                : 'text-gray-500 dark:text-gray-400'
                 }`}
               title="Vue grille"
             >
@@ -166,8 +197,8 @@ const Library = () => {
             <button
               onClick={() => setViewMode('list')}
               className={`p-2 rounded transition-all ${viewMode === 'list'
-                  ? 'bg-white dark:bg-gray-600 shadow-sm'
-                  : 'text-gray-500 dark:text-gray-400'
+                ? 'bg-white dark:bg-gray-600 shadow-sm'
+                : 'text-gray-500 dark:text-gray-400'
                 }`}
               title="Vue liste"
             >
@@ -481,22 +512,50 @@ const Library = () => {
                     )}
 
                     {/* Actions */}
-                    <div className="flex gap-2 justify-end">
-                      {partition.storage_path ? (
-                        <>
-                          <button onClick={() => handleViewPDF(partition)} className="p-2 rounded-full text-gray-500 dark:text-gray-400 hover:bg-blue-100 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400 transition-colors group" title="Voir">
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                    <div className="flex gap-2 justify-between items-center">
+                      {/* Prix */}
+                      {partition.price > 0 && !hasAccess(partition) && (
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-bold text-amber-600 dark:text-amber-400">
+                            {partition.price.toLocaleString()} FCFA
+                          </span>
+                          <button
+                            onClick={() => handleBuyPartition(partition)}
+                            disabled={buyingId === partition.id}
+                            className="px-3 py-1.5 bg-amber-500 text-white text-xs font-semibold rounded-lg hover:bg-amber-600 transition-all shadow-sm hover:shadow-md active:scale-95 disabled:opacity-50"
+                          >
+                            {buyingId === partition.id ? '...' : '🛒 Acheter'}
                           </button>
-                          <button onClick={() => handleDownload(partition)} className="p-2 rounded-full text-gray-500 dark:text-gray-400 hover:bg-green-100 dark:hover:bg-gray-700 hover:text-green-600 dark:hover:text-green-400 transition-colors group" title="Télécharger">
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                          </button>
-                        </>
-                      ) : null}
-                      {partition.created_by === currentUser.id && (
-                        <button onClick={() => handleDelete(partition.id)} className="p-2 rounded-full text-gray-500 dark:text-gray-400 hover:bg-red-100 dark:hover:bg-gray-700 hover:text-red-600 dark:hover:text-red-400 transition-colors group" title="Supprimer">
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                        </button>
+                        </div>
                       )}
+                      {partition.price > 0 && hasAccess(partition) && (
+                        <span className="text-xs font-medium text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 px-2 py-1 rounded-full">
+                          ✓ Débloqué
+                        </span>
+                      )}
+                      {(!partition.price || partition.price === 0) && <div />}
+
+                      <div className="flex gap-2">
+                        {hasAccess(partition) && partition.storage_path ? (
+                          <>
+                            <button onClick={() => handleViewPDF(partition)} className="p-2 rounded-full text-gray-500 dark:text-gray-400 hover:bg-blue-100 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400 transition-colors group" title="Voir">
+                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                            </button>
+                            <button onClick={() => handleDownload(partition)} className="p-2 rounded-full text-gray-500 dark:text-gray-400 hover:bg-green-100 dark:hover:bg-gray-700 hover:text-green-600 dark:hover:text-green-400 transition-colors group" title="Télécharger">
+                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                            </button>
+                          </>
+                        ) : !hasAccess(partition) && partition.storage_path ? (
+                          <div className="p-2 text-gray-300 dark:text-gray-600" title="Accès restreint">
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                          </div>
+                        ) : null}
+                        {partition.created_by === currentUser.id && (
+                          <button onClick={() => handleDelete(partition.id)} className="p-2 rounded-full text-gray-500 dark:text-gray-400 hover:bg-red-100 dark:hover:bg-gray-700 hover:text-red-600 dark:hover:text-red-400 transition-colors group" title="Supprimer">
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>

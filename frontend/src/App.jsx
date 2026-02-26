@@ -16,6 +16,8 @@ import Upload from './pages/Upload';
 import Messe from './pages/Messe';
 import Contact from './pages/Contact';
 import Profile from './pages/Profile';
+import Premium from './pages/Premium';
+import PaymentSuccess from './pages/PaymentSuccess';
 
 function App() {
   const { isDarkMode } = useTheme();
@@ -79,6 +81,8 @@ function App() {
           />
 
           <Route path="/contact" element={<Contact />} />
+          <Route path="/premium" element={<Premium />} />
+          <Route path="/payment-success" element={<PaymentSuccess />} />
         </Routes>
       </Layout>
     </>

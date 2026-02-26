@@ -9,6 +9,7 @@ import { MailModule } from './mail.module';
 import { HealthModule } from './health/health.module';
 import { APP_GUARD } from '@nestjs/core';
 import { FirebaseAuthGuard } from './auth/guards/firebase-auth.guard';
+import { PayunitModule } from './payunit/payunit.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { FirebaseAuthGuard } from './auth/guards/firebase-auth.guard';
     AuthModule,
     PartitionsModule,
     UsersModule,
+    PayunitModule,
     MailModule,
     HealthModule,
   ],

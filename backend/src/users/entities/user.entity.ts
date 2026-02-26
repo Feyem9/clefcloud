@@ -31,6 +31,12 @@ export class User {
   @Column({ default: true })
   is_active: boolean;
 
+  @Column({ default: false })
+  is_premium: boolean;
+
+  @Column({ type: 'timestamp', nullable: true })
+  premium_until: Date;
+
   @Column({ nullable: true })
   last_login: Date;
 

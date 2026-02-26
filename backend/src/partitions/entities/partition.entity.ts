@@ -26,6 +26,9 @@ export class Partition {
   @Column()
   category: string;
 
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  price: number;
+
   @Column({ nullable: true })
   messe_part: string;
 

@@ -45,6 +45,11 @@ const apiService = {
     return response.data;
   },
 
+  getDownloadUrl: async (id) => {
+    const response = await api.get(`/partitions/${id}/download`);
+    return response.data;
+  },
+
   // Upload avec PDF et Audio
   createPartition: async (formData) => {
     const response = await api.post('/partitions', formData, {
@@ -63,6 +68,35 @@ const apiService = {
   // Profil
   getProfile: async () => {
     const response = await api.get('/auth/profile');
+    return response.data;
+  },
+
+  // Utilisateur — stats et partitions
+  getUserStats: async () => {
+    const response = await api.get('/auth/profile');
+    const profile = response.data;
+    return {
+      totalPartitions: profile.totalPartitions || 0,
+      totalDownloads: profile.totalDownloads || 0,
+      totalViews: profile.totalViews || 0,
+      totalFavorites: profile.totalFavorites || 0,
+      recentUploads: profile.recentUploads || [],
+    };
+  },
+
+  getUserPartitions: async (userId, limit = 50, offset = 0) => {
+    const response = await api.get(`/users/${userId}/partitions?limit=${limit}&offset=${offset}`);
+    return response.data;
+  },
+
+  // Paiements — PayUnit
+  checkoutPartition: async (partitionId) => {
+    const response = await api.post('/payments/checkout/partition', { partitionId });
+    return response.data;
+  },
+
+  checkoutPremium: async () => {
+    const response = await api.post('/payments/checkout/premium');
     return response.data;
   },
 };

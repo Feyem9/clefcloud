@@ -3,6 +3,7 @@ import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { MailService } from './mail.service';
+import { HealthStatus, DatabaseStatus } from '../common/enums/health.enum';
 
 @ApiTags('health')
 @Controller('health')
@@ -20,22 +21,22 @@ export class HealthController {
     const health = {
       uptime: process.uptime(),
       timestamp: Date.now(),
-      status: 'OK',
+      status: HealthStatus.OK,
       services: {
-        database: 'unknown',
+        database: DatabaseStatus.UNKNOWN,
       },
     };
 
     try {
       // Check database connection
       await this.dataSource.query('SELECT 1');
-      health.services.database = 'connected';
+      health.services.database = DatabaseStatus.CONNECTED;
     } catch (error) {
-      health.services.database = 'disconnected';
-      health.status = 'DEGRADED';
+      health.services.database = DatabaseStatus.DISCONNECTED;
+      health.status = HealthStatus.DEGRADED;
     }
 
-    const statusCode = health.status === 'OK' ? 200 : 503;
+    const statusCode = health.status === HealthStatus.OK ? 200 : 503;
 
     return {
       statusCode,

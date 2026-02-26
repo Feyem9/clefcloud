@@ -51,6 +51,10 @@ const Header = () => {
                 <Link to="/contact" className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition font-medium active:scale-95">
                   Contact
                 </Link>
+                <Link to="/premium" className="text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 transition font-semibold active:scale-95 flex items-center gap-1">
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>
+                  Premium
+                </Link>
                 <Link to="/profile" className="flex items-center space-x-2 group">
                   <div className="w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center text-blue-600 font-semibold shadow-md group-hover:scale-110 transition-transform active:scale-95">
                     {currentUser.email?.[0].toUpperCase()}
@@ -76,7 +80,7 @@ const Header = () => {
                 </Link>
               </>
             )}
-            
+
             {/* Dark Mode Toggle */}
             <button
               onClick={toggleTheme}
@@ -115,15 +119,13 @@ const Header = () => {
 
         {/* Mobile Menu */}
         <div
-          className={`lg:hidden fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-300 ${
-            mobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
-          }`}
+          className={`lg:hidden fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-300 ${mobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+            }`}
           onClick={closeMobileMenu}
         >
           <div
-            className={`fixed right-0 top-0 h-full w-80 bg-white dark:bg-gray-900 shadow-2xl transform transition-transform duration-300 ease-in-out ${
-              mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
-            }`}
+            className={`fixed right-0 top-0 h-full w-80 bg-white dark:bg-gray-900 shadow-2xl transform transition-transform duration-300 ease-in-out ${mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
+              }`}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex flex-col h-full">
@@ -210,6 +212,17 @@ const Header = () => {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                         </svg>
                         <span className="font-medium text-gray-700 group-hover:text-primary-600 transition-colors">Contact</span>
+                      </Link>
+
+                      <Link
+                        to="/premium"
+                        onClick={closeMobileMenu}
+                        className="flex items-center space-x-3 p-4 rounded-xl bg-amber-50 hover:bg-amber-100 transition-colors group"
+                      >
+                        <svg className="w-6 h-6 text-amber-500" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                        </svg>
+                        <span className="font-semibold text-amber-700">Premium</span>
                       </Link>
                     </div>
                   </div>

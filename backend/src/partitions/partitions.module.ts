@@ -5,12 +5,13 @@ import { PartitionsService } from './partitions.service';
 import { Partition } from './entities/partition.entity';
 import { Favorite } from './entities/favorite.entity';
 import { User } from '../users/entities/user.entity';
+import { UserPartition } from '../users/entities/user-partition.entity';
 import { AuthModule } from '../auth/auth.module';
 import { FirebaseService } from '../firebase/firebase.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Partition, Favorite, User]),
+    TypeOrmModule.forFeature([Partition, Favorite, User, UserPartition]),
     AuthModule,
   ],
   controllers: [PartitionsController],

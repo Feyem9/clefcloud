@@ -1,7 +1,8 @@
-import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Logger, UnauthorizedException, Inject, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../users/entities/user.entity';
+import { UsersService } from '../users/users.service';
 import { FirebaseService } from '../firebase/firebase.service';
 import { MailService } from '../mail.service';
 
@@ -12,6 +13,8 @@ export class AuthService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    @Inject(forwardRef(() => UsersService))
+    private usersService: UsersService,
     private firebaseService: FirebaseService,
     private mailService: MailService,
   ) {}
@@ -25,7 +28,7 @@ export class AuthService {
       const { uid, email, name, picture } = decodedToken;
 
       let user = await this.userRepository.findOne({
-        where: { cognito_sub: uid }, // On réutilise ce champ pour le UID Firebase pour ne pas casser la DB
+        where: { cognito_sub: uid },
       });
 
       if (!user) {
@@ -51,6 +54,13 @@ export class AuthService {
       this.logger.error(`Erreur validation Firebase : ${error.message}`);
       throw new UnauthorizedException('Token invalide ou utilisateur introuvable');
     }
+  }
+
+  /**
+   * Récupère les statistiques du profil utilisateur
+   */
+  async getProfileStats(user: User) {
+    return this.usersService.getProfileStats(user);
   }
 
   /**

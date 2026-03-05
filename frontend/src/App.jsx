@@ -18,6 +18,7 @@ import Contact from './pages/Contact';
 import Profile from './pages/Profile';
 import Premium from './pages/Premium';
 import PaymentSuccess from './pages/PaymentSuccess';
+import TestBench from './pages/TestBench';
 
 function App() {
   const { isDarkMode } = useTheme();
@@ -83,6 +84,7 @@ function App() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/premium" element={<Premium />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
+          <Route path="/test-bench" element={<TestBench />} />
         </Routes>
       </Layout>
     </>

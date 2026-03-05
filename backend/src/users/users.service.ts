@@ -3,6 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { Partition } from '../partitions/entities/partition.entity';
+import { Favorite } from '../partitions/entities/favorite.entity';
+import { UserPartition } from './entities/user-partition.entity';
 
 @Injectable()
 export class UsersService {
@@ -13,6 +15,10 @@ export class UsersService {
     private userRepository: Repository<User>,
     @InjectRepository(Partition)
     private partitionRepository: Repository<Partition>,
+    @InjectRepository(Favorite)
+    private favoriteRepository: Repository<Favorite>,
+    @InjectRepository(UserPartition)
+    private userPartitionRepository: Repository<UserPartition>,
   ) {}
 
   /**
@@ -50,6 +56,50 @@ export class UsersService {
       total,
       limit,
       offset,
+    };
+  }
+
+  async getProfileStats(user: User) {
+    const userId = user.id;
+
+    // 1. Statistiques des partitions créées par l'utilisateur
+    const partitions = await this.partitionRepository.find({
+      where: { created_by: userId },
+    });
+
+    const totalPartitions = partitions.length;
+    const totalDownloads = partitions.reduce((sum, p) => sum + (p.download_count || 0), 0);
+    const totalViews = partitions.reduce((sum, p) => sum + (p.view_count || 0), 0);
+
+    // 2. Nombre de favoris (partitions que l'utilisateur a likées)
+    const totalFavorites = await this.favoriteRepository.count({
+      where: { user_id: userId },
+    });
+
+    // 3. Partitions récentes de l'utilisateur
+    const recentUploads = await this.partitionRepository.find({
+      where: { created_by: userId },
+      order: { created_at: 'DESC' },
+      take: 5,
+    });
+
+    // 4. Historique des achats
+    const purchases = await this.userPartitionRepository.find({
+      where: { user_id: userId },
+      relations: ['partition', 'partition.user'],
+      order: { created_at: 'DESC' },
+    });
+
+    return {
+      totalPartitions,
+      totalDownloads,
+      totalViews,
+      totalFavorites,
+      recentUploads,
+      purchases: purchases.map(p => ({
+        ...p.partition,
+        purchased_at: p.created_at,
+      })),
     };
   }
 

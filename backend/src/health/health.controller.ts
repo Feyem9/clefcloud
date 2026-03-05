@@ -4,6 +4,7 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { MailService } from './mail.service';
 import { HealthStatus, DatabaseStatus } from '../common/enums/health.enum';
+import { Public } from '../common/decorators/public.decorator';
 
 @ApiTags('health')
 @Controller('health')
@@ -13,6 +14,7 @@ export class HealthController {
     private mailService: MailService,
   ) {}
 
+  @Public()
   @Get()
   @ApiOperation({ summary: 'Health check endpoint' })
   @ApiResponse({ status: 200, description: 'Service is healthy' })
@@ -44,6 +46,7 @@ export class HealthController {
     };
   }
 
+  @Public()
   @Get('test-email')
   @ApiOperation({ summary: 'Send a test email' })
   async testEmail() {

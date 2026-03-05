@@ -23,15 +23,20 @@ export class FirebaseService implements OnModuleInit {
     }
 
     try {
-      this.firebaseApp = admin.initializeApp({
-        credential: admin.credential.cert({
-          projectId,
-          clientEmail,
-          privateKey,
-        }),
-        storageBucket,
-      });
-      this.logger.log(`✅ Firebase Admin initialisé pour le projet : ${projectId}`);
+      if (admin.apps.length === 0) {
+        this.firebaseApp = admin.initializeApp({
+          credential: admin.credential.cert({
+            projectId,
+            clientEmail,
+            privateKey,
+          }),
+          storageBucket,
+        });
+        this.logger.log(`✅ Firebase Admin initialisé pour le projet : ${projectId}`);
+      } else {
+        this.firebaseApp = admin.app();
+        this.logger.log('✅ Firebase Admin déjà initialisé (réutilisation)');
+      }
     } catch (error) {
       this.logger.error(`❌ Erreur d'initialisation Firebase : ${error.message}`);
     }

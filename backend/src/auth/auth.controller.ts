@@ -17,8 +17,12 @@ export class AuthController {
 
   @Get('profile')
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Récupère le profil de l\'utilisateur connecté' })
+  @ApiOperation({ summary: 'Récupère le profil de l\'utilisateur connecté avec stats' })
   async getProfile(@Req() req) {
-    return req.user;
+    const stats = await this.authService.getProfileStats(req.user);
+    return {
+      ...req.user,
+      ...stats,
+    };
   }
 }

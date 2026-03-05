@@ -1,9 +1,10 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import apiService from '../services/api';
 import { toast } from 'react-toastify';
 import { MESSE_PARTS } from '../constants';
+import AudioPlayer from '../components/AudioPlayer';
 
 const Upload = () => {
   const { currentUser } = useAuth();
@@ -12,6 +13,7 @@ const Upload = () => {
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef(null);
   const [filePreview, setFilePreview] = useState(null);
+  const [audioPreviewUrl, setAudioPreviewUrl] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
 
   const [formData, setFormData] = useState({
@@ -25,6 +27,13 @@ const Upload = () => {
 
   const [file, setFile] = useState(null);
   const [audioFile, setAudioFile] = useState(null);
+
+  // Cleanup effect for preview URLs
+  useEffect(() => {
+    return () => {
+      if (audioPreviewUrl) URL.revokeObjectURL(audioPreviewUrl);
+    };
+  }, [audioPreviewUrl]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -56,6 +65,22 @@ const Upload = () => {
         reader.readAsDataURL(selectedFile);
       }
       toast.success(`📄 ${selectedFile.name} sélectionné`);
+    }
+  };
+
+  const handleAudioChange = (e) => {
+    const selectedAudio = e.target.files[0];
+    if (selectedAudio) {
+      if (selectedAudio.size > 20 * 1024 * 1024) {
+        toast.error('Fichier audio trop volumineux (Max 20MB)');
+        return;
+      }
+      setAudioFile(selectedAudio);
+
+      // Create preview URL
+      if (audioPreviewUrl) URL.revokeObjectURL(audioPreviewUrl);
+      setAudioPreviewUrl(URL.createObjectURL(selectedAudio));
+      toast.success(`🎵 Audio ${selectedAudio.name} sélectionné`);
     }
   };
 
@@ -142,8 +167,13 @@ const Upload = () => {
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" /></svg>
                 Fichier Audio (MP3) - Optionnel
               </label>
-              <input type="file" accept="audio/*" onChange={(e) => setAudioFile(e.target.files[0])} className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-100 file:text-orange-700 hover:file:bg-orange-200 cursor-pointer" />
-              {audioFile && <p className="mt-2 text-xs text-orange-600 font-medium">✓ {audioFile.name}</p>}
+              <input type="file" accept="audio/*" onChange={handleAudioChange} className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-100 file:text-orange-700 hover:file:bg-orange-200 cursor-pointer" />
+              {audioPreviewUrl && (
+                <div className="mt-4">
+                  <p className="text-xs text-orange-600 font-medium mb-1 truncate">Aperçu : {audioFile?.name}</p>
+                  <AudioPlayer src={audioPreviewUrl} />
+                </div>
+              )}
             </div>
           </div>
 

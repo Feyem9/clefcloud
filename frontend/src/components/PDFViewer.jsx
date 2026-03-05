@@ -10,6 +10,7 @@ const PDFViewer = ({ url, onClose }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [scale, setScale] = useState(1.0);
+  const [rotation, setRotation] = useState(0);
 
   const onDocumentLoadSuccess = ({ numPages }) => {
     setNumPages(numPages);
@@ -34,6 +35,13 @@ const PDFViewer = ({ url, onClose }) => {
     setPageNumber(prev => Math.min(prev + 1, numPages));
   };
 
+  const handlePageInputChange = (e) => {
+    const value = parseInt(e.target.value);
+    if (!isNaN(value) && value >= 1 && value <= numPages) {
+      setPageNumber(value);
+    }
+  };
+
   const zoomIn = () => {
     setScale(prev => Math.min(prev + 0.2, 3.0));
   };
@@ -46,6 +54,14 @@ const PDFViewer = ({ url, onClose }) => {
     setScale(1.0);
   };
 
+  const rotateLeft = () => {
+    setRotation(prev => (prev - 90) % 360);
+  };
+
+  const rotateRight = () => {
+    setRotation(prev => (prev + 90) % 360);
+  };
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-2xl max-w-5xl w-full max-h-[90vh] flex flex-col">
@@ -55,6 +71,7 @@ const PDFViewer = ({ url, onClose }) => {
           <button
             onClick={onClose}
             className="p-2 hover:bg-gray-100 rounded-lg transition"
+            aria-label="Fermer"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -75,67 +92,99 @@ const PDFViewer = ({ url, onClose }) => {
 
           {!error && (
             <Document
-            file={url}
-            onLoadSuccess={onDocumentLoadSuccess}
-            onLoadError={onDocumentLoadError}
-            loading={
-              <div className="text-center">
-                <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-primary-600 mx-auto mb-4"></div>
-                <p className="text-gray-600">Chargement du document...</p>
-              </div>
-            }
-            options={{
-              cMapUrl: 'https://unpkg.com/pdfjs-dist@3.11.174/cmaps/',
-              cMapPacked: true,
-              standardFontDataUrl: 'https://unpkg.com/pdfjs-dist@3.11.174/standard_fonts/',
-            }}
-          >
-            <Page
-              pageNumber={pageNumber}
-              renderTextLayer={false}
-              renderAnnotationLayer={false}
-              className="shadow-lg"
-              scale={scale}
-              onLoadSuccess={onPageLoadSuccess}
+              file={url}
+              onLoadSuccess={onDocumentLoadSuccess}
+              onLoadError={onDocumentLoadError}
               loading={
-                <div className="text-center py-8">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-primary-600 mx-auto mb-2"></div>
-                  <p className="text-gray-600 text-sm">Chargement de la page {pageNumber}...</p>
+                <div className="text-center">
+                  <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-primary-600 mx-auto mb-4"></div>
+                  <p className="text-gray-600">Chargement du document...</p>
                 </div>
               }
-            />
-          </Document>
+              options={{
+                cMapUrl: 'https://unpkg.com/pdfjs-dist@3.11.174/cmaps/',
+                cMapPacked: true,
+                standardFontDataUrl: 'https://unpkg.com/pdfjs-dist@3.11.174/standard_fonts/',
+              }}
+            >
+              <Page
+                pageNumber={pageNumber}
+                rotate={rotation}
+                renderTextLayer={false}
+                renderAnnotationLayer={false}
+                className="shadow-lg"
+                scale={scale}
+                onLoadSuccess={onPageLoadSuccess}
+                loading={
+                  <div className="text-center py-8">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-primary-600 mx-auto mb-2"></div>
+                    <p className="text-gray-600 text-sm">Chargement de la page {pageNumber}...</p>
+                  </div>
+                }
+              />
+            </Document>
           )}
         </div>
 
         {/* Footer Controls */}
         {!loading && !error && numPages && (
-          <div className="flex justify-between items-center p-4 border-t bg-gray-50 gap-4">
-            {/* Navigation */}
+          <div className="flex flex-wrap justify-between items-center p-4 border-t bg-gray-50 gap-4">
+            {/* Navigation & Direct Page Input */}
             <div className="flex items-center gap-2">
               <button
                 onClick={goToPrevPage}
                 disabled={pageNumber <= 1}
-                className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition flex items-center gap-2"
+                className="p-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition"
+                title="Page précédente"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
-                Précédent
               </button>
 
-              <span className="text-gray-700 font-medium px-4">
-                Page {pageNumber} / {numPages}
-              </span>
+              <div className="flex items-center gap-1 bg-white border rounded-lg px-2">
+                <input
+                  type="number"
+                  value={pageNumber}
+                  onChange={handlePageInputChange}
+                  className="w-12 text-center py-1 font-medium focus:outline-none"
+                  min="1"
+                  max={numPages}
+                />
+                <span className="text-gray-400">/</span>
+                <span className="text-gray-700 font-medium pr-1">{numPages}</span>
+              </div>
 
               <button
                 onClick={goToNextPage}
                 disabled={pageNumber >= numPages}
-                className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition flex items-center gap-2"
+                className="p-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition"
+                title="Page suivante"
               >
-                Suivant
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Rotation Controls */}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={rotateLeft}
+                className="p-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition"
+                title="Rotation gauche"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+              </button>
+              <button
+                onClick={rotateRight}
+                className="p-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition"
+                title="Rotation droite"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                 </svg>
               </button>
             </div>
@@ -155,7 +204,7 @@ const PDFViewer = ({ url, onClose }) => {
 
               <button
                 onClick={resetZoom}
-                className="px-3 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition text-sm font-medium"
+                className="px-3 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition text-sm font-medium min-w-[60px]"
                 title="Réinitialiser le zoom"
               >
                 {Math.round(scale * 100)}%

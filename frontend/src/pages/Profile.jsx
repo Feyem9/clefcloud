@@ -6,6 +6,7 @@ import apiService from '../services/api';
 const Profile = () => {
   const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
+  const [userProfile, setUserProfile] = useState(null);
   const [partitions, setPartitions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
@@ -13,7 +14,8 @@ const Profile = () => {
     totalDownloads: 0,
     totalViews: 0,
     totalFavorites: 0,
-    recentUploads: []
+    recentUploads: [],
+    purchases: []
   });
 
   useEffect(() => {
@@ -24,13 +26,22 @@ const Profile = () => {
 
     const fetchData = async () => {
       try {
-        // Récupérer les statistiques de l'utilisateur
-        const statsData = await apiService.getUserStats();
-        setStats(statsData);
+        setLoading(true);
+        // Récupérer le profil complet (avec stats et achats)
+        const profileData = await apiService.getProfile();
+        setUserProfile(profileData);
+        setStats({
+          totalPartitions: profileData.totalPartitions || 0,
+          totalDownloads: profileData.totalDownloads || 0,
+          totalViews: profileData.totalViews || 0,
+          totalFavorites: profileData.totalFavorites || 0,
+          recentUploads: profileData.recentUploads || [],
+          purchases: profileData.purchases || []
+        });
 
         // Récupérer les partitions de l'utilisateur
-        if (currentUser.id) {
-          const partitionsData = await apiService.getUserPartitions(currentUser.id, 50, 0);
+        if (profileData.id) {
+          const partitionsData = await apiService.getUserPartitions(profileData.id, 50, 0);
           setPartitions(partitionsData.partitions || []);
         }
 
@@ -83,10 +94,17 @@ const Profile = () => {
           <div className="pt-20 pb-8 px-8">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div>
-                <h1 className="text-3xl font-bold text-primary-600">
-                  {currentUser?.name || 'Utilisateur'}
-                </h1>
-                <p className="text-gray-600 mt-1 flex items-center gap-2">
+                <div className="flex items-center gap-3">
+                  <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+                    {userProfile?.name || currentUser?.displayName || 'Utilisateur'}
+                  </h1>
+                  {userProfile?.is_premium && (
+                    <span className="px-3 py-1 bg-gradient-to-r from-amber-400 to-amber-600 text-white text-xs font-bold rounded-full shadow-sm animate-pulse">
+                      PREMIUM
+                    </span>
+                  )}
+                </div>
+                <p className="text-gray-600 dark:text-gray-400 mt-1 flex items-center gap-2">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
@@ -183,7 +201,7 @@ const Profile = () => {
             <button
               onClick={() => navigate('/library')}
               className="bg-green-400 text-white px-8 py-3 rounded-lg font-semibold hover:bg-green-50 hover:scale-105 hover:text-green-600 transition-all shadow-lgext-green-400 hover:scale-105 transition-all shadow-lg"
-              >
+            >
               Voir tout
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -201,7 +219,7 @@ const Profile = () => {
               <button
                 onClick={() => navigate('/upload')}
                 className="bg-green-400 text-white px-8 py-3 rounded-lg font-semibold hover:bg-green-50 hover:scale-105 hover:text-green-600 transition-all shadow-lgext-green-400 hover:scale-105 transition-all shadow-lg"
-                >
+              >
                 Ajouter une partition
               </button>
             </div>
@@ -229,11 +247,10 @@ const Profile = () => {
                               {partition.composer}
                             </p>
                           )}
-                          <span className={`px-2 py-1 text-xs font-semibold rounded-lg ${
-                            partition.category === 'messe' ? 'bg-blue-100 text-blue-700' :
-                            partition.category === 'concert' ? 'bg-purple-100 text-purple-700' :
-                            'bg-gray-100 text-gray-700'
-                          }`}>
+                          <span className={`px-2 py-1 text-xs font-semibold rounded-lg ${partition.category === 'messe' ? 'bg-blue-100 text-blue-700' :
+                              partition.category === 'concert' ? 'bg-purple-100 text-purple-700' :
+                                'bg-gray-100 text-gray-700'
+                            }`}>
                             {partition.category}
                           </span>
                           {partition.messePart && (
@@ -266,6 +283,39 @@ const Profile = () => {
                       </div>
                     )}
                   </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+        {/* Historique des achats */}
+        <div className="bg-white/80 backdrop-blur-lg rounded-2xl shadow-2xl border border-white/20 p-8">
+          <h2 className="text-2xl font-bold text-primary-600 mb-6 flex items-center gap-2">
+            <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+            </svg>
+            Mes Achats
+          </h2>
+
+          {(!stats.purchases || stats.purchases.length === 0) ? (
+            <div className="text-center py-8 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-dashed border-gray-300">
+              <p className="text-gray-500">Vous n'avez pas encore effectué d'achat individuel.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {stats.purchases.map((purchase) => (
+                <div key={purchase.id} className="bg-white dark:bg-gray-700 rounded-xl p-4 border border-gray-100 dark:border-gray-600 shadow-sm hover:shadow-md transition-all">
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="font-bold text-gray-900 dark:text-white line-clamp-1">{purchase.title}</h3>
+                    <span className="text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-bold">ACHETÉ</span>
+                  </div>
+                  <p className="text-xs text-gray-500 mb-4">Le {new Date(purchase.purchased_at).toLocaleDateString()}</p>
+                  <button
+                    onClick={() => navigate('/library')}
+                    className="w-full py-2 bg-primary-50 text-primary-700 rounded-lg text-sm font-semibold hover:bg-primary-100 transition-colors"
+                  >
+                    Ouvrir la partition
+                  </button>
                 </div>
               ))}
             </div>

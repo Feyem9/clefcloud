@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import apiService from '../services/api';
 import PDFViewer from '../components/PDFViewer';
+import AudioPlayer from '../components/AudioPlayer';
 import PartitionCardSkeleton from '../components/PartitionCardSkeleton';
 import { MESSE_PARTS } from '../constants';
 import { toast } from 'react-toastify';
@@ -17,9 +18,11 @@ const Library = () => {
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [messePartFilter, setMessePartFilter] = useState('all');
   const [ownerFilter, setOwnerFilter] = useState('all');
+  const [showFavorites, setShowFavorites] = useState(false);
   const [sortOrder, setSortOrder] = useState('date_desc');
   const [viewingPDF, setViewingPDF] = useState(null);
   const [buyingId, setBuyingId] = useState(null);
+  const [isTogglingFavorite, setIsTogglingFavorite] = useState(null);
   // Mémoriser la vue dans le localStorage
   const [viewMode, setViewMode] = useState(
     () => localStorage.getItem('clefcloud_view_mode') || 'grid'
@@ -29,26 +32,38 @@ const Library = () => {
     localStorage.setItem('clefcloud_view_mode', viewMode);
   }, [viewMode]);
 
+  // Fetch partitions avec filtres
   useEffect(() => {
-    if (!currentUser) {
-      return;
-    }
+    if (!currentUser) return;
 
-    const fetchPartitions = async () => {
-      try {
-        setLoading(true);
-        const data = await apiService.getPartitions();
-        setPartitions(data.partitions || []);
-      } catch (error) {
-        console.error('❌ Erreur lors du chargement des partitions:', error);
-        toast.error('Erreur lors du chargement des partitions');
-      } finally {
-        setLoading(false);
+    const timer = setTimeout(() => {
+      fetchData();
+    }, searchTerm ? 500 : 0);
+
+    return () => clearTimeout(timer);
+  }, [currentUser, searchTerm, categoryFilter, messePartFilter, showFavorites]);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      let data;
+      if (showFavorites) {
+        data = await apiService.getFavorites();
+      } else {
+        data = await apiService.getPartitions({
+          search: searchTerm,
+          category: categoryFilter,
+          messePart: messePartFilter
+        });
       }
-    };
-
-    fetchPartitions();
-  }, [currentUser]);
+      setPartitions(data || []);
+    } catch (error) {
+      console.error('❌ Erreur lors du chargement des partitions:', error);
+      toast.error('Erreur lors du chargement des partitions');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleDelete = async (id) => {
     if (window.confirm('Êtes-vous sûr de vouloir supprimer cette partition ?')) {
@@ -102,6 +117,25 @@ const Library = () => {
     }
   };
 
+  const handleToggleFavorite = async (partitionId) => {
+    setIsTogglingFavorite(partitionId);
+    try {
+      const { isFavorite } = await apiService.toggleFavorite(partitionId);
+      setPartitions(prev => prev.map(p =>
+        p.id === partitionId ? { ...p, isFavorite } : p
+      ));
+      if (showFavorites && !isFavorite) {
+        setPartitions(prev => prev.filter(p => p.id !== partitionId));
+      }
+      toast.info(isFavorite ? '❤️ Ajouté aux favoris' : '💔 Retiré des favoris');
+    } catch (error) {
+      console.error('Erreur favoris:', error);
+      toast.error('Erreur lors de la mise à jour des favoris');
+    } finally {
+      setIsTogglingFavorite(null);
+    }
+  };
+
   // Vérifie si l'utilisateur a accès au contenu d'une partition
   const hasAccess = (partition) => {
     // L'auteur a toujours accès
@@ -115,13 +149,10 @@ const Library = () => {
 
   const sortedAndFilteredPartitions = partitions
     .filter(partition => {
-      const matchesSearch = partition.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (partition.composer && partition.composer.toLowerCase().includes(searchTerm.toLowerCase()));
-      const matchesCategory = categoryFilter === 'all' || partition.category === categoryFilter;
-      const matchesMessePart = messePartFilter === 'all' || partition.messePart === messePartFilter;
+      // Les filtres complexes (recherche, catégorie) sont gérés par le backend.
+      // On garde ici les filtres clients simples.
       const matchesOwner = ownerFilter === 'all' || partition.created_by === currentUser.id;
-
-      return matchesSearch && matchesCategory && matchesMessePart && matchesOwner;
+      return matchesOwner;
     })
     .sort((a, b) => {
       if (sortOrder === 'title_asc') {
@@ -223,14 +254,29 @@ const Library = () => {
 
       {/* Filtres améliorés */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-6 transition-colors border border-gray-200 dark:border-gray-700">
-        <div className="flex items-center gap-2 mb-4">
-          <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-          </svg>
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Filtres</h2>
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
+          <div className="flex items-center gap-2">
+            <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+            </svg>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Filtres</h2>
+          </div>
+
+          <button
+            onClick={() => setShowFavorites(!showFavorites)}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold transition-all border ${showFavorites
+              ? 'bg-red-50 text-red-600 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-900'
+              : 'bg-gray-100 text-gray-600 border-gray-200 dark:bg-gray-700 dark:text-gray-400 dark:border-gray-600 hover:bg-gray-200'
+              }`}
+          >
+            <svg className={`w-5 h-5 ${showFavorites ? 'fill-current' : 'fill-none stroke-current'}`} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+            </svg>
+            {showFavorites ? 'Mes Favoris' : 'Tous les morceaux'}
+          </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 transition-opacity ${showFavorites ? 'opacity-50 pointer-events-none' : ''}`}>
           {/* Recherche */}
           <div className="lg:col-span-2">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -427,9 +473,24 @@ const Library = () => {
                       <h3 className="text-xl font-semibold text-gray-900 dark:text-white flex-1 line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
                         {partition.title}
                       </h3>
-                      <span className={`px-2 py-1 text-xs font-semibold rounded-full whitespace-nowrap ${getCategoryBadgeClass(partition.category)}`}>
-                        {partition.category}
-                      </span>
+                      <div className="flex flex-col items-end gap-2">
+                        <span className={`px-2 py-1 text-xs font-semibold rounded-full whitespace-nowrap ${getCategoryBadgeClass(partition.category)}`}>
+                          {partition.category}
+                        </span>
+                        <button
+                          onClick={() => handleToggleFavorite(partition.id)}
+                          disabled={isTogglingFavorite === partition.id}
+                          className={`p-1.5 rounded-full transition-all ${partition.isFavorite
+                              ? 'text-red-500 bg-red-50 dark:bg-red-900/20'
+                              : 'text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20'
+                            }`}
+                          title={partition.isFavorite ? "Retirer des favoris" : "Ajouter aux favoris"}
+                        >
+                          <svg className={`w-5 h-5 ${partition.isFavorite ? 'fill-current' : 'fill-none stroke-current'}`} viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                          </svg>
+                        </button>
+                      </div>
                     </div>
 
                     {/* Informations */}
@@ -498,16 +559,10 @@ const Library = () => {
                       </div>
                     </div>
 
-                    {/* Lecteur Audio */}
+                    {/* Lecteur Audio Avancé */}
                     {partition.audio_url && (
                       <div className="mb-4">
-                        <audio
-                          controls
-                          className="w-full h-8 accent-primary-600"
-                          src={partition.audio_url}
-                        >
-                          Votre navigateur ne supporte pas l'élément audio.
-                        </audio>
+                        <AudioPlayer src={partition.audio_url} />
                       </div>
                     )}
 
@@ -577,6 +632,18 @@ const Library = () => {
                         <p className="text-md font-semibold text-gray-900 dark:text-white truncate">{partition.title}</p>
                         <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{partition.composer || 'Compositeur inconnu'}</p>
                       </div>
+                      <button
+                        onClick={() => handleToggleFavorite(partition.id)}
+                        disabled={isTogglingFavorite === partition.id}
+                        className={`p-2 rounded-full transition-all ${partition.isFavorite
+                            ? 'text-red-500 bg-red-50 dark:bg-red-900/20'
+                            : 'text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20'
+                          }`}
+                      >
+                        <svg className={`w-5 h-5 ${partition.isFavorite ? 'fill-current' : 'fill-none stroke-current'}`} viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                        </svg>
+                      </button>
                     </div>
                     <div className="hidden md:flex items-center gap-4 mx-4">
                       <span className={`px-3 py-1 text-xs font-semibold rounded-full ${getCategoryBadgeClass(partition.category)}`}>

@@ -8,9 +8,10 @@ import {
   UseInterceptors,
   UploadedFiles,
   Req,
+  Query,
 } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
-import { ApiTags, ApiOperation, ApiConsumes, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiConsumes, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { PartitionsService } from './partitions.service';
 import { CreatePartitionDto } from './dto/create-partition.dto';
 
@@ -38,15 +39,35 @@ export class PartitionsController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Récupérer toutes les partitions' })
-  async findAll(@Req() req) {
-    return this.partitionsService.findAll(req.user);
+  @ApiOperation({ summary: 'Récupérer toutes les partitions (avec filtres)' })
+  @ApiQuery({ name: 'search', required: false })
+  @ApiQuery({ name: 'category', required: false })
+  @ApiQuery({ name: 'messePart', required: false })
+  async findAll(
+    @Req() req,
+    @Query('search') search?: string,
+    @Query('category') category?: string,
+    @Query('messePart') messePart?: string,
+  ) {
+    return this.partitionsService.findAll(req.user, search, category, messePart);
+  }
+
+  @Get('favorites')
+  @ApiOperation({ summary: 'Récupérer les favoris de l\'utilisateur' })
+  async findFavorites(@Req() req) {
+    return this.partitionsService.findFavorites(req.user);
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Récupérer une partition par ID' })
   async findOne(@Param('id') id: string, @Req() req) {
     return this.partitionsService.findOne(+id, req.user);
+  }
+
+  @Post(':id/favorite')
+  @ApiOperation({ summary: 'Ajouter/Retirer des favoris' })
+  async toggleFavorite(@Param('id') id: string, @Req() req) {
+    return this.partitionsService.toggleFavorite(+id, req.user);
   }
 
   @Delete(':id')

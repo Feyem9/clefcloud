@@ -35,8 +35,24 @@ const apiService = {
   },
 
   // Partitions
-  getPartitions: async () => {
-    const response = await api.get('/partitions');
+  getPartitions: async (filters = {}) => {
+    const { search, category, messePart } = filters;
+    let url = '/partitions?';
+    if (search) url += `search=${encodeURIComponent(search)}&`;
+    if (category) url += `category=${encodeURIComponent(category)}&`;
+    if (messePart) url += `messePart=${encodeURIComponent(messePart)}&`;
+
+    const response = await api.get(url);
+    return response.data;
+  },
+
+  getFavorites: async () => {
+    const response = await api.get('/partitions/favorites');
+    return response.data;
+  },
+
+  toggleFavorite: async (id) => {
+    const response = await api.post(`/partitions/${id}/favorite`);
     return response.data;
   },
 

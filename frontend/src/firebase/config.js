@@ -1,9 +1,9 @@
 // ========================================
-// FIREBASE DÉSACTIVÉ - MIGRATION VERS AWS
+// CONFIGURATION FIREBASE
 // ========================================
-// Ce fichier n'est plus utilisé car l'application utilise maintenant AWS Cognito
-// Les exports vides sont conservés pour éviter les erreurs d'import
- 
+// Utilisé pour l'Authentification et le Stockage des fichiers (PDF/Audio)
+// migration AWS -> Firebase accomplie.
+
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';

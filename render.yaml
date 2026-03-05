@@ -1,0 +1,45 @@
+services:
+  - type: web
+    name: clefcloud-backend
+    env: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm install && npm run build
+    startCommand: npm run start:prod
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DB_HOST
+        fromValue: DB_HOST
+      - key: DB_PORT
+        fromValue: DB_PORT
+      - key: DB_USERNAME
+        fromValue: DB_USERNAME
+      - key: DB_PASSWORD
+        fromValue: DB_PASSWORD
+      - key: DB_DATABASE
+        fromValue: DB_DATABASE
+      - key: FIREBASE_PROJECT_ID
+        fromValue: FIREBASE_PROJECT_ID
+      - key: FIREBASE_CLIENT_EMAIL
+        fromValue: FIREBASE_CLIENT_EMAIL
+      - key: FIREBASE_PRIVATE_KEY
+        fromValue: FIREBASE_PRIVATE_KEY
+      - key: FIREBASE_STORAGE_BUCKET
+        fromValue: FIREBASE_STORAGE_BUCKET
+      - key: MAIL_HOST
+        fromValue: MAIL_HOST
+      - key: MAIL_PORT
+        fromValue: MAIL_PORT
+      - key: MAIL_USER
+        fromValue: MAIL_USER
+      - key: MAIL_PASSWORD
+        fromValue: MAIL_PASSWORD
+      - key: MAIL_FROM_NAME
+        value: ClefCloud
+      - key: MAIL_FROM_EMAIL
+        fromValue: MAIL_FROM_EMAIL
+      - key: CORS_ORIGIN
+        value: https://clefcloud.web.app

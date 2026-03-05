@@ -1,20 +1,21 @@
-import { Module, Global } from '@nestjs/common';
+import { Module, Global, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PassportModule } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { User } from '../users/entities/user.entity';
+import { UsersModule } from '../users/users.module';
 import { FirebaseModule } from '../firebase/firebase.module';
 import { MailModule } from '../mail.module';
 import { FirebaseAuthStrategy } from './strategies/firebase-auth.strategy';
 import { FirebaseAuthGuard } from './guards/firebase-auth.guard';
-import { AuthRabbitMQConsumer } from './rabbitmq.consumer';
 
 @Global()
 @Module({
   imports: [
     TypeOrmModule.forFeature([User]),
     PassportModule.register({ defaultStrategy: 'firebase-auth' }),
+    forwardRef(() => UsersModule),
     FirebaseModule,
     MailModule,
   ],
@@ -22,7 +23,6 @@ import { AuthRabbitMQConsumer } from './rabbitmq.consumer';
     AuthService,
     FirebaseAuthStrategy,
     FirebaseAuthGuard,
-    AuthRabbitMQConsumer,
   ],
   controllers: [AuthController],
   exports: [AuthService, FirebaseAuthGuard, PassportModule],

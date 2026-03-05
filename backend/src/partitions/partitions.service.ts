@@ -2,6 +2,7 @@ import { Injectable, NotFoundException, ForbiddenException, Logger } from '@nest
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Partition } from './entities/partition.entity';
+import { Favorite } from './entities/favorite.entity';
 import { CreatePartitionDto } from './dto/create-partition.dto';
 import { User } from '../users/entities/user.entity';
 import { UserPartition } from '../users/entities/user-partition.entity';
@@ -14,6 +15,8 @@ export class PartitionsService {
   constructor(
     @InjectRepository(Partition)
     private partitionRepository: Repository<Partition>,
+    @InjectRepository(Favorite)
+    private favoriteRepository: Repository<Favorite>,
     @InjectRepository(UserPartition)
     private userPartitionRepository: Repository<UserPartition>,
     private firebaseService: FirebaseService,
@@ -68,12 +71,70 @@ export class PartitionsService {
     }
   }
 
-  async findAll(user: User) {
-    // On récupère tout, mais on pourrait filtrer par visibilité
-    return this.partitionRepository.find({
-      relations: ['user'],
-      order: { created_at: 'DESC' },
+  async findAll(user: User, search?: string, category?: string, messePart?: string) {
+    const query = this.partitionRepository.createQueryBuilder('partition')
+      .leftJoinAndSelect('partition.user', 'user')
+      .where('partition.is_active = :isActive', { isActive: true });
+
+    if (search) {
+      query.andWhere(
+        '(LOWER(partition.title) LIKE LOWER(:search) OR LOWER(partition.composer) LIKE LOWER(:search))',
+        { search: `%${search}%` },
+      );
+    }
+
+    if (category && category !== 'all') {
+      query.andWhere('partition.category = :category', { category });
+    }
+
+    if (messePart && messePart !== 'all') {
+      query.andWhere('partition.messe_part = :messePart', { messePart });
+    }
+
+    query.orderBy('partition.created_at', 'DESC');
+
+    const partitions = await query.getMany();
+
+    // Ajouter l'info isFavorite pour chaque partition
+    const favoriteIds = await this.favoriteRepository.find({
+      where: { user_id: user.id },
+      select: ['partition_id'],
+    }).then(favs => favs.map(f => f.partition_id));
+
+    return partitions.map(p => ({
+      ...p,
+      isFavorite: favoriteIds.includes(p.id),
+    }));
+  }
+
+  async findFavorites(user: User) {
+    const favorites = await this.favoriteRepository.find({
+      where: { user_id: user.id },
+      relations: ['partition', 'partition.user'],
     });
+
+    return favorites.map(f => ({
+      ...f.partition,
+      isFavorite: true,
+    }));
+  }
+
+  async toggleFavorite(partitionId: number, user: User) {
+    const favorite = await this.favoriteRepository.findOne({
+      where: { user_id: user.id, partition_id: partitionId },
+    });
+
+    if (favorite) {
+      await this.favoriteRepository.remove(favorite);
+      return { isFavorite: false };
+    } else {
+      const newFavorite = this.favoriteRepository.create({
+        user_id: user.id,
+        partition_id: partitionId,
+      });
+      await this.favoriteRepository.save(newFavorite);
+      return { isFavorite: true };
+    }
   }
 
   async findOne(id: number, user?: User) {
@@ -110,9 +171,16 @@ export class PartitionsService {
       delete partition.audio_storage_path;
     }
 
+    // Info favorite
+    const favorite = user ? await this.favoriteRepository.findOneBy({
+      user_id: user.id,
+      partition_id: partition.id,
+    }) : null;
+
     return {
       ...partition,
       hasAccess,
+      isFavorite: !!favorite,
     };
   }
 

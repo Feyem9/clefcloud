@@ -38,7 +38,6 @@ export class UsersController {
   }
 
   @Put(':id')
-  @UseGuards(AuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Mettre à jour le profil utilisateur' })
   @ApiResponse({ status: 200, description: 'Profil mis à jour' })

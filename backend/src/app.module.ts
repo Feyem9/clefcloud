@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, Logger } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
@@ -22,9 +22,13 @@ import { PayunitModule } from './payunit/payunit.module';
     // Base de données (Supabase / Postgres)
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        type: 'postgres',
-        host: config.get<string>('DB_HOST'),
+      useFactory: (config: ConfigService) => {
+        const host = config.get<string>('DB_HOST');
+        const logger = new Logger('TypeOrmConfig');
+        logger.log(`Connecting to database at ${host}`);
+        return {
+          type: 'postgres',
+          host,
         port: config.get<number>('DB_PORT'),
         username: config.get<string>('DB_USERNAME'),
         password: config.get<string>('DB_PASSWORD'),
@@ -35,8 +39,9 @@ import { PayunitModule } from './payunit/payunit.module';
         extra: {
           family: 4, // Force IPv4 to avoid ENETUNREACH on Render Free Tier
         },
-      }),
-    }),
+      };
+    },
+  }),
 
     // Modules fonctionnels
     FirebaseModule,

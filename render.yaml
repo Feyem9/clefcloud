@@ -21,6 +21,8 @@ services:
         sync: false
       - key: DB_DATABASE
         sync: false
+      - key: DB_SSL
+        value: "true"
       - key: FIREBASE_PROJECT_ID
         sync: false
       - key: FIREBASE_CLIENT_EMAIL

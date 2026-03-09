@@ -32,6 +32,9 @@ import { PayunitModule } from './payunit/payunit.module';
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         synchronize: config.get<string>('NODE_ENV') === 'development', // SÉCURITÉ : False en production
         ssl: config.get<string>('DB_SSL') === 'true' ? { rejectUnauthorized: false } : false,
+        extra: {
+          family: 4, // Force IPv4 to avoid ENETUNREACH on Render Free Tier
+        },
       }),
     }),
 

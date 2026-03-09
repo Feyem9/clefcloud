@@ -3,8 +3,12 @@ import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { Logger } from '@nestjs/common';
+import * as dns from 'node:dns';
 
 async function bootstrap() {
+  // Force IPv4 for DNS resolution to avoid ENETUNREACH in Render Free Tier
+  dns.setDefaultResultOrder('ipv4first');
+  
   const app = await NestFactory.create(AppModule);
   const logger = new Logger('Bootstrap');
 

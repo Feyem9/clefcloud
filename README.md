@@ -32,3 +32,4 @@ Pour contribuer au projet, merci de lire attentivement le fichier [CONTRIBUTING.
 ## 🌍 Licence
 Propriété de ClefCloud. Tous droits réservés.
 \n- Déploiement CI/CD configuré le 09/03/2026
+\n- ✨ Tentative de déploiement suite à correction du secret : 09/03/2026 13:48

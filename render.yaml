@@ -42,4 +42,6 @@ services:
       - key: MAIL_FROM_EMAIL
         sync: false
       - key: CORS_ORIGIN
-        value: https://clefcloud.web.app
+        value: https://clefcloud-18253.web.app
+      - key: NPM_CONFIG_PRODUCTION
+        value: false

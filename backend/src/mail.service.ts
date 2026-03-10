@@ -2,12 +2,10 @@ import { Injectable, Logger } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
 import { User } from './users/entities/user.entity';
 import { ConfigService } from '@nestjs/config';
-import * as brevo from '@getbrevo/brevo';
 
 @Injectable()
 export class MailService {
   private readonly logger = new Logger(MailService.name);
-  private readonly brevoClient: brevo.TransactionalEmailsApi;
   private readonly fromEmail: string;
   private readonly fromName: string;
 
@@ -17,16 +15,7 @@ export class MailService {
   ) {
     this.fromEmail = this.configService.get('MAIL_FROM_EMAIL', 'pasyves43@gmail.com');
     this.fromName = this.configService.get('MAIL_FROM_NAME', 'ClefCloud');
-    
-    const brevoApiKey = this.configService.get('BREVO_API_KEY');
-    
-    if (brevoApiKey) {
-      this.brevoClient = new brevo.TransactionalEmailsApi();
-      this.brevoClient.setApiKey(brevo.TransactionalEmailsApiApiKeys.apiKey, brevoApiKey);
-      this.logger.log(`📧 Brevo Client initialized - From: ${this.fromName} <${this.fromEmail}>`);
-    } else {
-      this.logger.warn('⚠️  BREVO_API_KEY not configured, emails will not be sent');
-    }
+    this.logger.log(`📧 Mail Service initialized using SMTP - From: ${this.fromName} <${this.fromEmail}>`);
   }
 
   async sendTestEmail(to: string) {

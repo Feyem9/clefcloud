@@ -36,3 +36,4 @@ Propriété de ClefCloud. Tous droits réservés.
 \n- ✨ Tentative de connexion via Connection Pooler (IPv4) : 09/03/2026 14:44
 \n- ✨ Mise à jour Firebase API Key : 09/03/2026 20:10
 \n- ✨ Déploiement final avec secrets Firebase validés : 09/03/2026 20:23
+\n- ✨ Injection de l'URL Backend de Production : 10/03/2026 10:35

@@ -3,6 +3,7 @@ import {
   CanActivate,
   ExecutionContext,
   UnauthorizedException,
+  Logger,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { AuthService } from '../auth.service';
@@ -38,6 +39,8 @@ export class FirebaseAuthGuard implements CanActivate {
       request.user = user;
       return true;
     } catch (error) {
+      const logger = new Logger('FirebaseAuthGuard');
+      logger.error(`Auth failure for token ${token.substring(0, 10)}... : ${error.message}`);
       throw new UnauthorizedException('Session expirée ou invalide');
     }
   }

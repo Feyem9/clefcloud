@@ -41,6 +41,14 @@ VITE_FIREBASE_MEASUREMENT_ID=G-9ER067Z85T
 5. Remplis les variables d'environnement demandées (DB_HOST, DB_PASSWORD, etc.) à partir de tes accès Supabase et ton Admin SDK Firebase.
 6. Valide. Render va builder (`npm install && npm run build`) et lancer le serveur.
 
+> [!IMPORTANT]
+> **ERREUR "ENETUNREACH" (IPv6)**
+> Si tu vois une erreur `ENETUNREACH` avec une adresse longue (IPv6) dans les logs de Render, c'est parce que Render Free ne supporte pas l'IPv6.
+> **La solution :**
+> 1. Va sur Supabase > **Settings** > **Database**.
+> 2. Dans la section **Connection Pooler**, copie le **Host** (différent du host direct).
+> 3. Sur Render, change `DB_HOST` avec ce nouveau host et change `DB_PORT` par **`6543`**.
+
 ---
 
 ## 3. Mise à jour finale du fichier workflow

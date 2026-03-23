@@ -12,7 +12,7 @@ import { MailService } from './mail.service';
         transport: {
           host: configService.get<string>('MAIL_HOST', 'smtp.gmail.com'),
           port: parseInt(configService.get<string>('MAIL_PORT', '587')),
-          secure: false, // true pour 465, false pour 587
+          secure: configService.get<string>('MAIL_PORT') === '465', // true pour 465, false pour 587
           auth: {
             user: configService.get<string>('MAIL_USER'),
             pass: configService.get<string>('MAIL_PASSWORD'),
@@ -20,6 +20,8 @@ import { MailService } from './mail.service';
           tls: {
             rejectUnauthorized: false,
           },
+          // Option pour forcer IPv4 si nécessaire sur Render
+          ignoreTLS: false,
         },
         defaults: {
           from: `"${configService.get<string>('MAIL_FROM_NAME', 'ClefCloud')}" <${configService.get<string>('MAIL_FROM_EMAIL')}>`,

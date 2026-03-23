@@ -82,9 +82,10 @@ export class FirebaseService implements OnModuleInit {
       },
     });
 
-    // Rendre le fichier public (standard pour ClefCloud)
-    await fileRef.makePublic();
-    const downloadUrl = fileRef.publicUrl();
+    // Rendre le fichier public via URL standard (Google Cloud IAM strict)
+    // Format : https://firebasestorage.googleapis.com/v0/b/<bucket_name>/o/<encoded_path>?alt=media
+    const encodedPath = encodeURIComponent(cleanPath).replace(/%2F/g, '/');
+    const downloadUrl = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodedPath}?alt=media`;
 
     this.logger.log(`Fichier uploadé : ${cleanPath}`);
 

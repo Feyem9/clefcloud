@@ -112,6 +112,16 @@ export class PayunitController {
         user.premium_until = expiry;
         await this.userRepository.save(user);
       }
+      
+      // Si c'est l'achat d'une partition individuelle
+      if (transaction.type === TransactionType.PARTITION && transaction.partition_id) {
+        // Accorder l'accès permanent à cette partition
+        const userPartition = this.transactionRepository.manager.create('UserPartition', {
+          user_id: transaction.user_id,
+          partition_id: transaction.partition_id
+        });
+        await this.transactionRepository.manager.save(userPartition);
+      }
     } else {
       transaction.status = TransactionStatus.FAILED;
       await this.transactionRepository.save(transaction);

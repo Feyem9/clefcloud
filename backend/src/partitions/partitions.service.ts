@@ -49,7 +49,7 @@ export class PartitionsService {
           `${baseFolder}/partition.pdf`,
         );
         savedPartition.storage_path = storagePath;
-        // On peut aussi stocker l'URL directe pour simplifier le front
+        savedPartition.download_url = downloadUrl;
       }
 
       // 2. Gérer l'Audio

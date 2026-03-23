@@ -64,6 +64,20 @@ export class AuthService {
   }
 
   /**
+   * Met à jour le profil de l'utilisateur connecté
+   */
+  async updateProfile(user: User, name: string) {
+    return this.usersService.update(user.id, name);
+  }
+
+  /**
+   * Supprime le compte de l'utilisateur de la base de données
+   */
+  async deleteAccount(user: User) {
+    return this.usersService.deleteUser(user.id);
+  }
+
+  /**
    * Note : Les fonctions signUp, signIn, changePassword, etc. 
    * sont maintenant gérées directement par le Frontend via le SDK Firebase.
    * Le backend ne sert plus qu'à VALIDER le token et synchroniser les infos.

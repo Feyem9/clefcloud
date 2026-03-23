@@ -121,4 +121,14 @@ export class UsersService {
       updated_at: updatedUser.updated_at,
     };
   }
+
+  async deleteUser(id: number) {
+    const user = await this.findOne(id);
+    // Supprimer l'utilisateur de la base de données.
+    // L'ON DELETE CASCADE défini dans la DB s'occupera des favoris et partitions associées, 
+    // ou lever une erreur s'il y a des violations de contrainte à gérer.
+    await this.userRepository.delete(user.id);
+    this.logger.log(`Utilisateur supprimé : ${id}`);
+    return { success: true };
+  }
 }

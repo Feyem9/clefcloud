@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import apiService from '../services/api';
+import { useAuth } from '../contexts/AuthContext';
 
 const ForgotPassword = () => {
   const [step, setStep] = useState(1); // 1: demander code, 2: réinitialiser mot de passe
@@ -12,6 +13,8 @@ const ForgotPassword = () => {
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const { forgotPassword } = useAuth();
+
   const handleRequestCode = async (e) => {
     e.preventDefault();
 
@@ -19,12 +22,15 @@ const ForgotPassword = () => {
       setError('');
       setSuccess('');
       setLoading(true);
-      
-      await apiService.forgotPassword(email);
-      setSuccess('Code de réinitialisation envoyé ! Vérifiez votre email.');
-      setStep(2);
+
+      await forgotPassword(email);
+      setSuccess('Un email de réinitialisation a été envoyé ! Vérifiez votre boîte de réception.');
     } catch (error) {
-      setError(error.message || 'Erreur lors de l\'envoi du code');
+      if (error.code === 'auth/user-not-found') {
+        setError('Aucun compte trouvé avec cet email.');
+      } else {
+        setError(error.message || 'Erreur lors de l\'envoi de l\'email');
+      }
       console.error(error);
     } finally {
       setLoading(false);
@@ -33,32 +39,7 @@ const ForgotPassword = () => {
 
   const handleResetPassword = async (e) => {
     e.preventDefault();
-
-    if (newPassword !== confirmPassword) {
-      return setError('Les mots de passe ne correspondent pas');
-    }
-
-    if (newPassword.length < 8) {
-      return setError('Le mot de passe doit contenir au moins 8 caractères');
-    }
-
-    try {
-      setError('');
-      setSuccess('');
-      setLoading(true);
-      
-      await apiService.confirmForgotPassword(email, code, newPassword);
-      setSuccess('Mot de passe réinitialisé avec succès ! Redirection...');
-      
-      setTimeout(() => {
-        window.location.href = '/login';
-      }, 2000);
-    } catch (error) {
-      setError(error.message || 'Code invalide ou expiré');
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
+    // Le flux Firebase utilise un lien dans l'email, ce code n'est plus appelé
   };
 
   return (

@@ -4,11 +4,15 @@ import { useNavigate } from 'react-router-dom';
 import apiService from '../services/api';
 
 const Profile = () => {
-  const { currentUser, logout } = useAuth();
+  const { currentUser, logout, updateUserProfile, deleteAccount } = useAuth();
   const navigate = useNavigate();
   const [userProfile, setUserProfile] = useState(null);
   const [partitions, setPartitions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editName, setEditName] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [error, setError] = useState('');
   const [stats, setStats] = useState({
     totalPartitions: 0,
     totalDownloads: 0,
@@ -38,6 +42,7 @@ const Profile = () => {
           recentUploads: profileData.recentUploads || [],
           purchases: profileData.purchases || []
         });
+        setEditName(profileData.name || currentUser?.displayName || '');
 
         // Récupérer les partitions de l'utilisateur
         if (profileData.id) {
@@ -61,6 +66,33 @@ const Profile = () => {
       navigate('/');
     } catch (error) {
       console.error('Erreur lors de la déconnexion:', error);
+    }
+  };
+
+  const handleUpdateProfile = async () => {
+    try {
+      setError('');
+      setLoading(true);
+      await updateUserProfile(editName);
+      setUserProfile({ ...userProfile, name: editName });
+      setIsEditing(false);
+    } catch (err) {
+      setError('Erreur lors de la modification : ' + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    try {
+      setError('');
+      setLoading(true);
+      await deleteAccount();
+      navigate('/');
+    } catch (err) {
+      setError('Erreur lors de la suppression : ' + err.message);
+      setLoading(false);
+      setIsDeleting(false);
     }
   };
 
@@ -93,33 +125,77 @@ const Profile = () => {
 
           <div className="pt-20 pb-8 px-8">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-              <div>
-                <div className="flex items-center gap-3">
-                  <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-                    {userProfile?.name || currentUser?.displayName || 'Utilisateur'}
-                  </h1>
-                  {userProfile?.is_premium && (
-                    <span className="px-3 py-1 bg-gradient-to-r from-amber-400 to-amber-600 text-white text-xs font-bold rounded-full shadow-sm animate-pulse">
-                      PREMIUM
-                    </span>
-                  )}
-                </div>
-                <p className="text-gray-600 dark:text-gray-400 mt-1 flex items-center gap-2">
+              <div className="flex-1 w-full">
+                {error && <p className="text-red-500 mb-2 text-sm">{error}</p>}
+
+                {isEditing ? (
+                  <div className="flex flex-col gap-3">
+                    <input
+                      type="text"
+                      className="text-2xl font-bold text-gray-900 border-2 border-primary-300 rounded-lg px-3 py-1 bg-white/50 focus:outline-none focus:border-primary-500 w-full sm:w-80"
+                      value={editName}
+                      onChange={(e) => setEditName(e.target.value)}
+                      placeholder="Votre nom"
+                    />
+                    <div className="flex gap-2">
+                      <button onClick={handleUpdateProfile} className="px-4 py-1.5 bg-green-500 text-white rounded-lg text-sm font-semibold hover:bg-green-600">Enregistrer</button>
+                      <button onClick={() => { setIsEditing(false); setEditName(userProfile?.name || currentUser?.displayName || ''); }} className="px-4 py-1.5 bg-gray-200 text-gray-700 rounded-lg text-sm font-semibold hover:bg-gray-300">Annuler</button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-3">
+                    <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+                      {userProfile?.name || currentUser?.displayName || 'Utilisateur'}
+                    </h1>
+                    <button onClick={() => setIsEditing(true)} className="p-1.5 text-gray-400 hover:text-primary-600 transition-colors" title="Modifier le nom">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                    </button>
+                    {userProfile?.is_premium && (
+                      <span className="px-3 py-1 bg-gradient-to-r from-amber-400 to-amber-600 text-white text-xs font-bold rounded-full shadow-sm animate-pulse">
+                        PREMIUM
+                      </span>
+                    )}
+                  </div>
+                )}
+
+                <p className="text-gray-600 dark:text-gray-400 mt-2 flex items-center gap-2">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
                   {currentUser?.email}
                 </p>
               </div>
-              <button
-                onClick={handleLogout}
-                className="px-6 py-2.5 bg-red-600 text-white rounded-xl font-semibold hover:bg-red-700 transition-all duration-200 transform hover:scale-105 shadow-lg flex items-center gap-2"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                </svg>
-                Déconnexion
-              </button>
+              <div className="flex flex-col gap-3 shrink-0 mt-4 sm:mt-0">
+                <button
+                  onClick={handleLogout}
+                  className="px-6 py-2.5 bg-gray-100 text-gray-800 rounded-xl font-semibold hover:bg-gray-200 transition-all duration-200 flex justify-center items-center gap-2 border border-gray-200"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
+                  Déconnexion
+                </button>
+
+                {isDeleting ? (
+                  <div className="bg-red-50 border border-red-200 rounded-xl p-3 flex flex-col gap-2 shadow-inner">
+                    <p className="text-xs text-red-700 font-semibold text-center">Toutes vos données seront effacées. Sûr ?</p>
+                    <div className="flex gap-2 justify-center">
+                      <button onClick={handleDeleteAccount} className="px-3 py-1.5 bg-red-600 text-white rounded-lg text-sm font-bold hover:bg-red-700">Oui, supprimer</button>
+                      <button onClick={() => setIsDeleting(false)} className="px-3 py-1.5 bg-white text-gray-700 border border-gray-300 rounded-lg text-sm font-bold hover:bg-gray-50">Annuler</button>
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setIsDeleting(true)}
+                    className="px-6 py-2 border-2 border-red-100 bg-red-50 text-red-600 rounded-xl font-semibold hover:bg-red-100 hover:border-red-200 transition-all duration-200 flex items-center justify-center gap-2 text-sm"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    Supprimer le compte
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -248,8 +324,8 @@ const Profile = () => {
                             </p>
                           )}
                           <span className={`px-2 py-1 text-xs font-semibold rounded-lg ${partition.category === 'messe' ? 'bg-blue-100 text-blue-700' :
-                              partition.category === 'concert' ? 'bg-purple-100 text-purple-700' :
-                                'bg-gray-100 text-gray-700'
+                            partition.category === 'concert' ? 'bg-purple-100 text-purple-700' :
+                              'bg-gray-100 text-gray-700'
                             }`}>
                             {partition.category}
                           </span>

@@ -7,12 +7,10 @@ const Signup = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [phone, setPhone] = useState('');
-  const [confirmationCode, setConfirmationCode] = useState('');
-  const [needsConfirmation, setNeedsConfirmation] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
-  const { signup, confirmSignup } = useAuth();
+  const { signup } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -35,40 +33,17 @@ const Signup = () => {
       setError('');
       setSuccess('');
       setLoading(true);
-      
-      const result = await signup(email, password, phone);
-      
-      console.log('Signup result:', result); // Debug
-      
-      if (result.needsConfirmation) {
-        setNeedsConfirmation(true);
-        setSuccess('Inscription réussie ! Un code de confirmation a été envoyé à votre email.');
-      } else {
-        navigate('/library');
+
+      const user = await signup(email, password); // Note: Firebase Auth de base ne prend pas le téléphone, mais on valide le formulaire
+
+      if (user) {
+        setSuccess('Inscription réussie ! Un lien de confirmation a été envoyé à votre email.');
+        setTimeout(() => {
+          navigate('/login');
+        }, 3000);
       }
     } catch (error) {
       setError(error.message || 'Échec de la création du compte. Email déjà utilisé ?');
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleConfirmation = async (e) => {
-    e.preventDefault();
-
-    try {
-      setError('');
-      setLoading(true);
-      
-      await confirmSignup(email, confirmationCode);
-      setSuccess('Email confirmé ! Vous pouvez maintenant vous connecter.');
-      
-      setTimeout(() => {
-        navigate('/login');
-      }, 2000);
-    } catch (error) {
-      setError(error.message || 'Code de confirmation invalide');
       console.error(error);
     } finally {
       setLoading(false);
@@ -96,10 +71,10 @@ const Signup = () => {
               </div>
             </div>
             <h2 className="mt-8 text-center text-4xl font-bold" style={{ background: 'linear-gradient(135deg, #8C48FF, #F2598A, #FFB152)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
-              {needsConfirmation ? 'Confirmer votre email' : 'Créer un compte'}
+              Créer un compte
             </h2>
             <p className="mt-3 text-center text-base text-gray-700">
-              {needsConfirmation ? 'Entrez le code reçu par email' : 'Commencez à sauvegarder vos partitions'}
+              Commencez à sauvegarder vos partitions
             </p>
           </div>
 
@@ -125,119 +100,88 @@ const Signup = () => {
             </div>
           )}
 
-          {!needsConfirmation ? (
-            <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
-              <div className="space-y-5">
-                <div className="group">
-                  <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
-                    Email
-                  </label>
-                  <input
-                    id="email"
-                    type="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="appearance-none block w-full px-3 py-3 border-2 border-gray-200 rounded-xl placeholder-gray-400 focus:outline-none focus:border-transparent transition-all duration-200 bg-white/70 backdrop-blur-sm hover:bg-white"
-                    onFocus={(e) => e.target.style.boxShadow = '0 0 0 3px rgba(140, 72, 255, 0.3)'}
-                    onBlur={(e) => e.target.style.boxShadow = ''}
-                    placeholder="votre@email.com"
-                  />
-                </div>
-
-                <div className="group">
-                  <label htmlFor="phone" className="block text-sm font-semibold text-gray-700 mb-2">
-                    Téléphone <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    id="phone"
-                    type="tel"
-                    required
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    className="appearance-none block w-full px-3 py-3 border-2 border-gray-200 rounded-xl placeholder-gray-400 focus:outline-none focus:border-transparent transition-all duration-200 bg-white/70 backdrop-blur-sm hover:bg-white"
-                    onFocus={(e) => e.target.style.boxShadow = '0 0 0 3px rgba(140, 72, 255, 0.3)'}
-                    onBlur={(e) => e.target.style.boxShadow = ''}
-                    placeholder="+237683845543"
-                  />
-                  <p className="mt-1 text-xs text-gray-500">Format international (ex: +237...)</p>
-                </div>
-
-                <div className="group">
-                  <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
-                    Mot de passe
-                  </label>
-                  <input
-                    id="password"
-                    type="password"
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="appearance-none block w-full px-3 py-3 border-2 border-gray-200 rounded-xl placeholder-gray-400 focus:outline-none focus:border-transparent transition-all duration-200 bg-white/70 backdrop-blur-sm hover:bg-white"
-                    onFocus={(e) => e.target.style.boxShadow = '0 0 0 3px rgba(140, 72, 255, 0.3)'}
-                    onBlur={(e) => e.target.style.boxShadow = ''}
-                    placeholder="••••••••"
-                  />
-                  <p className="mt-1 text-xs text-gray-500">Minimum 8 caractères</p>
-                </div>
-
-                <div className="group">
-                  <label htmlFor="confirm-password" className="block text-sm font-semibold text-gray-700 mb-2">
-                    Confirmer le mot de passe
-                  </label>
-                  <input
-                    id="confirm-password"
-                    type="password"
-                    required
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="appearance-none block w-full px-3 py-3 border-2 border-gray-200 rounded-xl placeholder-gray-400 focus:outline-none focus:border-transparent transition-all duration-200 bg-white/70 backdrop-blur-sm hover:bg-white"
-                    onFocus={(e) => e.target.style.boxShadow = '0 0 0 3px rgba(140, 72, 255, 0.3)'}
-                    onBlur={(e) => e.target.style.boxShadow = ''}
-                    placeholder="••••••••"
-                  />
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full flex justify-center py-3.5 px-4 border border-transparent text-base font-semibold rounded-xl text-white disabled:opacity-50 transform transition-all duration-200 hover:scale-[1.02] shadow-lg hover:shadow-2xl"
-                style={{ background: 'linear-gradient(135deg, #8C48FF, #F2598A, #FFB152)' }}
-              >
-                {loading ? 'Inscription...' : 'S\'inscrire'}
-              </button>
-            </form>
-          ) : (
-            <form className="mt-8 space-y-5" onSubmit={handleConfirmation}>
+          <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
+            <div className="space-y-5">
               <div className="group">
-                <label htmlFor="code" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Code de confirmation
+                <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
+                  Email
                 </label>
                 <input
-                  id="code"
-                  type="text"
+                  id="email"
+                  type="email"
                   required
-                  value={confirmationCode}
-                  onChange={(e) => setConfirmationCode(e.target.value)}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   className="appearance-none block w-full px-3 py-3 border-2 border-gray-200 rounded-xl placeholder-gray-400 focus:outline-none focus:border-transparent transition-all duration-200 bg-white/70 backdrop-blur-sm hover:bg-white"
                   onFocus={(e) => e.target.style.boxShadow = '0 0 0 3px rgba(140, 72, 255, 0.3)'}
                   onBlur={(e) => e.target.style.boxShadow = ''}
-                  placeholder="123456"
+                  placeholder="votre@email.com"
                 />
-                <p className="mt-1 text-xs text-gray-500">Vérifiez votre boîte email</p>
               </div>
 
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full flex justify-center py-3.5 px-4 border border-transparent text-base font-semibold rounded-xl text-white disabled:opacity-50 transform transition-all duration-200 hover:scale-[1.02] shadow-lg hover:shadow-2xl"
-                style={{ background: 'linear-gradient(135deg, #8C48FF, #F2598A, #FFB152)' }}
-              >
-                {loading ? 'Confirmation...' : 'Confirmer'}
-              </button>
-            </form>
-          )}
+              <div className="group">
+                <label htmlFor="phone" className="block text-sm font-semibold text-gray-700 mb-2">
+                  Téléphone <span className="text-red-500">*</span>
+                </label>
+                <input
+                  id="phone"
+                  type="tel"
+                  required
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="appearance-none block w-full px-3 py-3 border-2 border-gray-200 rounded-xl placeholder-gray-400 focus:outline-none focus:border-transparent transition-all duration-200 bg-white/70 backdrop-blur-sm hover:bg-white"
+                  onFocus={(e) => e.target.style.boxShadow = '0 0 0 3px rgba(140, 72, 255, 0.3)'}
+                  onBlur={(e) => e.target.style.boxShadow = ''}
+                  placeholder="+237683845543"
+                />
+                <p className="mt-1 text-xs text-gray-500">Format international (ex: +237...)</p>
+              </div>
+
+              <div className="group">
+                <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
+                  Mot de passe
+                </label>
+                <input
+                  id="password"
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="appearance-none block w-full px-3 py-3 border-2 border-gray-200 rounded-xl placeholder-gray-400 focus:outline-none focus:border-transparent transition-all duration-200 bg-white/70 backdrop-blur-sm hover:bg-white"
+                  onFocus={(e) => e.target.style.boxShadow = '0 0 0 3px rgba(140, 72, 255, 0.3)'}
+                  onBlur={(e) => e.target.style.boxShadow = ''}
+                  placeholder="••••••••"
+                />
+                <p className="mt-1 text-xs text-gray-500">Minimum 8 caractères</p>
+              </div>
+
+              <div className="group">
+                <label htmlFor="confirm-password" className="block text-sm font-semibold text-gray-700 mb-2">
+                  Confirmer le mot de passe
+                </label>
+                <input
+                  id="confirm-password"
+                  type="password"
+                  required
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="appearance-none block w-full px-3 py-3 border-2 border-gray-200 rounded-xl placeholder-gray-400 focus:outline-none focus:border-transparent transition-all duration-200 bg-white/70 backdrop-blur-sm hover:bg-white"
+                  onFocus={(e) => e.target.style.boxShadow = '0 0 0 3px rgba(140, 72, 255, 0.3)'}
+                  onBlur={(e) => e.target.style.boxShadow = ''}
+                  placeholder="••••••••"
+                />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full flex justify-center py-3.5 px-4 border border-transparent text-base font-semibold rounded-xl text-white disabled:opacity-50 transform transition-all duration-200 hover:scale-[1.02] shadow-lg hover:shadow-2xl"
+              style={{ background: 'linear-gradient(135deg, #8C48FF, #F2598A, #FFB152)' }}
+            >
+              {loading ? 'Inscription...' : 'S\'inscrire'}
+            </button>
+          </form>
 
           <div className="mt-8 text-center">
             <p className="text-sm text-gray-600">

@@ -87,6 +87,16 @@ const apiService = {
     return response.data;
   },
 
+  updateProfile: async (data) => {
+    const response = await api.put('/auth/profile', data);
+    return response.data;
+  },
+
+  deleteProfile: async () => {
+    const response = await api.delete('/auth/profile');
+    return response.data;
+  },
+
   // Utilisateur — stats et partitions
   getUserStats: async () => {
     const response = await api.get('/auth/profile');

@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, UseGuards, Req } from '@nestjs/common';
+import { Controller, Post, Body, Get, Put, Delete, UseGuards, Req } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { Public } from '../common/decorators/public.decorator';
@@ -24,5 +24,19 @@ export class AuthController {
       ...req.user,
       ...stats,
     };
+  }
+
+  @Put('profile')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Met à jour le profil de l\'utilisateur connecté' })
+  async updateProfile(@Req() req, @Body('name') name: string) {
+    return this.authService.updateProfile(req.user, name);
+  }
+
+  @Delete('profile')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Supprime définitivement le compte de l\'utilisateur' })
+  async deleteAccount(@Req() req) {
+    return this.authService.deleteAccount(req.user);
   }
 }

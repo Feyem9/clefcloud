@@ -7,7 +7,9 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
   sendPasswordResetEmail,
-  sendEmailVerification
+  sendEmailVerification,
+  updateProfile,
+  deleteUser
 } from 'firebase/auth';
 import { auth } from '../firebase/config';
 import apiService from '../services/api';
@@ -84,6 +86,44 @@ export const AuthProvider = ({ children }) => {
     return signOut(auth);
   };
 
+  // Mise à jour de profil
+  const updateUserProfile = async (displayName) => {
+    setError(null);
+    try {
+      if (!currentUser) throw new Error('Utilisateur non connecté');
+
+      // Update Firebase
+      await updateProfile(currentUser, { displayName });
+      // Update Postgres
+      await apiService.updateProfile({ name: displayName });
+
+      // Actualiser le currentUser localement
+      setCurrentUser({ ...currentUser, displayName });
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    }
+  };
+
+  // Suppression de profil
+  const deleteAccount = async () => {
+    setError(null);
+    try {
+      if (!currentUser) throw new Error('Utilisateur non connecté');
+
+      // Delete from Postgres first (needs the active Firebase token)
+      await apiService.deleteProfile();
+      // Delete from Firebase
+      await deleteUser(currentUser);
+
+      apiService.logout();
+      setCurrentUser(null);
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    }
+  };
+
   // Surveillance de l'état de l'utilisateur
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -91,6 +131,14 @@ export const AuthProvider = ({ children }) => {
         // Rafraîchir le token Bearer pour les appels API backend
         const token = await user.getIdToken();
         apiService.setAuthToken(token);
+
+        // Synchroniser immédiatement avec le backend PostgreSQL
+        try {
+          await apiService.validateToken(token);
+        } catch (err) {
+          console.error('Erreur lors de la synchronisation backend de firebase:', err);
+        }
+
         setCurrentUser(user);
       } else {
         setCurrentUser(null);
@@ -110,6 +158,8 @@ export const AuthProvider = ({ children }) => {
     loginWithGoogle,
     logout,
     forgotPassword,
+    updateUserProfile,
+    deleteAccount,
     loading,
     error
   };

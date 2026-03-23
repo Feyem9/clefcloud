@@ -25,9 +25,18 @@ const apiService = {
     }
   },
 
-  validateToken: async (token) => {
-    const response = await api.post('/auth/validate', { token });
-    return response.data;
+  validateToken: async (token, retries = 3) => {
+    // Système de Retry pour gérer le réveil (Cold Start) du serveur gratuit Render ou les requêtes avortées
+    for (let i = 0; i < retries; i++) {
+      try {
+        const response = await api.post('/auth/validate', { token });
+        return response.data;
+      } catch (err) {
+        if (i === retries - 1) throw err; // Si c'est la dernière tentative, on throw l'erreur
+        // Attendre 2 secondes avant de retenter (le temps que Render se réveille)
+        await new Promise(resolve => setTimeout(resolve, 2000));
+      }
+    }
   },
 
   logout: () => {

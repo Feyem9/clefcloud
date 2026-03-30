@@ -1,7 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { S3Client, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, PutObjectCommand, DeleteObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 @Injectable()
 export class R2Service {
@@ -78,5 +79,16 @@ export class R2Service {
     } catch (error) {
       this.logger.error(`Erreur suppression R2: ${error.message}`);
     }
+  }
+
+  /**
+   * Génère une URL signée temporaire (Presigned URL)
+   */
+  async getPresignedUrl(storagePath: string, expiresIn: number = 3600): Promise<string> {
+    const command = new GetObjectCommand({
+      Bucket: this.bucketName,
+      Key: storagePath,
+    });
+    return getSignedUrl(this.s3Client, command, { expiresIn });
   }
 }

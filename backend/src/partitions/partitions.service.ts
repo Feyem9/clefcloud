@@ -209,6 +209,12 @@ export class PartitionsService {
       throw new NotFoundException('Aucun fichier associé à cette partition');
     }
 
+    // Si le fichier est sur R2, on génère une URL signée pour contourner les erreurs CORS/401
+    if (partition.download_url.includes('r2.dev') && partition.storage_path) {
+      const presignedUrl = await this.r2Service.getPresignedUrl(partition.storage_path, 3600);
+      return { url: presignedUrl };
+    }
+
     return { url: partition.download_url };
   }
 }

@@ -198,5 +198,17 @@ export class PartitionsService {
     return this.partitionRepository.remove(partition);
   }
 
-  // Les autres méthodes (favoris, recherche) restent similaires mais utilisent FirebaseService
+  async getDownloadUrl(id: number, user: User) {
+    const partition = await this.findOne(id, user);
+
+    if (!partition.hasAccess) {
+      throw new ForbiddenException('Vous n\'avez pas accès à cette partition');
+    }
+
+    if (!partition.download_url) {
+      throw new NotFoundException('Aucun fichier associé à cette partition');
+    }
+
+    return { url: partition.download_url };
+  }
 }

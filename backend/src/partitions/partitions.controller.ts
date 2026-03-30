@@ -58,6 +58,12 @@ export class PartitionsController {
     return this.partitionsService.findFavorites(req.user);
   }
 
+  @Get(':id/download')
+  @ApiOperation({ summary: 'Obtenir l\'URL de téléchargement d\'une partition' })
+  async getDownloadUrl(@Param('id') id: string, @Req() req) {
+    return this.partitionsService.getDownloadUrl(+id, req.user);
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Récupérer une partition par ID' })
   async findOne(@Param('id') id: string, @Req() req) {

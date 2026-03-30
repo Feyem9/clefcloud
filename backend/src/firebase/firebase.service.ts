@@ -15,7 +15,6 @@ export class FirebaseService implements OnModuleInit {
     const privateKey = this.configService
       .get<string>('FIREBASE_PRIVATE_KEY')
       ?.replace(/\\n/g, '\n');
-    const storageBucket = this.configService.get<string>('FIREBASE_STORAGE_BUCKET');
 
     if (!projectId || !clientEmail || !privateKey) {
       this.logger.error('❌ Configuration Firebase incomplète dans le .env !');
@@ -30,7 +29,6 @@ export class FirebaseService implements OnModuleInit {
             clientEmail,
             privateKey,
           }),
-          storageBucket,
         });
         this.logger.log(`✅ Firebase Admin initialisé pour le projet : ${projectId}`);
       } else {
@@ -46,10 +44,6 @@ export class FirebaseService implements OnModuleInit {
     return admin.auth(this.firebaseApp);
   }
 
-  get storage() {
-    return admin.storage(this.firebaseApp).bucket();
-  }
-
   /**
    * Vérifie un token ID Firebase envoyé par le frontend
    */
@@ -59,48 +53,6 @@ export class FirebaseService implements OnModuleInit {
     } catch (error) {
       this.logger.error(`Token verification failed: ${error.message}`);
       throw error;
-    }
-  }
-
-  /**
-   * Upload d'un fichier (Partition ou Audio)
-   */
-  async uploadFile(
-    userId: number,
-    file: Express.Multer.File,
-    cleanPath: string,
-  ): Promise<{ storagePath: string; downloadUrl: string }> {
-    const bucket = this.storage;
-    const fileRef = bucket.file(cleanPath);
-
-    await fileRef.save(file.buffer, {
-      contentType: file.mimetype,
-      metadata: {
-        metadata: {
-          uploadedBy: String(userId),
-        },
-      },
-    });
-
-    // Rendre le fichier public via URL standard (Google Cloud IAM strict)
-    // Format : https://firebasestorage.googleapis.com/v0/b/<bucket_name>/o/<encoded_path>?alt=media
-    const encodedPath = encodeURIComponent(cleanPath).replace(/%2F/g, '/');
-    const downloadUrl = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodedPath}?alt=media`;
-
-    this.logger.log(`Fichier uploadé : ${cleanPath}`);
-
-    return { storagePath: cleanPath, downloadUrl };
-  }
-
-  /**
-   * Suppression d'un fichier
-   */
-  async deleteFile(storagePath: string): Promise<void> {
-    try {
-      await this.storage.file(storagePath).delete();
-      this.logger.log(`Fichier supprimé : ${storagePath}`);
-    } catch (error) {
-      this.logger.error(`Erreur suppression fichier ${storagePath}: ${error.message}`);
     }
   }
 }

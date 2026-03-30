@@ -10,6 +10,7 @@ import { HealthModule } from './health/health.module';
 import { APP_GUARD } from '@nestjs/core';
 import { FirebaseAuthGuard } from './auth/guards/firebase-auth.guard';
 import { PayunitModule } from './payunit/payunit.module';
+import { R2Module } from './r2/r2.module';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { PayunitModule } from './payunit/payunit.module';
 
     // Modules fonctionnels
     FirebaseModule,
+    R2Module,
     AuthModule,
     PartitionsModule,
     UsersModule,

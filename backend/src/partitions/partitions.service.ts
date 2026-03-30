@@ -6,7 +6,7 @@ import { Favorite } from './entities/favorite.entity';
 import { CreatePartitionDto } from './dto/create-partition.dto';
 import { User } from '../users/entities/user.entity';
 import { UserPartition } from '../users/entities/user-partition.entity';
-import { FirebaseService } from '../firebase/firebase.service';
+import { R2Service } from '../r2/r2.service';
 
 @Injectable()
 export class PartitionsService {
@@ -19,7 +19,7 @@ export class PartitionsService {
     private favoriteRepository: Repository<Favorite>,
     @InjectRepository(UserPartition)
     private userPartitionRepository: Repository<UserPartition>,
-    private firebaseService: FirebaseService,
+    private r2Service: R2Service,
   ) {}
 
   async create(
@@ -43,7 +43,7 @@ export class PartitionsService {
     try {
       // 1. Gérer le PDF
       if (files.pdf && files.pdf[0]) {
-        const { storagePath, downloadUrl } = await this.firebaseService.uploadFile(
+        const { storagePath, downloadUrl } = await this.r2Service.uploadFile(
           user.id,
           files.pdf[0],
           `${baseFolder}/partition.pdf`,
@@ -54,7 +54,7 @@ export class PartitionsService {
 
       // 2. Gérer l'Audio
       if (files.audio && files.audio[0]) {
-        const { storagePath, downloadUrl } = await this.firebaseService.uploadFile(
+        const { storagePath, downloadUrl } = await this.r2Service.uploadFile(
           user.id,
           files.audio[0],
           `${baseFolder}/demo.mp3`,
@@ -191,9 +191,9 @@ export class PartitionsService {
       throw new ForbiddenException('Vous ne pouvez supprimer que vos propres partitions');
     }
 
-    // Supprimer les fichiers sur Firebase
-    if (partition.storage_path) await this.firebaseService.deleteFile(partition.storage_path);
-    if (partition.audio_storage_path) await this.firebaseService.deleteFile(partition.audio_storage_path);
+    // Supprimer les fichiers sur R2
+    if (partition.storage_path) await this.r2Service.deleteFile(partition.storage_path);
+    if (partition.audio_storage_path) await this.r2Service.deleteFile(partition.audio_storage_path);
 
     return this.partitionRepository.remove(partition);
   }

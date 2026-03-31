@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&amp;family=Manrope:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-surface": "#e5e2e1",
+              "surface-container-lowest": "#0e0e0e",
+              "secondary-fixed": "#dde1ff",
+              "secondary-fixed-dim": "#bbc4f7",
+              "on-error": "#690005",
+              "on-secondary": "#242d58",
+              "primary-fixed": "#dee0ff",
+              "background": "#131313",
+              "surface-container-highest": "#353534",
+              "inverse-primary": "#4858ab",
+              "on-secondary-fixed": "#0e1842",
+              "on-error-container": "#ffdad6",
+              "on-primary-fixed": "#00105b",
+              "on-primary-fixed-variant": "#2f3f92",
+              "inverse-surface": "#e5e2e1",
+              "on-primary": "#15267b",
+              "on-tertiary-fixed-variant": "#574500",
+              "primary-container": "#14267a",
+              "on-surface-variant": "#c6c5d4",
+              "surface-container-low": "#1c1b1b",
+              "on-secondary-container": "#a9b2e5",
+              "surface-dim": "#131313",
+              "surface-tint": "#bac3ff",
+              "on-primary-container": "#8392ea",
+              "on-tertiary-fixed": "#241a00",
+              "surface": "#131313",
+              "tertiary": "#e9c349",
+              "secondary-container": "#3b4470",
+              "outline": "#908f9d",
+              "error-container": "#93000a",
+              "error": "#ffb4ab",
+              "surface-variant": "#353534",
+              "on-tertiary-container": "#4e3d00",
+              "tertiary-fixed-dim": "#e9c349",
+              "primary-fixed-dim": "#bac3ff",
+              "on-background": "#e5e2e1",
+              "on-secondary-fixed-variant": "#3b4470",
+              "surface-container-high": "#2a2a2a",
+              "surface-container": "#201f1f",
+              "secondary": "#bbc4f7",
+              "inverse-on-surface": "#313030",
+              "tertiary-container": "#cba72f",
+              "outline-variant": "#454652",
+              "on-tertiary": "#3c2f00",
+              "primary": "#bac3ff",
+              "surface-bright": "#393939",
+              "tertiary-fixed": "#ffe088"
+            },
+            fontFamily: {
+              "headline": ["Noto Serif"],
+              "body": ["Manrope"],
+              "label": ["Manrope"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #131313;
+            color: #e5e2e1;
+            font-family: 'Manrope', sans-serif;
+        }
+        .glass-nav {
+            background: rgba(19, 19, 19, 0.6);
+            backdrop-filter: blur(20px);
+        }
+        .score-scrubber-track {
+            height: 4px;
+            background: #353534;
+            border-radius: 2px;
+            position: relative;
+        }
+        .score-scrubber-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #bac3ff, #bbc4f7);
+            border-radius: 2px;
+        }
+        .score-scrubber-head {
+            width: 12px;
+            height: 12px;
+            background: #e9c349;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 10px rgba(233, 195, 73, 0.5);
+        }
+    </style>
+</head>
+<body class="bg-background selection:bg-primary-container selection:text-primary">
+<!-- TopNavBar -->
+<header class="fixed top-0 w-full z-50 bg-[#131313]/60 backdrop-blur-xl shadow-2xl shadow-black/40">
+<div class="flex justify-between items-center px-8 h-20 w-full max-w-[1440px] mx-auto">
+<div class="text-[#bac3ff] font-['Noto_Serif'] italic text-2xl tracking-tighter">ClefCloud</div>
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-slate-400 hover:text-slate-200 transition-colors font-['Noto_Serif'] font-bold text-lg tracking-tight" href="#">Home</a>
+<a class="text-slate-400 hover:text-slate-200 transition-colors font-['Noto_Serif'] font-bold text-lg tracking-tight" href="#">Library</a>
+<a class="text-slate-400 hover:text-slate-200 transition-colors font-['Noto_Serif'] font-bold text-lg tracking-tight" href="#">Upload</a>
+<a class="text-[#bac3ff] border-b-2 border-[#bac3ff] pb-1 font-['Noto_Serif'] font-bold text-lg tracking-tight" href="#">Messe</a>
+<a class="text-slate-400 hover:text-slate-200 transition-colors font-['Noto_Serif'] font-bold text-lg tracking-tight" href="#">Premium</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="p-2 hover:bg-[#353534]/50 rounded-lg transition-all active:scale-95 duration-200">
+<span class="material-symbols-outlined text-[#bac3ff]">search</span>
+</button>
+<button class="p-2 hover:bg-[#353534]/50 rounded-lg transition-all active:scale-95 duration-200">
+<span class="material-symbols-outlined text-[#bac3ff]">account_circle</span>
+</button>
+</div>
+</div>
+</header>
+<main class="pt-32 pb-20 px-6 max-w-7xl mx-auto">
+<!-- Header Section -->
+<section class="mb-16">
+<span class="font-label text-tertiary text-sm tracking-widest uppercase mb-4 block">Planificateur Liturgique</span>
+<div class="flex flex-col md:flex-row justify-between items-end gap-6">
+<div>
+<h1 class="font-headline text-5xl md:text-7xl font-bold tracking-tight text-on-surface mb-6">Messe de Dimanche</h1>
+<p class="font-body text-on-surface-variant text-lg max-w-2xl leading-relaxed">
+                        Composez le manuscrit de votre service. Organisez chaque temps fort de la liturgie avec l'élégance d'une partition classique.
+                    </p>
+</div>
+<div class="flex gap-4">
+<button class="bg-surface-container-high text-on-surface px-6 py-3 rounded-full font-label text-sm font-semibold hover:bg-surface-container-highest transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">save</span> SAUVEGARDER LE PROGRAMME
+                    </button>
+<button class="bg-gradient-to-r from-primary to-primary-container text-on-primary px-8 py-3 rounded-full font-label text-sm font-bold shadow-lg shadow-primary/20 hover:scale-105 transition-all active:scale-95">
+                        DIFFUSER LA MESSE
+                    </button>
+</div>
+</div>
+</section>
+<!-- Program Timeline Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+<!-- Sidebar: Available Scores / Search -->
+<aside class="lg:col-span-4 space-y-8 order-2 lg:order-1">
+<div class="bg-surface-container-low rounded-xl p-6 space-y-6">
+<div class="relative">
+<input class="w-full bg-surface-container-lowest border-none focus:ring-1 focus:ring-primary rounded-lg py-3 px-10 text-on-surface font-body" placeholder="Rechercher une partition..." type="text"/>
+<span class="material-symbols-outlined absolute left-3 top-3.5 text-on-surface-variant text-sm">search</span>
+</div>
+<div class="space-y-4">
+<h3 class="font-label text-xs font-bold text-on-surface-variant tracking-widest uppercase">Suggestions Recentes</h3>
+<!-- Mini Card -->
+<div class="group bg-surface-container-high p-4 rounded-lg flex items-center gap-4 cursor-pointer hover:bg-surface-container-highest transition-all">
+<div class="w-12 h-16 bg-surface-container-lowest overflow-hidden rounded shadow-md group-hover:shadow-primary/10 transition-all">
+<img class="w-full h-full object-cover opacity-80 group-hover:opacity-100" data-alt="vintage musical manuscript sheet with faded ink notes on aged yellowed paper soft warm lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuArZrolSL_gGWaZY2w7ERt2q_q-zqsEFnXcnwpJlTa-yr5xnoPJ9inDMQ-AlgJ-jxnFrq25YlqOzB_k6k0DXhOFL8C4xrW92M94LyQ41acjRBqT_j7aH_0YmlRe-iRbBaV7pWZjPggaSPQb-bauWEEIg2JhWjnCrdY0LLbke9Hq_P1Atoucdf40mttkJb_me6VNn5GPJ27QSUMwRF-2-qNPlbQ42j3Ili_-X62u1j7gxbzCFyBse9-HhkQOhwWQRFqod0FV5WqBYo4"/>
+</div>
+<div class="flex-1">
+<p class="font-headline text-sm font-bold text-primary">Kyrie des Anges</p>
+<p class="font-body text-xs text-on-surface-variant">Traditionnel • G Major</p>
+</div>
+<button class="text-tertiary hover:scale-110 transition-transform">
+<span class="material-symbols-outlined">add_circle</span>
+</button>
+</div>
+<div class="group bg-surface-container-high p-4 rounded-lg flex items-center gap-4 cursor-pointer hover:bg-surface-container-highest transition-all">
+<div class="w-12 h-16 bg-surface-container-lowest overflow-hidden rounded shadow-md group-hover:shadow-primary/10 transition-all">
+<img class="w-full h-full object-cover opacity-80 group-hover:opacity-100" data-alt="modern choral sheet music clean lines minimalist aesthetic dark ink on white crisp paper dramatic shadow" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDO4AG8qo0ydjMii6fPTxn5jBVDYOpLUnVYlgFZuKU08O5x3hlI21e-pkl52EeH3Kvy7qYwr8aBoOddicQR5KRGHdgtaWAe1k7jEF_IM8TTfFgclFp9UnIhXruWTfZRzDawAKOq9x3Zq6VZLggOKSVniezucULUYNrhpoxEAoIWyaJZ2LfURXdug4vCRx4FK6WhyFMYQiZQSqLrufd6RUS935a10nPZpHiSzgVeSi0efP5XlAdUZukFw13xv05zCZ5KAo2dGgUopgU"/>
+</div>
+<div class="flex-1">
+<p class="font-headline text-sm font-bold text-primary">Gloria in Excelsis</p>
+<p class="font-body text-xs text-on-surface-variant">L. Perosi • D Major</p>
+</div>
+<button class="text-tertiary hover:scale-110 transition-transform">
+<span class="material-symbols-outlined">add_circle</span>
+</button>
+</div>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-8 rounded-2xl border border-outline-variant/10">
+<h4 class="font-headline text-xl text-on-surface mb-4">Note de l'organiste</h4>
+<p class="font-body text-on-surface-variant italic text-sm leading-relaxed">
+                        "Pour le Kyrie, privilégier un tempo lent et une registration douce au récit. Le Gloria doit être éclatant avec le plein jeu."
+                    </p>
+</div>
+</aside>
+<!-- Main Timeline: Liturgical Flow -->
+<div class="lg:col-span-8 order-1 lg:order-2">
+<div class="relative space-y-12 before:absolute before:left-6 before:top-0 before:bottom-0 before:w-px before:bg-gradient-to-b before:from-primary/40 before:via-outline-variant/20 before:to-transparent">
+<!-- Liturgical Step: Entrée -->
+<div class="relative pl-16 group">
+<div class="absolute left-3.5 top-0 w-5 h-5 bg-background border-2 border-primary rounded-full z-10 group-hover:bg-primary transition-colors"></div>
+<div class="flex items-center justify-between mb-4">
+<h2 class="font-headline text-2xl font-bold text-on-surface tracking-tight">Rites d'Entrée</h2>
+<span class="font-label text-xs text-on-surface-variant opacity-60">Étape 01 / 07</span>
+</div>
+<div class="bg-surface-container-low rounded-2xl p-6 flex flex-col md:flex-row gap-6 items-center hover:bg-surface-container-high transition-colors group-hover:shadow-2xl group-hover:shadow-black/50 border border-transparent hover:border-outline-variant/10">
+<div class="w-full md:w-32 h-40 bg-surface-container-lowest rounded-lg overflow-hidden shadow-xl">
+<img class="w-full h-full object-cover" data-alt="classical organ pipes close up metallic texture warm golden ambient light ethereal atmosphere" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAhSZCb00-g0VSwDFnl8x9L0_GykLBpD1RHOYQuZyXmikv_IRwjVW313-ZesC4G3HMX91H47s3t4QuxPKmNdDcym71s3f0t0uQ0jMsxVLPm8sRhXUUUEuo7vc3pVZaeMM7afiwKjRzkW1Saw_7AyNZJdNpECL71f__pwixWS1FDMuoyuOo2FtVV7GUmFZxNfH1poX27kOw0N2nwdx5YHUMCPUg-m5rEl4Sq7Gkp89RjSDimIeFjwjtCoG_YUVVJqV0sb5YQyrUJvqw"/>
+</div>
+<div class="flex-1 space-y-2">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-headline text-xl font-bold text-on-surface">Peuple de Lumière</h3>
+<p class="font-body text-primary-fixed-dim text-sm">Hymne d'Ouverture • Jean-Paul Lécot</p>
+</div>
+<span class="bg-tertiary/10 text-tertiary text-[10px] px-2 py-1 rounded font-bold uppercase tracking-widest">Favori</span>
+</div>
+<div class="flex items-center gap-4 py-3">
+<div class="flex-1 score-scrubber-track">
+<div class="score-scrubber-fill w-1/3"></div>
+<div class="score-scrubber-head left-1/3"></div>
+</div>
+<span class="font-label text-[10px] text-on-surface-variant">03:45</span>
+</div>
+<div class="flex gap-3">
+<button class="flex-1 bg-surface-container-highest text-on-surface py-2 rounded font-label text-[10px] font-bold tracking-widest uppercase hover:bg-primary hover:text-on-primary transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">visibility</span> Quick View
+                                    </button>
+<button class="p-2 text-on-surface-variant hover:text-error transition-colors">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Liturgical Step: Kyrie -->
+<div class="relative pl-16 group">
+<div class="absolute left-3.5 top-0 w-5 h-5 bg-background border-2 border-primary rounded-full z-10 group-hover:bg-primary transition-colors"></div>
+<div class="flex items-center justify-between mb-4">
+<h2 class="font-headline text-2xl font-bold text-on-surface tracking-tight">Kyrie Eleison</h2>
+<span class="font-label text-xs text-on-surface-variant opacity-60">Étape 02 / 07</span>
+</div>
+<div class="bg-surface-container-low border-2 border-dashed border-outline-variant/30 rounded-2xl p-8 flex flex-col items-center justify-center text-center group-hover:border-primary/50 transition-all cursor-pointer">
+<span class="material-symbols-outlined text-4xl text-outline-variant mb-3 group-hover:text-primary transition-colors">music_note</span>
+<p class="font-body text-on-surface-variant text-sm">Cliquez pour assigner un Kyrie à cette étape</p>
+</div>
+</div>
+<!-- Liturgical Step: Gloria -->
+<div class="relative pl-16 group">
+<div class="absolute left-3.5 top-0 w-5 h-5 bg-background border-2 border-primary rounded-full z-10 group-hover:bg-primary transition-colors"></div>
+<div class="flex items-center justify-between mb-4">
+<h2 class="font-headline text-2xl font-bold text-on-surface tracking-tight">Gloria</h2>
+<span class="font-label text-xs text-on-surface-variant opacity-60">Étape 03 / 07</span>
+</div>
+<div class="bg-surface-container-low rounded-2xl p-6 flex flex-col md:flex-row gap-6 items-center hover:bg-surface-container-high transition-colors border border-transparent hover:border-outline-variant/10">
+<div class="w-full md:w-32 h-40 bg-surface-container-lowest rounded-lg overflow-hidden shadow-xl">
+<img class="w-full h-full object-cover" data-alt="cathedral stained glass window casting colorful light on ancient stone wall dark dramatic atmosphere" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBFu9Pm1Yjvu9RabCErTW9ELEn319d1zqkl9az18zJZcXSCHPUGix1-iWl2AsEH28dreWp0gBLMS2cOOMhPleNu4c_zIur8lAiQMEcMRyBe2ni4kGfEYbOa_ddq2PncKeKUbtTCbOhqDju9WG2EXOI8zPBwFhb7h721thxuonn6UnKZZdmpFtu0x1Q2TQ6rEHk6crRDTxbuWlLVvXwPZE6F9y68fIunFHkgylYnGj0JH3ntVXGcxKEUd0N2WgSgCRQB4RkSDtg0bdg"/>
+</div>
+<div class="flex-1 space-y-2">
+<h3 class="font-headline text-xl font-bold text-on-surface">Messe de Saint Jean</h3>
+<p class="font-body text-primary-fixed-dim text-sm">Gloire à Dieu • C. Villanueva</p>
+<div class="flex items-center gap-4 py-3">
+<div class="flex-1 score-scrubber-track">
+<div class="score-scrubber-fill w-2/3"></div>
+<div class="score-scrubber-head left-2/3"></div>
+</div>
+<span class="font-label text-[10px] text-on-surface-variant">04:12</span>
+</div>
+<div class="flex gap-3">
+<button class="flex-1 bg-surface-container-highest text-on-surface py-2 rounded font-label text-[10px] font-bold tracking-widest uppercase hover:bg-primary hover:text-on-primary transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">visibility</span> Quick View
+                                    </button>
+<button class="p-2 text-on-surface-variant hover:text-error transition-colors">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Score Preview Modal (Simulation) -->
+<div class="fixed inset-0 z-[100] flex items-center justify-center px-4 pointer-events-none">
+<div class="bg-[#131313]/90 backdrop-blur-2xl w-full max-w-2xl h-[819px] rounded-2xl shadow-[0_40px_80px_rgba(0,0,0,0.8)] border border-outline-variant/20 flex flex-col pointer-events-auto opacity-0 translate-y-10 scale-95 transition-all">
+<!-- This would be toggled via JS in a real app -->
+</div>
+</div>
+<!-- Active Song Quick Info (FAB area) -->
+<div class="fixed bottom-8 left-1/2 -translate-x-1/2 bg-surface-container-highest/80 backdrop-blur-md px-6 py-3 rounded-full flex items-center gap-8 shadow-2xl border border-primary/10 z-40">
+<div class="flex items-center gap-3 border-r border-outline-variant/20 pr-8">
+<span class="material-symbols-outlined text-tertiary" style="font-variation-settings: 'FILL' 1;">queue_music</span>
+<div>
+<p class="font-label text-[10px] text-on-surface-variant tracking-tighter uppercase font-bold">En préparation</p>
+<p class="font-body text-sm font-bold text-on-surface">7 Éléments • 22 min</p>
+</div>
+</div>
+<button class="bg-primary text-on-primary w-10 h-10 rounded-full flex items-center justify-center shadow-lg shadow-primary/20 hover:scale-110 active:scale-95 transition-all">
+<span class="material-symbols-outlined">play_arrow</span>
+</button>
+</div>
+<!-- Footer -->
+<footer class="bg-[#0e0e0e] w-full py-12 border-t border-[#454652]/15 mt-20">
+<div class="flex flex-col md:flex-row justify-between items-center px-12 w-full max-w-[1440px] mx-auto gap-8">
+<div class="text-[#e9c349] font-bold">ClefCloud</div>
+<div class="flex gap-8">
+<a class="font-['Manrope'] text-sm tracking-wide uppercase text-slate-500 hover:text-[#bac3ff] transition-colors opacity-80 hover:opacity-100" href="#">About</a>
+<a class="font-['Manrope'] text-sm tracking-wide uppercase text-slate-500 hover:text-[#bac3ff] transition-colors opacity-80 hover:opacity-100" href="#">Help</a>
+<a class="font-['Manrope'] text-sm tracking-wide uppercase text-slate-500 hover:text-[#bac3ff] transition-colors opacity-80 hover:opacity-100" href="#">Privacy</a>
+<a class="font-['Manrope'] text-sm tracking-wide uppercase text-slate-500 hover:text-[#bac3ff] transition-colors opacity-80 hover:opacity-100" href="#">Terms</a>
+<a class="font-['Manrope'] text-sm tracking-wide uppercase text-slate-500 hover:text-[#bac3ff] transition-colors opacity-80 hover:opacity-100" href="#">Social</a>
+</div>
+<div class="font-['Manrope'] text-sm tracking-wide uppercase text-slate-500">© 2024 ClefCloud. The Digital Manuscript.</div>
+</div>
+</footer>
+</body></html>

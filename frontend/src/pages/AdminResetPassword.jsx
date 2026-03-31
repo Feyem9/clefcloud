@@ -53,9 +53,9 @@ const AdminResetPassword = () => {
   return (
     <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8" style={{ background: 'radial-gradient(circle, rgba(255, 177, 82, 0.15) 6.6%, rgba(242, 89, 138, 0.15) 50%, rgba(140, 72, 255, 0.15) 89.6%)' }}>
       <div className="max-w-md w-full">
-        <div className="bg-white/95 backdrop-blur-xl p-8 sm:p-10 rounded-3xl shadow-2xl border-2 border-orange-300">
+        <div className="bg-white/95 backdrop-blur-xl p-8 sm:p-10 rounded-3xl shadow-ambient border-2 border-orange-300">
           {/* Warning Banner */}
-          <div className="mb-6 bg-orange-50 border-l-4 border-orange-500 text-orange-700 px-4 py-3 rounded-lg">
+          <div className="mb-6 bg-orange-50 border-l-4 border-orange-500 text-orange-700 px-4 py-3 rounded-xl">
             <div className="flex items-start">
               <svg className="w-5 h-5 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
@@ -92,7 +92,7 @@ const AdminResetPassword = () => {
           </div>
 
           {error && (
-            <div className="mt-6 bg-red-50 border-l-4 border-red-500 text-red-700 px-4 py-3 rounded-lg shadow-sm">
+            <div className="mt-6 bg-red-50 border-l-4 border-red-500 text-red-700 px-4 py-3 rounded-xl shadow-ambient">
               <div className="flex items-center">
                 <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
@@ -103,7 +103,7 @@ const AdminResetPassword = () => {
           )}
 
           {success && (
-            <div className="mt-6 bg-green-50 border-l-4 border-green-500 text-green-700 px-4 py-3 rounded-lg shadow-sm">
+            <div className="mt-6 bg-green-50 border-l-4 border-green-500 text-green-700 px-4 py-3 rounded-xl shadow-ambient">
               <div className="flex items-center">
                 <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
@@ -147,7 +147,7 @@ const AdminResetPassword = () => {
                   onBlur={(e) => e.target.style.boxShadow = ''}
                   placeholder="••••••••"
                 />
-                <p className="mt-1 text-xs text-gray-500">Minimum 8 caractères</p>
+                <p className="mt-1 text-xs text-outline-variant">Minimum 8 caractères</p>
               </div>
 
               <div className="group">
@@ -171,7 +171,7 @@ const AdminResetPassword = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex justify-center py-3.5 px-4 border border-transparent text-base font-semibold rounded-xl text-white disabled:opacity-50 transform transition-all duration-200 hover:scale-[1.02] shadow-lg hover:shadow-2xl"
+              className="w-full flex justify-center py-3.5 px-4 border border-transparent text-base font-semibold rounded-xl text-on-primary disabled:opacity-50 transform transition-all duration-200 hover:scale-[1.02] shadow-ambient hover:shadow-ambient"
               style={{ background: 'linear-gradient(135deg, #FFB152, #F2598A, #8C48FF)' }}
             >
               {loading ? '⚙️ Réinitialisation...' : '🔓 Réinitialiser (Admin)'}
@@ -179,7 +179,7 @@ const AdminResetPassword = () => {
           </form>
 
           <div className="mt-8 text-center">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-on-surface-variant">
               <Link to="/login" className="font-semibold transition-all duration-200" style={{ background: 'linear-gradient(135deg, #8C48FF, #F2598A)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
                 ← Retour à la connexion
               </Link>

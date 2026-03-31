@@ -53,7 +53,7 @@ const Signup = () => {
   return (
     <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8" style={{ background: 'radial-gradient(circle, rgba(255, 177, 82, 0.15) 6.6%, rgba(242, 89, 138, 0.15) 50%, rgba(140, 72, 255, 0.15) 89.6%)' }}>
       <div className="max-w-md w-full">
-        <div className="bg-white/95 backdrop-blur-xl p-8 sm:p-10 rounded-3xl shadow-2xl border-2 border-white/30">
+        <div className="bg-white/95 backdrop-blur-xl p-8 sm:p-10 rounded-3xl shadow-ambient border-2 border-white/30">
           <div>
             <div className="flex justify-center">
               <div className="relative">
@@ -79,7 +79,7 @@ const Signup = () => {
           </div>
 
           {error && (
-            <div className="mt-6 bg-red-50 border-l-4 border-red-500 text-red-700 px-4 py-3 rounded-lg shadow-sm">
+            <div className="mt-6 bg-red-50 border-l-4 border-red-500 text-red-700 px-4 py-3 rounded-xl shadow-ambient">
               <div className="flex items-center">
                 <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
@@ -90,7 +90,7 @@ const Signup = () => {
           )}
 
           {success && (
-            <div className="mt-6 bg-green-50 border-l-4 border-green-500 text-green-700 px-4 py-3 rounded-lg shadow-sm">
+            <div className="mt-6 bg-green-50 border-l-4 border-green-500 text-green-700 px-4 py-3 rounded-xl shadow-ambient">
               <div className="flex items-center">
                 <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
@@ -134,7 +134,7 @@ const Signup = () => {
                   onBlur={(e) => e.target.style.boxShadow = ''}
                   placeholder="+237683845543"
                 />
-                <p className="mt-1 text-xs text-gray-500">Format international (ex: +237...)</p>
+                <p className="mt-1 text-xs text-outline-variant">Format international (ex: +237...)</p>
               </div>
 
               <div className="group">
@@ -152,7 +152,7 @@ const Signup = () => {
                   onBlur={(e) => e.target.style.boxShadow = ''}
                   placeholder="••••••••"
                 />
-                <p className="mt-1 text-xs text-gray-500">Minimum 8 caractères</p>
+                <p className="mt-1 text-xs text-outline-variant">Minimum 8 caractères</p>
               </div>
 
               <div className="group">
@@ -176,7 +176,7 @@ const Signup = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex justify-center py-3.5 px-4 border border-transparent text-base font-semibold rounded-xl text-white disabled:opacity-50 transform transition-all duration-200 hover:scale-[1.02] shadow-lg hover:shadow-2xl"
+              className="w-full flex justify-center py-3.5 px-4 border border-transparent text-base font-semibold rounded-xl text-on-primary disabled:opacity-50 transform transition-all duration-200 hover:scale-[1.02] shadow-ambient hover:shadow-ambient"
               style={{ background: 'linear-gradient(135deg, #8C48FF, #F2598A, #FFB152)' }}
             >
               {loading ? 'Inscription...' : 'S\'inscrire'}
@@ -184,7 +184,7 @@ const Signup = () => {
           </form>
 
           <div className="mt-8 text-center">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-on-surface-variant">
               Déjà un compte ?{' '}
               <Link to="/login" className="font-semibold transition-all duration-200" style={{ background: 'linear-gradient(135deg, #8C48FF, #F2598A)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
                 Connectez-vous

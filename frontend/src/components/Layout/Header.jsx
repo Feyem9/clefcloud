@@ -24,7 +24,7 @@ const Header = () => {
   };
 
   return (
-    <header className="bg-white dark:bg-gray-900 shadow-md sticky top-0 z-50 transition-colors">
+    <header className="bg-surface-container-lowest/80 backdrop-blur-xl sticky top-0 z-50 transition-colors">
       <nav className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
@@ -32,23 +32,23 @@ const Header = () => {
             <svg className="w-8 h-8 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
             </svg>
-            <span className="text-2xl font-bold text-gray-800 dark:text-white">ClefCloud</span>
+            <span className="text-2xl font-bold text-on-surface font-display">ClefCloud</span>
           </Link>
 
           {/* Desktop Menu */}
           <div className="hidden lg:flex items-center space-x-6">
             {currentUser ? (
               <>
-                <Link to="/library" className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition font-medium active:scale-95">
+                <Link to="/library" className="text-on-surface-variant hover:text-primary transition font-medium active:scale-95">
                   Partitions
                 </Link>
-                <Link to="/messe" className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition font-medium active:scale-95">
+                <Link to="/messe" className="text-on-surface-variant hover:text-primary transition font-medium active:scale-95">
                   Messe
                 </Link>
-                <Link to="/upload" className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition font-medium active:scale-95">
+                <Link to="/upload" className="text-on-surface-variant hover:text-primary transition font-medium active:scale-95">
                   Ajouter
                 </Link>
-                <Link to="/contact" className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition font-medium active:scale-95">
+                <Link to="/contact" className="text-on-surface-variant hover:text-primary transition font-medium active:scale-95">
                   Contact
                 </Link>
                 <Link to="/premium" className="text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 transition font-semibold active:scale-95 flex items-center gap-1">
@@ -66,15 +66,15 @@ const Header = () => {
               </>
             ) : (
               <>
-                <Link to="/contact" className="text-gray-700 hover:text-purple-600 transition font-medium active:scale-95">
+                <Link to="/contact" className="text-on-surface hover:text-primary transition font-medium active:scale-95">
                   Contact
                 </Link>
-                <Link to="/login" className="text-gray-700 hover:text-purple-600 transition font-medium active:scale-95">
+                <Link to="/login" className="text-on-surface hover:text-primary transition font-medium active:scale-95">
                   Connexion
                 </Link>
                 <Link
                   to="/signup"
-                  className="text-gray-700 hover:text-purple-600 transition font-medium active:scale-95bg-primary-600 hover:bg-primary-700 px-4 py-2 rounded-lg transition font-medium shadow-md active:scale-95"
+                  className="bg-gradient-to-br from-primary to-primary-container text-on-primary px-6 py-2 rounded-full transition-all shadow-ambient active:scale-95"
                 >
                   Inscription
                 </Link>
@@ -124,18 +124,18 @@ const Header = () => {
           onClick={closeMobileMenu}
         >
           <div
-            className={`fixed right-0 top-0 h-full w-80 bg-white dark:bg-gray-900 shadow-2xl transform transition-transform duration-300 ease-in-out ${mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
+            className={`fixed right-0 top-0 h-full w-80 bg-surface-container-lowest shadow-ambient transform transition-transform duration-300 ease-in-out ${mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
               }`}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex flex-col h-full">
               {/* Mobile Menu Header */}
-              <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+              <div className="flex items-center justify-between p-6 bg-surface-container-low">
                 <div className="flex items-center space-x-2">
                   <svg className="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
                   </svg>
-                  <span className="text-xl font-bold text-gray-800 dark:text-white">Menu</span>
+                  <span className="text-xl font-bold text-on-surface font-display">Menu</span>
                 </div>
                 <button
                   onClick={closeMobileMenu}
@@ -157,14 +157,14 @@ const Header = () => {
                       onClick={closeMobileMenu}
                       className="flex items-center space-x-3 p-4 rounded-xl bg-primary-50 hover:bg-primary-100 transition-all"
                     >
-                      <div className="w-12 h-12 bg-primary-600 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                      <div className="w-12 h-12 bg-primary-600 rounded-full flex items-center justify-center text-on-primary font-bold text-lg shadow-lg">
                         {currentUser.email?.[0].toUpperCase()}
                       </div>
                       <div className="flex-1">
                         <p className="font-semibold text-gray-900">Mon Profil</p>
-                        <p className="text-sm text-gray-600 truncate">{currentUser.email}</p>
+                        <p className="text-sm text-on-surface-variant truncate">{currentUser.email}</p>
                       </div>
-                      <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-5 h-5 text-outline-variant" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
                     </Link>
@@ -175,7 +175,7 @@ const Header = () => {
                         onClick={closeMobileMenu}
                         className="flex items-center space-x-3 p-4 rounded-xl hover:bg-gray-50 transition-colors group"
                       >
-                        <svg className="w-6 h-6 text-gray-400 group-hover:text-primary-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-6 h-6 text-outline-variant group-hover:text-primary-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
                         </svg>
                         <span className="font-medium text-gray-700 group-hover:text-primary-600 transition-colors">Partitions</span>
@@ -186,7 +186,7 @@ const Header = () => {
                         onClick={closeMobileMenu}
                         className="flex items-center space-x-3 p-4 rounded-xl hover:bg-gray-50 transition-colors group"
                       >
-                        <svg className="w-6 h-6 text-gray-400 group-hover:text-primary-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-6 h-6 text-outline-variant group-hover:text-primary-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                         </svg>
                         <span className="font-medium text-gray-700 group-hover:text-primary-600 transition-colors">Messe</span>
@@ -197,7 +197,7 @@ const Header = () => {
                         onClick={closeMobileMenu}
                         className="flex items-center space-x-3 p-4 rounded-xl hover:bg-gray-50 transition-colors group"
                       >
-                        <svg className="w-6 h-6 text-gray-400 group-hover:text-primary-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-6 h-6 text-outline-variant group-hover:text-primary-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                         </svg>
                         <span className="font-medium text-gray-700 group-hover:text-primary-600 transition-colors">Ajouter</span>
@@ -208,7 +208,7 @@ const Header = () => {
                         onClick={closeMobileMenu}
                         className="flex items-center space-x-3 p-4 rounded-xl hover:bg-gray-50 transition-colors group"
                       >
-                        <svg className="w-6 h-6 text-gray-400 group-hover:text-primary-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-6 h-6 text-outline-variant group-hover:text-primary-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                         </svg>
                         <span className="font-medium text-gray-700 group-hover:text-primary-600 transition-colors">Contact</span>
@@ -233,7 +233,7 @@ const Header = () => {
                       onClick={closeMobileMenu}
                       className="flex items-center space-x-3 p-4 rounded-xl hover:bg-gray-50 transition-colors group"
                     >
-                      <svg className="w-6 h-6 text-gray-400 group-hover:text-purple-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-6 h-6 text-outline-variant group-hover:text-purple-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                       </svg>
                       <span className="font-medium text-gray-700 group-hover:text-purple-600 transition-colors">Contact</span>
@@ -244,7 +244,7 @@ const Header = () => {
                       onClick={closeMobileMenu}
                       className="flex items-center space-x-3 p-4 rounded-xl hover:bg-gray-50 transition-colors group"
                     >
-                      <svg className="w-6 h-6 text-gray-400 group-hover:text-purple-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-6 h-6 text-outline-variant group-hover:text-purple-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
                       </svg>
                       <span className="font-medium text-gray-700 group-hover:text-purple-600 transition-colors">Connexion</span>
@@ -253,7 +253,7 @@ const Header = () => {
                     <Link
                       to="/signup"
                       onClick={closeMobileMenu}
-                      className="flex items-center justify-center space-x-2 p-4 rounded-xl bg-primary-600 text-white hover:bg-primary-700 transition-all shadow-lg font-semibold"
+                      className="flex items-center justify-center space-x-2 p-4 rounded-xl bg-gradient-to-br from-primary to-primary-container text-on-primary hover:opacity-90 transition-all shadow-ambient rounded-full font-semibold"
                     >
                       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
@@ -266,7 +266,7 @@ const Header = () => {
 
               {/* Mobile Menu Footer */}
               {currentUser && (
-                <div className="border-t border-gray-200 p-4">
+                <div className="bg-surface-container-low p-4">
                   <button
                     onClick={handleLogout}
                     className="w-full flex items-center justify-center space-x-2 p-4 rounded-xl bg-red-50 text-red-600 hover:bg-red-100 transition-colors font-semibold"

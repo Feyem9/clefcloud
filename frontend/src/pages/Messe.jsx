@@ -53,14 +53,14 @@ const Messe = () => {
     <div>
       <h1 className="text-3xl font-bold text-gray-900 mb-8">Partitions de Messe</h1>
 
-      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+      <div className="bg-white rounded-xl shadow-ambient p-6 mb-6">
         <label className="block text-sm font-medium text-gray-700 mb-2">
           Sélectionnez une partie de la messe
         </label>
         <select
           value={selectedPart}
           onChange={(e) => setSelectedPart(e.target.value)}
-          className="w-full md:w-1/2 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-lg"
+          className="w-full md:w-1/2 px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary border-transparent focus:bg-surface-container-lowest text-lg"
         >
           <option value="">-- Choisir une partie --</option>
           {MESSE_PARTS.map(part => (
@@ -80,34 +80,34 @@ const Messe = () => {
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
             </div>
           ) : partitions.length === 0 ? (
-            <div className="bg-white rounded-lg shadow-md p-12 text-center">
-              <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="bg-white rounded-xl shadow-ambient p-12 text-center">
+              <svg className="w-16 h-16 text-outline-variant mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
               </svg>
               <h3 className="text-xl font-semibold text-gray-700 mb-2">
                 Aucune partition pour {selectedPart}
               </h3>
-              <p className="text-gray-500">
+              <p className="text-outline-variant">
                 Ajoutez une partition pour cette partie de la messe
               </p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {partitions.map((partition) => (
-                <div key={partition.id} className="bg-white rounded-lg shadow-md hover:shadow-lg transition overflow-hidden">
+                <div key={partition.id} className="bg-white rounded-xl shadow-ambient hover:shadow-ambient transition overflow-hidden">
                   <div className="p-6">
                     <h3 className="text-xl font-semibold text-gray-900 mb-3">
                       {partition.title}
                     </h3>
 
                     {partition.composer && (
-                      <p className="text-gray-600 mb-2">
+                      <p className="text-on-surface-variant mb-2">
                         <span className="font-medium">Compositeur:</span> {partition.composer}
                       </p>
                     )}
 
                     {partition.key && (
-                      <p className="text-gray-600 mb-2">
+                      <p className="text-on-surface-variant mb-2">
                         <span className="font-medium">Tonalité:</span> {partition.key}
                       </p>
                     )}
@@ -126,7 +126,7 @@ const Messe = () => {
                       href={partition.downloadURL}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="block w-full bg-primary-600 text-white text-center py-2 rounded-lg hover:bg-primary-700 transition mt-4"
+                      className="block w-full bg-primary-600 text-on-primary text-center py-2 rounded-xl hover:bg-primary-700 transition mt-4"
                     >
                       Ouvrir la partition
                     </a>
@@ -139,7 +139,7 @@ const Messe = () => {
       )}
 
       {!selectedPart && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-8 text-center">
+        <div className="bg-blue-50 border border-blue-200 rounded-xl p-8 text-center">
           <svg className="w-12 h-12 text-blue-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>

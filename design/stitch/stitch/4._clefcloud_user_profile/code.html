@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-surface": "#e5e2e1",
+              "surface-container-lowest": "#0e0e0e",
+              "secondary-fixed": "#dde1ff",
+              "secondary-fixed-dim": "#bbc4f7",
+              "on-error": "#690005",
+              "on-secondary": "#242d58",
+              "primary-fixed": "#dee0ff",
+              "background": "#131313",
+              "surface-container-highest": "#353534",
+              "inverse-primary": "#4858ab",
+              "on-secondary-fixed": "#0e1842",
+              "on-error-container": "#ffdad6",
+              "on-primary-fixed": "#00105b",
+              "on-primary-fixed-variant": "#2f3f92",
+              "inverse-surface": "#e5e2e1",
+              "on-primary": "#15267b",
+              "on-tertiary-fixed-variant": "#574500",
+              "primary-container": "#14267a",
+              "on-surface-variant": "#c6c5d4",
+              "surface-container-low": "#1c1b1b",
+              "on-secondary-container": "#a9b2e5",
+              "surface-dim": "#131313",
+              "surface-tint": "#bac3ff",
+              "on-primary-container": "#8392ea",
+              "on-tertiary-fixed": "#241a00",
+              "surface": "#131313",
+              "tertiary": "#e9c349",
+              "secondary-container": "#3b4470",
+              "outline": "#908f9d",
+              "error-container": "#93000a",
+              "error": "#ffb4ab",
+              "surface-variant": "#353534",
+              "on-tertiary-container": "#4e3d00",
+              "tertiary-fixed-dim": "#e9c349",
+              "primary-fixed-dim": "#bac3ff",
+              "on-background": "#e5e2e1",
+              "on-secondary-fixed-variant": "#3b4470",
+              "surface-container-high": "#2a2a2a",
+              "surface-container": "#201f1f",
+              "secondary": "#bbc4f7",
+              "inverse-on-surface": "#313030",
+              "tertiary-container": "#cba72f",
+              "outline-variant": "#454652",
+              "on-tertiary": "#3c2f00",
+              "primary": "#bac3ff",
+              "surface-bright": "#393939",
+              "tertiary-fixed": "#ffe088"
+            },
+            fontFamily: {
+              "headline": ["Noto Serif"],
+              "body": ["Manrope"],
+              "label": ["Manrope"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      .glass-effect {
+        backdrop-filter: blur(24px);
+      }
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 4px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #454652;
+        border-radius: 10px;
+      }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body selection:bg-primary/30 selection:text-primary">
+<!-- Shared Navigation Shell -->
+<header class="fixed top-0 w-full z-50 bg-[#131313]/60 backdrop-blur-xl shadow-2xl shadow-black/40">
+<nav class="flex justify-between items-center px-8 h-20 w-full max-w-[1440px] mx-auto">
+<div class="text-[#bac3ff] font-['Noto_Serif'] italic text-2xl tracking-tighter">ClefCloud</div>
+<div class="hidden md:flex items-center gap-8">
+<a class="text-slate-400 hover:text-slate-200 transition-colors font-['Noto_Serif'] font-bold text-lg tracking-tight" href="#">Home</a>
+<a class="text-slate-400 hover:text-slate-200 transition-colors font-['Noto_Serif'] font-bold text-lg tracking-tight" href="#">Library</a>
+<a class="text-slate-400 hover:text-slate-200 transition-colors font-['Noto_Serif'] font-bold text-lg tracking-tight" href="#">Upload</a>
+<a class="text-slate-400 hover:text-slate-200 transition-colors font-['Noto_Serif'] font-bold text-lg tracking-tight" href="#">Messe</a>
+<a class="text-slate-400 hover:text-slate-200 transition-colors font-['Noto_Serif'] font-bold text-lg tracking-tight" href="#">Premium</a>
+</div>
+<div class="flex items-center gap-4">
+<div class="p-2 hover:bg-[#353534]/50 rounded-lg transition-all active:scale-95 duration-200 text-[#bac3ff] border-b-2 border-[#bac3ff] pb-1 cursor-pointer">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</div>
+</div>
+</nav>
+</header>
+<main class="pt-32 pb-20 px-6 max-w-[1440px] mx-auto min-h-screen">
+<!-- Hero Section / Header -->
+<section class="mb-16 relative">
+<div class="flex flex-col md:flex-row items-end gap-8">
+<div class="relative group">
+<div class="w-40 h-40 rounded-full overflow-hidden shadow-2xl shadow-black/60 border border-outline-variant/10">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="close-up portrait of a classical pianist with thoughtful expression in a dimly lit studio with warm golden accent lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDu-ew3yqf7JuqUlLVTyMVbSkSUgKl-RfsOIx-CWbloocgxJwEDoEJQsAy5IvmiPY_wQGU2tC_u2UfTawDrv0IOT73t6-BOgAZObAL8L1fHyUhhPiiUtjaIg5ByU0a7_nlZ48HX5VAfbFsuYU8eBffum5yFla-fQd0PSONT_hU0L_zybpNXJ63NekkLfsb5Gnuh_pFGlQJ2J2NTiLBjOsrjYuMri0kkFcDrHXOFRLft-70gJtlCg6ZhNdX3LvyzJNBr7g-p3I038fU"/>
+</div>
+<div class="absolute bottom-2 right-2 bg-tertiary text-on-tertiary p-2 rounded-full shadow-lg">
+<span class="material-symbols-outlined text-sm" data-icon="edit">edit</span>
+</div>
+</div>
+<div class="flex-1 pb-2">
+<div class="flex items-center gap-4 mb-2">
+<span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase border border-primary/20">Premium Member</span>
+<span class="text-on-surface-variant font-label text-xs tracking-[0.1rem] uppercase">Joined oct 2023</span>
+</div>
+<h1 class="font-headline text-5xl md:text-6xl font-bold tracking-tighter text-on-surface mb-2">Julian Vercetti</h1>
+<p class="text-on-surface-variant font-body text-lg italic">Concertmaster &amp; Digital Archivist</p>
+</div>
+<div class="flex gap-4">
+<button class="px-8 py-4 bg-gradient-to-r from-primary to-primary-container text-on-primary rounded-full font-bold transition-all active:scale-95 shadow-xl shadow-primary/20">Edit Profile</button>
+</div>
+</div>
+</section>
+<!-- Stats Bento Grid -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+<div class="bg-surface-container-high p-8 rounded-xl relative overflow-hidden group hover:bg-surface-container-highest transition-colors duration-500">
+<div class="absolute -right-4 -top-4 opacity-5 group-hover:opacity-10 transition-opacity">
+<span class="material-symbols-outlined text-9xl" data-icon="cloud_upload">cloud_upload</span>
+</div>
+<p class="font-label text-xs tracking-widest uppercase text-tertiary mb-4">Partitions uploadées</p>
+<div class="flex items-baseline gap-2">
+<span class="text-5xl font-headline font-bold">142</span>
+<span class="text-on-surface-variant text-sm">manuscripts</span>
+</div>
+</div>
+<div class="bg-surface-container-high p-8 rounded-xl relative overflow-hidden group hover:bg-surface-container-highest transition-colors duration-500">
+<div class="absolute -right-4 -top-4 opacity-5 group-hover:opacity-10 transition-opacity">
+<span class="material-symbols-outlined text-9xl" data-icon="play_circle">play_circle</span>
+</div>
+<p class="font-label text-xs tracking-widest uppercase text-primary mb-4">Lectures totales</p>
+<div class="flex items-baseline gap-2">
+<span class="text-5xl font-headline font-bold">3.8k</span>
+<span class="text-on-surface-variant text-sm">rehearsals</span>
+</div>
+</div>
+<div class="bg-surface-container-high p-8 rounded-xl relative overflow-hidden group hover:bg-surface-container-highest transition-colors duration-500">
+<div class="absolute -right-4 -top-4 opacity-5 group-hover:opacity-10 transition-opacity">
+<span class="material-symbols-outlined text-9xl" data-icon="favorite">favorite</span>
+</div>
+<p class="font-label text-xs tracking-widest uppercase text-secondary mb-4">Favoris</p>
+<div class="flex items-baseline gap-2">
+<span class="text-5xl font-headline font-bold">29</span>
+<span class="text-on-surface-variant text-sm">collections</span>
+</div>
+</div>
+</section>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+<!-- Recent Activity -->
+<section class="lg:col-span-7">
+<div class="flex justify-between items-center mb-8">
+<h2 class="font-headline text-3xl font-bold tracking-tight">Recent Activity</h2>
+<button class="text-primary font-label text-xs tracking-widest uppercase hover:underline">View History</button>
+</div>
+<div class="space-y-4">
+<!-- Activity Item -->
+<div class="bg-surface-container-low p-5 rounded-lg flex items-center gap-6 hover:bg-surface-container-high transition-all">
+<div class="w-12 h-16 bg-surface-container-highest rounded flex items-center justify-center border border-outline-variant/10">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="description">description</span>
+</div>
+<div class="flex-1">
+<h4 class="font-bold text-on-surface">Nocturne No. 2 in E-flat major</h4>
+<p class="text-sm text-on-surface-variant">Uploaded to <span class="text-tertiary">Chopin Essentials</span></p>
+</div>
+<div class="text-right">
+<p class="text-xs text-outline font-label uppercase tracking-tighter">2 hours ago</p>
+</div>
+</div>
+<div class="bg-surface-container-low p-5 rounded-lg flex items-center gap-6 hover:bg-surface-container-high transition-all">
+<div class="w-12 h-16 bg-surface-container-highest rounded flex items-center justify-center border border-outline-variant/10">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="library_music">library_music</span>
+</div>
+<div class="flex-1">
+<h4 class="font-bold text-on-surface">Practice Session: Bach Suite No. 1</h4>
+<p class="text-sm text-on-surface-variant">Completed 45 minutes of rehearsal</p>
+</div>
+<div class="text-right">
+<p class="text-xs text-outline font-label uppercase tracking-tighter">Yesterday</p>
+</div>
+</div>
+<div class="bg-surface-container-low p-5 rounded-lg flex items-center gap-6 hover:bg-surface-container-high transition-all">
+<div class="w-12 h-16 bg-surface-container-highest rounded flex items-center justify-center border border-outline-variant/10">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="bookmark">bookmark</span>
+</div>
+<div class="flex-1">
+<h4 class="font-bold text-on-surface">New Favorite Added</h4>
+<p class="text-sm text-on-surface-variant">Debussy - Clair de Lune (Annotated)</p>
+</div>
+<div class="text-right">
+<p class="text-xs text-outline font-label uppercase tracking-tighter">3 days ago</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Settings Sidebar -->
+<aside class="lg:col-span-5">
+<div class="bg-surface-container-low rounded-2xl p-8 sticky top-28 shadow-2xl shadow-black/20">
+<h2 class="font-headline text-2xl font-bold tracking-tight mb-8">Account Settings</h2>
+<form class="space-y-8">
+<div>
+<label class="block font-label text-[10px] uppercase tracking-[0.2rem] text-outline mb-3">Email Address</label>
+<div class="relative">
+<input class="w-full bg-surface-container-lowest border-none rounded-lg p-4 text-on-surface focus:ring-1 focus:ring-primary placeholder:text-outline/40" type="email" value="julian.vercetti@clefcloud.com"/>
+<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-outline/50 text-lg" data-icon="verified">verified</span>
+</div>
+</div>
+<div>
+<label class="block font-label text-[10px] uppercase tracking-[0.2rem] text-outline mb-3">Security</label>
+<button class="w-full text-left bg-surface-container-lowest rounded-lg p-4 flex justify-between items-center group" type="button">
+<span class="text-on-surface">Update Password</span>
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+<div>
+<label class="block font-label text-[10px] uppercase tracking-[0.2rem] text-outline mb-6">Notification Preferences</label>
+<div class="space-y-4">
+<label class="flex items-center justify-between cursor-pointer group">
+<span class="text-on-surface-variant group-hover:text-on-surface transition-colors">Shared Manuscripts</span>
+<input checked="" class="rounded bg-surface-container-highest border-outline-variant text-primary focus:ring-primary focus:ring-offset-surface" type="checkbox"/>
+</label>
+<label class="flex items-center justify-between cursor-pointer group">
+<span class="text-on-surface-variant group-hover:text-on-surface transition-colors">Community Comments</span>
+<input checked="" class="rounded bg-surface-container-highest border-outline-variant text-primary focus:ring-primary focus:ring-offset-surface" type="checkbox"/>
+</label>
+<label class="flex items-center justify-between cursor-pointer group">
+<span class="text-on-surface-variant group-hover:text-on-surface transition-colors">Platform Updates</span>
+<input class="rounded bg-surface-container-highest border-outline-variant text-primary focus:ring-primary focus:ring-offset-surface" type="checkbox"/>
+</label>
+</div>
+</div>
+<div class="pt-4 space-y-4">
+<button class="w-full py-4 bg-surface-container-highest text-on-surface rounded-full font-bold hover:bg-surface-bright transition-colors" type="button">Save All Changes</button>
+<button class="w-full py-2 text-error text-xs font-label uppercase tracking-widest hover:bg-error-container/20 rounded transition-colors" type="button">Logout of all sessions</button>
+</div>
+</form>
+</div>
+</aside>
+</div>
+</main>
+<footer class="bg-[#0e0e0e] w-full py-12 border-t border-[#454652]/15 mt-20">
+<div class="flex flex-col md:flex-row justify-between items-center px-12 w-full max-w-[1440px] mx-auto gap-8">
+<div class="text-[#e9c349] font-bold text-xl tracking-widest font-headline">CLEFCLOUD</div>
+<div class="flex gap-8">
+<a class="font-['Manrope'] text-sm tracking-wide uppercase text-slate-500 hover:text-[#bac3ff] transition-colors opacity-80 hover:opacity-100" href="#">About</a>
+<a class="font-['Manrope'] text-sm tracking-wide uppercase text-slate-500 hover:text-[#bac3ff] transition-colors opacity-80 hover:opacity-100" href="#">Help</a>
+<a class="font-['Manrope'] text-sm tracking-wide uppercase text-slate-500 hover:text-[#bac3ff] transition-colors opacity-80 hover:opacity-100" href="#">Privacy</a>
+<a class="font-['Manrope'] text-sm tracking-wide uppercase text-slate-500 hover:text-[#bac3ff] transition-colors opacity-80 hover:opacity-100" href="#">Terms</a>
+</div>
+<p class="text-slate-500 font-['Manrope'] text-sm tracking-wide">© 2024 ClefCloud. The Digital Manuscript.</p>
+</div>
+</footer>
+</body></html>

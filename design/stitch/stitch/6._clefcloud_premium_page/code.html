@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ClefCloud Premium | The Digital Manuscript</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&amp;family=Manrope:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-surface": "#e5e2e1",
+              "surface-container-lowest": "#0e0e0e",
+              "secondary-fixed": "#dde1ff",
+              "secondary-fixed-dim": "#bbc4f7",
+              "on-error": "#690005",
+              "on-secondary": "#242d58",
+              "primary-fixed": "#dee0ff",
+              "background": "#131313",
+              "surface-container-highest": "#353534",
+              "inverse-primary": "#4858ab",
+              "on-secondary-fixed": "#0e1842",
+              "on-error-container": "#ffdad6",
+              "on-primary-fixed": "#00105b",
+              "on-primary-fixed-variant": "#2f3f92",
+              "inverse-surface": "#e5e2e1",
+              "on-primary": "#15267b",
+              "on-tertiary-fixed-variant": "#574500",
+              "primary-container": "#14267a",
+              "on-surface-variant": "#c6c5d4",
+              "surface-container-low": "#1c1b1b",
+              "on-secondary-container": "#a9b2e5",
+              "surface-dim": "#131313",
+              "surface-tint": "#bac3ff",
+              "on-primary-container": "#8392ea",
+              "on-tertiary-fixed": "#241a00",
+              "surface": "#131313",
+              "tertiary": "#e9c349",
+              "secondary-container": "#3b4470",
+              "outline": "#908f9d",
+              "error-container": "#93000a",
+              "error": "#ffb4ab",
+              "surface-variant": "#353534",
+              "on-tertiary-container": "#4e3d00",
+              "tertiary-fixed-dim": "#e9c349",
+              "primary-fixed-dim": "#bac3ff",
+              "on-background": "#e5e2e1",
+              "on-secondary-fixed-variant": "#3b4470",
+              "surface-container-high": "#2a2a2a",
+              "surface-container": "#201f1f",
+              "secondary": "#bbc4f7",
+              "inverse-on-surface": "#313030",
+              "tertiary-container": "#cba72f",
+              "outline-variant": "#454652",
+              "on-tertiary": "#3c2f00",
+              "primary": "#bac3ff",
+              "surface-bright": "#393939",
+              "tertiary-fixed": "#ffe088"
+            },
+            fontFamily: {
+              "headline": ["Noto Serif"],
+              "body": ["Manrope"],
+              "label": ["Manrope"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      .glass-effect {
+        backdrop-filter: blur(24px);
+      }
+      .premium-glow {
+        box-shadow: 0 0 20px rgba(186, 195, 255, 0.15);
+      }
+      .asymmetric-grid {
+        display: grid;
+        grid-template-columns: 1fr 1.2fr;
+        gap: 2rem;
+      }
+      @media (max-width: 768px) {
+        .asymmetric-grid {
+            grid-template-columns: 1fr;
+        }
+      }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body selection:bg-primary-container selection:text-primary">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-[#131313]/60 backdrop-blur-xl shadow-2xl shadow-black/40 h-20">
+<div class="flex justify-between items-center px-8 h-full w-full max-w-[1440px] mx-auto">
+<div class="text-[#bac3ff] font-['Noto_Serif'] italic text-2xl tracking-tighter">
+                ClefCloud
+            </div>
+<div class="hidden md:flex items-center gap-8 font-['Noto_Serif'] font-bold text-lg tracking-tight">
+<a class="text-slate-400 hover:text-slate-200 transition-colors" href="#">Home</a>
+<a class="text-slate-400 hover:text-slate-200 transition-colors" href="#">Library</a>
+<a class="text-slate-400 hover:text-slate-200 transition-colors" href="#">Upload</a>
+<a class="text-slate-400 hover:text-slate-200 transition-colors" href="#">Messe</a>
+<a class="text-[#bac3ff] border-b-2 border-[#bac3ff] pb-1" href="#">Premium</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="hover:bg-[#353534]/50 rounded-lg transition-all p-2 active:scale-95 duration-200">
+<span class="material-symbols-outlined text-[#bac3ff]">account_circle</span>
+</button>
+</div>
+</div>
+</nav>
+<main class="pt-32 pb-20 px-6 max-w-7xl mx-auto">
+<!-- Hero Section -->
+<header class="text-center mb-20">
+<h1 class="font-headline text-5xl md:text-7xl font-bold mb-6 tracking-tight text-on-surface">
+                Élevez votre <span class="italic text-primary">Partition</span>
+</h1>
+<p class="max-w-2xl mx-auto text-on-surface-variant font-body text-lg leading-relaxed">
+                Le manuscrit numérique conçu pour l'excellence. Choisissez le plan qui accompagne votre voyage musical.
+            </p>
+</header>
+<!-- Pricing Tiers -->
+<div class="grid md:grid-cols-2 gap-8 mb-24 max-w-5xl mx-auto">
+<!-- Gratuit -->
+<div class="bg-surface-container-low p-10 rounded-xl relative overflow-hidden group hover:bg-surface-container transition-all duration-300">
+<div class="mb-8">
+<h3 class="font-headline text-2xl font-bold mb-2">Gratuit</h3>
+<div class="flex items-baseline gap-1">
+<span class="text-4xl font-bold">0€</span>
+<span class="text-on-surface-variant font-label text-sm uppercase tracking-widest">/ mois</span>
+</div>
+</div>
+<ul class="space-y-4 mb-10">
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-sm">check</span>
+<span class="text-on-surface-variant">500 Mo de stockage</span>
+</li>
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-sm">check</span>
+<span class="text-on-surface-variant">Accès en ligne uniquement</span>
+</li>
+<li class="flex items-center gap-3 opacity-40">
+<span class="material-symbols-outlined text-sm">close</span>
+<span class="text-on-surface-variant line-through">Annotations avancées</span>
+</li>
+<li class="flex items-center gap-3 opacity-40">
+<span class="material-symbols-outlined text-sm">close</span>
+<span class="text-on-surface-variant line-through">Zéro publicité</span>
+</li>
+</ul>
+<button class="w-full py-4 rounded-full font-bold uppercase tracking-widest text-xs border border-outline-variant/20 hover:bg-surface-container-highest transition-all active:scale-95">
+                    Plan Actuel
+                </button>
+</div>
+<!-- Premium -->
+<div class="bg-surface-container-high p-10 rounded-xl relative overflow-hidden premium-glow border border-primary/20 transition-all duration-500 hover:border-primary/40">
+<div class="absolute top-6 right-6">
+<span class="bg-tertiary text-on-tertiary font-label text-[10px] font-extrabold uppercase tracking-tighter px-3 py-1 rounded-full">Populaire</span>
+</div>
+<div class="mb-8">
+<h3 class="font-headline text-2xl font-bold mb-2 text-primary">Premium</h3>
+<div class="flex items-baseline gap-1">
+<span class="text-4xl font-bold">9,99€</span>
+<span class="text-on-surface-variant font-label text-sm uppercase tracking-widest">/ mois</span>
+</div>
+</div>
+<ul class="space-y-4 mb-10">
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-tertiary" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="text-on-surface font-semibold">Stockage illimité</span>
+</li>
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-tertiary" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="text-on-surface font-semibold">Accès hors-ligne</span>
+</li>
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-tertiary" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="text-on-surface font-semibold">Annotations avancées</span>
+</li>
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-tertiary" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="text-on-surface font-semibold">Pas de publicités</span>
+</li>
+</ul>
+<button class="w-full py-4 rounded-full font-bold uppercase tracking-widest text-xs bg-gradient-to-r from-primary to-primary-container text-on-primary shadow-xl shadow-primary/10 hover:shadow-primary/20 transition-all active:scale-95">
+                    Passer au Premium
+                </button>
+</div>
+</div>
+<!-- Checkout Section (Asymmetric Bento Grid) -->
+<section class="asymmetric-grid items-start">
+<!-- Social Proof / Context Card -->
+<div class="bg-surface-container-low rounded-xl overflow-hidden h-full">
+<div class="h-64 relative">
+<img alt="Musical focus" class="w-full h-full object-cover grayscale brightness-50" data-alt="Moody cinematic close-up of sheet music on a vintage piano under a single warm spotlight in a dark room" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDHTrixhdwnAwqZH4D6bRb_IqP07m9MTtyqJTs6Hk_FsplnM4qM7TlEAxePLWW_DzOmK2wsBbMn-MM5IdkLKR6vztsF5rmyvfD6O7uB4wM28e-edSSt_XPXWjvztgf1v4H_rDq_jgPhCICfUto1ZMiDQuMIAh73IpLD12FUUelt_y6brfr9tpM3OLaR9f1ZsD5RZ4wiKmmNzpHPj-AfdKr7HrhnebVa7eIdfyzoFiXMJ7PIWkVHGZrq6evbednmqZ-aYs2ljAeSBzk"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-low to-transparent"></div>
+<div class="absolute bottom-6 left-8 right-8">
+<p class="font-headline italic text-xl text-on-surface">"La musique est le silence entre les notes."</p>
+<p class="font-label text-xs uppercase tracking-widest text-tertiary mt-2">Claude Debussy</p>
+</div>
+</div>
+<div class="p-8">
+<h4 class="font-headline text-lg font-bold mb-4">Rejoignez 50,000+ musiciens</h4>
+<p class="text-sm text-on-surface-variant leading-relaxed">
+                        Des conservatoires de Paris aux studios de Nashville, ClefCloud est l'outil privilégié de ceux qui refusent les limites de l'analogique.
+                    </p>
+<div class="mt-8 flex gap-2">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest border border-outline-variant/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-xs">music_note</span>
+</div>
+<div class="w-8 h-8 rounded-full bg-surface-container-highest border border-outline-variant/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-xs">piano</span>
+</div>
+<div class="w-8 h-8 rounded-full bg-surface-container-highest border border-outline-variant/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-xs">compost</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Checkout Form (PayUnit Style) -->
+<div class="bg-surface-container-high rounded-xl p-8 border border-outline-variant/10">
+<div class="flex justify-between items-center mb-10">
+<h3 class="font-headline text-xl font-bold">Paiement Sécurisé</h3>
+<div class="flex items-center gap-2">
+<div class="w-10 h-6 bg-surface-container-highest rounded-sm flex items-center justify-center text-[10px] font-bold text-on-surface-variant">VISA</div>
+<div class="w-10 h-6 bg-surface-container-highest rounded-sm flex items-center justify-center text-[10px] font-bold text-on-surface-variant">MC</div>
+</div>
+</div>
+<form class="space-y-6">
+<div>
+<label class="block font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2">Titulaire de la carte</label>
+<input class="w-full bg-surface-container-lowest border-none rounded-lg p-4 text-on-surface placeholder:text-outline/30 focus:ring-1 focus:ring-primary transition-all" placeholder="JEAN-SÉBASTIEN BACH" type="text"/>
+</div>
+<div>
+<label class="block font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2">Numéro de carte</label>
+<div class="relative">
+<input class="w-full bg-surface-container-lowest border-none rounded-lg p-4 text-on-surface placeholder:text-outline/30 focus:ring-1 focus:ring-primary transition-all" placeholder="0000 0000 0000 0000" type="text"/>
+<span class="material-symbols-outlined absolute right-4 top-4 text-on-surface-variant/40">lock</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div>
+<label class="block font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2">Expiration</label>
+<input class="w-full bg-surface-container-lowest border-none rounded-lg p-4 text-on-surface placeholder:text-outline/30 focus:ring-1 focus:ring-primary transition-all" placeholder="MM/YY" type="text"/>
+</div>
+<div>
+<label class="block font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2">CVC</label>
+<input class="w-full bg-surface-container-lowest border-none rounded-lg p-4 text-on-surface placeholder:text-outline/30 focus:ring-1 focus:ring-primary transition-all" placeholder="123" type="text"/>
+</div>
+</div>
+<div class="pt-4">
+<button class="w-full py-5 rounded-lg bg-on-surface text-surface font-bold uppercase tracking-widest text-sm flex items-center justify-center gap-3 hover:bg-white transition-all active:scale-[0.98]" type="submit">
+<span class="material-symbols-outlined">verified_user</span>
+                            Confirmer 9,99€
+                        </button>
+<p class="text-[10px] text-center text-on-surface-variant mt-4 opacity-60 uppercase tracking-widest">Paiement chiffré par PayUnit. Annulation possible à tout moment.</p>
+</div>
+</form>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-[#0e0e0e] w-full py-12 border-t border-[#454652]/15">
+<div class="flex flex-col md:flex-row justify-between items-center px-12 w-full max-w-[1440px] mx-auto gap-8">
+<div class="flex flex-col items-center md:items-start">
+<div class="text-[#e9c349] font-bold text-xl mb-2">ClefCloud</div>
+<p class="text-slate-500 font-['Manrope'] text-sm tracking-wide uppercase">
+                    © 2024 ClefCloud. The Digital Manuscript.
+                </p>
+</div>
+<div class="flex gap-8 font-['Manrope'] text-sm tracking-wide uppercase">
+<a class="text-slate-500 hover:text-[#bac3ff] transition-colors" href="#">About</a>
+<a class="text-slate-500 hover:text-[#bac3ff] transition-colors" href="#">Help</a>
+<a class="text-slate-500 hover:text-[#bac3ff] transition-colors" href="#">Privacy</a>
+<a class="text-slate-500 hover:text-[#bac3ff] transition-colors" href="#">Terms</a>
+<a class="text-slate-500 hover:text-[#bac3ff] transition-colors" href="#">Social</a>
+</div>
+</div>
+</footer>
+</body></html>

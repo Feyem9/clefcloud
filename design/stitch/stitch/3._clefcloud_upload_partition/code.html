@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Upload Partition | ClefCloud</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&amp;family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-surface": "#e5e2e1",
+              "surface-container-lowest": "#0e0e0e",
+              "secondary-fixed": "#dde1ff",
+              "secondary-fixed-dim": "#bbc4f7",
+              "on-error": "#690005",
+              "on-secondary": "#242d58",
+              "primary-fixed": "#dee0ff",
+              "background": "#131313",
+              "surface-container-highest": "#353534",
+              "inverse-primary": "#4858ab",
+              "on-secondary-fixed": "#0e1842",
+              "on-error-container": "#ffdad6",
+              "on-primary-fixed": "#00105b",
+              "on-primary-fixed-variant": "#2f3f92",
+              "inverse-surface": "#e5e2e1",
+              "on-primary": "#15267b",
+              "on-tertiary-fixed-variant": "#574500",
+              "primary-container": "#14267a",
+              "on-surface-variant": "#c6c5d4",
+              "surface-container-low": "#1c1b1b",
+              "on-secondary-container": "#a9b2e5",
+              "surface-dim": "#131313",
+              "surface-tint": "#bac3ff",
+              "on-primary-container": "#8392ea",
+              "on-tertiary-fixed": "#241a00",
+              "surface": "#131313",
+              "tertiary": "#e9c349",
+              "secondary-container": "#3b4470",
+              "outline": "#908f9d",
+              "error-container": "#93000a",
+              "error": "#ffb4ab",
+              "surface-variant": "#353534",
+              "on-tertiary-container": "#4e3d00",
+              "tertiary-fixed-dim": "#e9c349",
+              "primary-fixed-dim": "#bac3ff",
+              "on-background": "#e5e2e1",
+              "on-secondary-fixed-variant": "#3b4470",
+              "surface-container-high": "#2a2a2a",
+              "surface-container": "#201f1f",
+              "secondary": "#bbc4f7",
+              "inverse-on-surface": "#313030",
+              "tertiary-container": "#cba72f",
+              "outline-variant": "#454652",
+              "on-tertiary": "#3c2f00",
+              "primary": "#bac3ff",
+              "surface-bright": "#393939",
+              "tertiary-fixed": "#ffe088"
+            },
+            fontFamily: {
+              "headline": ["Noto Serif"],
+              "body": ["Manrope"],
+              "label": ["Manrope"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+        }
+        .dashed-dropzone {
+            background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='8' ry='8' stroke='%23454652' stroke-width='2' stroke-dasharray='12%2c 12' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e");
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-[#131313]/60 backdrop-blur-xl shadow-2xl shadow-black/40 h-20 flex items-center justify-center">
+<div class="flex justify-between items-center px-8 w-full max-w-[1440px]">
+<div class="text-[#bac3ff] font-headline italic text-2xl tracking-tighter">ClefCloud</div>
+<div class="hidden md:flex items-center gap-8">
+<a class="text-slate-400 hover:text-slate-200 transition-colors font-headline font-bold text-lg tracking-tight" href="#">Home</a>
+<a class="text-slate-400 hover:text-slate-200 transition-colors font-headline font-bold text-lg tracking-tight" href="#">Library</a>
+<a class="text-[#bac3ff] border-b-2 border-[#bac3ff] pb-1 font-headline font-bold text-lg tracking-tight" href="#">Upload</a>
+<a class="text-slate-400 hover:text-slate-200 transition-colors font-headline font-bold text-lg tracking-tight" href="#">Messe</a>
+<a class="text-slate-400 hover:text-slate-200 transition-colors font-headline font-bold text-lg tracking-tight" href="#">Premium</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined p-2 text-[#bac3ff] hover:bg-[#353534]/50 rounded-lg transition-all active:scale-95 duration-200">account_circle</button>
+</div>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="flex-grow pt-32 pb-20 px-6 max-w-[1200px] mx-auto w-full">
+<!-- Page Header -->
+<header class="mb-12">
+<h1 class="font-headline text-5xl font-bold text-primary mb-2">Upload Partition</h1>
+<p class="text-on-surface-variant font-body text-lg">Bring your digital manuscript to the cloud.</p>
+</header>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+<!-- Upload Section (Left) -->
+<div class="lg:col-span-7 space-y-8">
+<!-- Drag and Drop Zone -->
+<div class="relative group">
+<div class="dashed-dropzone rounded-xl h-[400px] flex flex-col items-center justify-center transition-all duration-300 group-hover:bg-surface-container-low cursor-pointer">
+<div class="bg-surface-container-high w-20 h-20 rounded-full flex items-center justify-center mb-6 shadow-2xl group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-4xl text-primary" data-icon="cloud_upload">cloud_upload</span>
+</div>
+<h3 class="text-xl font-headline font-bold mb-2">Drag &amp; Drop your Score</h3>
+<p class="text-on-surface-variant text-sm">PDF, JPEG or PNG (Max 50MB)</p>
+<button class="mt-8 px-8 py-3 bg-gradient-to-r from-primary to-primary-container text-on-primary rounded-full font-bold transition-all hover:shadow-[0_0_20px_rgba(186,195,255,0.3)]">
+                            Select File
+                        </button>
+</div>
+</div>
+<!-- Preview Area (Simulated state) -->
+<div class="bg-surface-container-low rounded-xl p-6 relative overflow-hidden">
+<div class="flex items-start gap-6">
+<div class="w-24 h-32 bg-surface-container-highest rounded shadow-lg overflow-hidden flex-shrink-0 flex items-center justify-center">
+<!-- Placeholder for sheet music image -->
+<img alt="Score Preview" class="w-full h-full object-cover opacity-50" data-alt="close-up of vintage music sheet manuscript with ink notes on aged paper soft bokeh nocturnal lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-Yx1tYFsU5n6NVWhn9_Z2uhrsfd-Ks8ZIi_cufiILgletuf0nyWZz2IjqReAFz3Zroag8ktcCRESlY1Zuv37YQFAkFPL_sLATaqvlsmHRZGYUWEswqEODaE17p3LDZSk-GKkvbRWISO9LSlTrOjRPZuRR6meNqQsFBAuasRsOZc4ipnoiOdDEqE2I4VpdaNE_UHNRROlQoe3en9sdzOrRQc5D85BEetYFejZKSbzT0XPgANUCv5s2a2mTNK3p2ivy_UCIJJjhcDY"/>
+<span class="absolute material-symbols-outlined text-primary text-4xl" data-icon="description">description</span>
+</div>
+<div class="flex-grow space-y-4">
+<div class="flex justify-between items-center">
+<div>
+<h4 class="font-bold text-on-surface">nocturne_op9_no2.pdf</h4>
+<p class="text-xs text-on-surface-variant uppercase tracking-widest">Processing Digitalization...</p>
+</div>
+<span class="text-tertiary font-bold">75%</span>
+</div>
+<!-- Score Scrubber Progress Bar -->
+<div class="w-full h-2 bg-surface-variant rounded-full overflow-hidden relative">
+<div class="absolute top-0 left-0 h-full w-3/4 bg-gradient-to-r from-primary to-secondary rounded-full"></div>
+<div class="absolute top-1/2 left-3/4 -translate-y-1/2 -translate-x-1/2 w-4 h-4 bg-tertiary rounded-full shadow-[0_0_10px_#e9c349]"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Form Section (Right) -->
+<div class="lg:col-span-5">
+<div class="bg-surface-container-low rounded-xl p-8 space-y-8">
+<div>
+<h2 class="font-headline text-2xl font-bold mb-6">Metadata</h2>
+<div class="space-y-6">
+<!-- Titre -->
+<div class="space-y-2">
+<label class="block text-xs font-bold uppercase tracking-widest text-on-surface-variant">Titre *</label>
+<input class="w-full bg-surface-container-lowest border-none rounded-lg px-4 py-3 focus:ring-1 focus:ring-primary placeholder:text-outline-variant text-on-surface transition-all" placeholder="e.g. Moonlight Sonata" type="text"/>
+</div>
+<!-- Compositeur -->
+<div class="space-y-2">
+<label class="block text-xs font-bold uppercase tracking-widest text-on-surface-variant">Compositeur</label>
+<input class="w-full bg-surface-container-lowest border-none rounded-lg px-4 py-3 focus:ring-1 focus:ring-primary placeholder:text-outline-variant text-on-surface transition-all" placeholder="e.g. Ludwig van Beethoven" type="text"/>
+</div>
+<!-- Catégorie -->
+<div class="space-y-2">
+<label class="block text-xs font-bold uppercase tracking-widest text-on-surface-variant">Catégorie</label>
+<div class="relative">
+<select class="w-full bg-surface-container-lowest border-none rounded-lg px-4 py-3 focus:ring-1 focus:ring-primary text-on-surface appearance-none transition-all">
+<option>Classical</option>
+<option>Jazz</option>
+<option>Contemporary</option>
+<option>Baroque</option>
+<option>Romantic</option>
+</select>
+<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant" data-icon="expand_more">expand_more</span>
+</div>
+</div>
+<!-- Tags -->
+<div class="space-y-2">
+<label class="block text-xs font-bold uppercase tracking-widest text-on-surface-variant">Tags</label>
+<input class="w-full bg-surface-container-lowest border-none rounded-lg px-4 py-3 focus:ring-1 focus:ring-primary placeholder:text-outline-variant text-on-surface transition-all" placeholder="Piano, Solo, Allegro..." type="text"/>
+<div class="flex flex-wrap gap-2 mt-3">
+<span class="px-3 py-1 bg-surface-container-highest text-primary text-xs rounded-full flex items-center gap-2">
+                                        Piano <button class="material-symbols-outlined text-[10px]" data-icon="close">close</button>
+</span>
+<span class="px-3 py-1 bg-surface-container-highest text-primary text-xs rounded-full flex items-center gap-2">
+                                        Solo <button class="material-symbols-outlined text-[10px]" data-icon="close">close</button>
+</span>
+</div>
+</div>
+</div>
+</div>
+<div class="pt-6 border-t border-outline-variant/15 flex flex-col gap-4">
+<button class="w-full py-4 bg-gradient-to-r from-primary to-primary-container text-on-primary rounded-full font-bold text-lg hover:shadow-xl active:scale-95 transition-all">
+                            Finalize Upload
+                        </button>
+<button class="w-full py-3 text-on-surface font-semibold hover:bg-surface-container-highest rounded-full transition-colors">
+                            Save as Draft
+                        </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Asymmetrical Tip Section -->
+<section class="mt-20 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+<div class="bg-surface-container-low p-10 rounded-xl relative overflow-hidden">
+<div class="absolute -top-10 -right-10 w-40 h-40 bg-tertiary/5 rounded-full blur-3xl"></div>
+<h3 class="font-headline text-3xl font-bold text-tertiary mb-4">Precision Scanning</h3>
+<p class="text-on-surface-variant leading-relaxed mb-6">
+                    Our AI-powered manuscript engine will attempt to read your notation and provide an interactive playback. For best results, ensure the scan is clear and well-lit.
+                </p>
+<a class="text-primary font-bold flex items-center gap-2 group" href="#">
+                    View Scanning Guide 
+                    <span class="material-symbols-outlined group-hover:translate-x-2 transition-transform" data-icon="arrow_forward">arrow_forward</span>
+</a>
+</div>
+<div class="aspect-video rounded-xl overflow-hidden shadow-2xl">
+<img alt="Scanning Process" class="w-full h-full object-cover" data-alt="elegant dark studio background with a modern tablet displaying a musical score glowing soft blue light cinematic minimalist" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA0w40m6UDQ3M7J_WaO6BFWsdmP8gUqYwNf2w5RoWNIEYhatLe5B6AwVDIxNN1a6uWpc0keANlrQ9NECxi3MeLbtijBrcFhq5bUE3X19d8pbnmhDgkQf4tDkSWcVXz3oWbnf7O0sB7iOgALdeP1cYz3jS2FcPBpzAjf7l3Bfw_rGZ-PeXucZZqL6gEO-h5AcURHFZodk8VhLaWfGHkqE07IOPpi_RNGk5QcWNMT5CG-GWdxvL1oCTjIOjEIbfYDupHAVvr2MrZpebU"/>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-[#0e0e0e] w-full py-12 border-t border-[#454652]/15 mt-auto">
+<div class="flex flex-col md:flex-row justify-between items-center px-12 w-full max-w-[1440px] mx-auto gap-8">
+<div class="flex flex-col gap-2">
+<div class="text-[#e9c349] font-bold text-xl">ClefCloud</div>
+<p class="text-slate-500 font-body text-sm tracking-wide uppercase">© 2024 ClefCloud. The Digital Manuscript.</p>
+</div>
+<div class="flex gap-8">
+<a class="text-slate-500 hover:text-[#bac3ff] transition-colors font-body text-sm tracking-wide uppercase" href="#">About</a>
+<a class="text-slate-500 hover:text-[#bac3ff] transition-colors font-body text-sm tracking-wide uppercase" href="#">Help</a>
+<a class="text-slate-500 hover:text-[#bac3ff] transition-colors font-body text-sm tracking-wide uppercase" href="#">Privacy</a>
+<a class="text-slate-500 hover:text-[#bac3ff] transition-colors font-body text-sm tracking-wide uppercase" href="#">Terms</a>
+<a class="text-slate-500 hover:text-[#bac3ff] transition-colors font-body text-sm tracking-wide uppercase" href="#">Social</a>
+</div>
+</div>
+</footer>
+</body></html>

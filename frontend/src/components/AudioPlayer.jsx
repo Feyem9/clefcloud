@@ -78,7 +78,7 @@ const AudioPlayer = ({ src }) => {
             <div className="flex flex-col gap-2">
                 {/* Seek Bar */}
                 <div className="flex items-center gap-2 group">
-                    <span className="text-[10px] font-medium text-gray-500 w-8">{formatTime(currentTime)}</span>
+                    <span className="text-[10px] font-medium text-outline-variant w-8">{formatTime(currentTime)}</span>
                     <input
                         type="range"
                         ref={progressBarRef}
@@ -88,7 +88,7 @@ const AudioPlayer = ({ src }) => {
                         onChange={handleProgressChange}
                         className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-600 rounded-lg appearance-none cursor-pointer accent-primary-600"
                     />
-                    <span className="text-[10px] font-medium text-gray-500 w-8">{formatTime(duration)}</span>
+                    <span className="text-[10px] font-medium text-outline-variant w-8">{formatTime(duration)}</span>
                 </div>
 
                 {/* Controls */}
@@ -97,7 +97,7 @@ const AudioPlayer = ({ src }) => {
                         <button
                             onClick={togglePlayPause}
                             aria-label={isPlaying ? "Pause" : "Play"}
-                            className="w-8 h-8 flex items-center justify-center bg-primary-600 text-black rounded-full hover:bg-primary-700 transition-all active:scale-90 shadow-sm"
+                            className="w-8 h-8 flex items-center justify-center bg-primary-600 text-on-primary rounded-full hover:bg-primary-700 transition-all active:scale-90 shadow-sm"
                         >
                             {isPlaying ? (
                                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
@@ -114,7 +114,7 @@ const AudioPlayer = ({ src }) => {
                             <button
                                 onClick={toggleMute}
                                 aria-label={isMuted ? "Unmute" : "Mute"}
-                                className="text-gray-500 hover:text-primary-600 transition-colors"
+                                className="text-outline-variant hover:text-primary-600 transition-colors"
                             >
                                 {isMuted || volume === 0 ? (
                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -140,7 +140,7 @@ const AudioPlayer = ({ src }) => {
                         </div>
                     </div>
 
-                    <div className="text-[10px] text-gray-400 font-mono hidden sm:block">
+                    <div className="text-[10px] text-outline-variant font-mono hidden sm:block">
                         MP3 AUDIO
                     </div>
                 </div>

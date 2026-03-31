@@ -32,7 +32,7 @@ const PaymentSuccess = () => {
         <div className="animate-fade-in flex items-center justify-center min-h-[60vh]">
             <div className="max-w-md w-full text-center">
                 {status === 'success' ? (
-                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-10 border border-gray-200 dark:border-gray-700">
+                    <div className="bg-surface-container-lowest shadow-ambient rounded-2xl shadow-ambient p-10 ">
                         {/* Success Icon */}
                         <div className="w-20 h-20 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
                             <svg className="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -40,10 +40,10 @@ const PaymentSuccess = () => {
                             </svg>
                         </div>
 
-                        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-3">
+                        <h1 className="text-3xl font-bold text-on-surface font-display mb-3">
                             Paiement réussi ! 🎉
                         </h1>
-                        <p className="text-gray-600 dark:text-gray-400 mb-8 leading-relaxed">
+                        <p className="text-on-surface-variant mb-8 leading-relaxed">
                             Merci pour votre achat. Votre accès a été activé avec succès.
                             Vous pouvez maintenant profiter de toutes les fonctionnalités.
                         </p>
@@ -51,7 +51,7 @@ const PaymentSuccess = () => {
                         <div className="flex flex-col sm:flex-row gap-3 justify-center">
                             <Link
                                 to="/library"
-                                className="bg-primary-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-primary-700 transition-all shadow-md hover:shadow-lg hover:scale-105 flex items-center justify-center gap-2"
+                                className="bg-primary-600 text-on-primary px-6 py-3 rounded-xl font-semibold hover:bg-primary-700 transition-all shadow-ambient hover:shadow-ambient hover:scale-105 flex items-center justify-center gap-2"
                             >
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
@@ -60,14 +60,14 @@ const PaymentSuccess = () => {
                             </Link>
                             <Link
                                 to="/"
-                                className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-6 py-3 rounded-xl font-semibold hover:bg-gray-200 dark:hover:bg-gray-600 transition-all"
+                                className="bg-surface-container-high text-on-surface-variant px-6 py-3 rounded-xl font-semibold hover:bg-surface-container-high dark:hover:bg-gray-600 transition-all"
                             >
                                 Retour à l'accueil
                             </Link>
                         </div>
                     </div>
                 ) : (
-                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-10 border border-gray-200 dark:border-gray-700">
+                    <div className="bg-surface-container-lowest shadow-ambient rounded-2xl shadow-ambient p-10 ">
                         {/* Error Icon */}
                         <div className="w-20 h-20 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
                             <svg className="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -75,10 +75,10 @@ const PaymentSuccess = () => {
                             </svg>
                         </div>
 
-                        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-3">
+                        <h1 className="text-3xl font-bold text-on-surface font-display mb-3">
                             Paiement échoué
                         </h1>
-                        <p className="text-gray-600 dark:text-gray-400 mb-8 leading-relaxed">
+                        <p className="text-on-surface-variant mb-8 leading-relaxed">
                             Le paiement n'a pas pu être complété. Aucun montant n'a été débité.
                             Veuillez réessayer ou contacter le support.
                         </p>
@@ -86,13 +86,13 @@ const PaymentSuccess = () => {
                         <div className="flex flex-col sm:flex-row gap-3 justify-center">
                             <Link
                                 to="/premium"
-                                className="bg-amber-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-amber-600 transition-all shadow-md hover:shadow-lg hover:scale-105"
+                                className="bg-amber-500 text-on-primary px-6 py-3 rounded-xl font-semibold hover:bg-amber-600 transition-all shadow-ambient hover:shadow-ambient hover:scale-105"
                             >
                                 Réessayer
                             </Link>
                             <Link
                                 to="/contact"
-                                className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-6 py-3 rounded-xl font-semibold hover:bg-gray-200 dark:hover:bg-gray-600 transition-all"
+                                className="bg-surface-container-high text-on-surface-variant px-6 py-3 rounded-xl font-semibold hover:bg-surface-container-high dark:hover:bg-gray-600 transition-all"
                             >
                                 Contacter le support
                             </Link>

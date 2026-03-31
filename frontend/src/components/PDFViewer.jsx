@@ -98,7 +98,7 @@ const PDFViewer = ({ url, onClose }) => {
               loading={
                 <div className="text-center">
                   <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-primary-600 mx-auto mb-4"></div>
-                  <p className="text-gray-600">Chargement du document...</p>
+                  <p className="text-on-surface-variant">Chargement du document...</p>
                 </div>
               }
               options={{
@@ -118,7 +118,7 @@ const PDFViewer = ({ url, onClose }) => {
                 loading={
                   <div className="text-center py-8">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-primary-600 mx-auto mb-2"></div>
-                    <p className="text-gray-600 text-sm">Chargement de la page {pageNumber}...</p>
+                    <p className="text-on-surface-variant text-sm">Chargement de la page {pageNumber}...</p>
                   </div>
                 }
               />
@@ -134,7 +134,7 @@ const PDFViewer = ({ url, onClose }) => {
               <button
                 onClick={goToPrevPage}
                 disabled={pageNumber <= 1}
-                className="p-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition"
+                className="p-2 bg-primary-600 text-on-primary rounded-lg hover:bg-primary-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition"
                 title="Page précédente"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -151,14 +151,14 @@ const PDFViewer = ({ url, onClose }) => {
                   min="1"
                   max={numPages}
                 />
-                <span className="text-gray-400">/</span>
+                <span className="text-outline-variant">/</span>
                 <span className="text-gray-700 font-medium pr-1">{numPages}</span>
               </div>
 
               <button
                 onClick={goToNextPage}
                 disabled={pageNumber >= numPages}
-                className="p-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition"
+                className="p-2 bg-primary-600 text-on-primary rounded-lg hover:bg-primary-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition"
                 title="Page suivante"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

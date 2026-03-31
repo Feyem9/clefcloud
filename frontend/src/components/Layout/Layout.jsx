@@ -12,7 +12,7 @@ const Layout = ({ children }) => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900 transition-colors">
+    <div className="min-h-screen flex flex-col transition-colors">
       <Header />
       <main className={`flex-1 ${isProfilePage ? '' : 'container mx-auto px-4 py-8'}`}>
         {children}

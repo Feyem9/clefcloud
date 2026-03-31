@@ -75,36 +75,36 @@ const Premium = () => {
     return (
         <div className="animate-fade-in">
             {/* Hero Section */}
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-yellow-400 via-amber-500 to-orange-500 p-12 mb-12 shadow-2xl">
+            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-yellow-400 via-amber-500 to-orange-500 p-12 mb-12 shadow-ambient">
                 <div className="absolute inset-0 bg-black/10"></div>
                 <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
                 <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2"></div>
 
                 <div className="relative max-w-3xl mx-auto text-center">
-                    <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full text-white text-sm font-medium mb-6">
+                    <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full text-on-primary text-sm font-medium mb-6">
                         <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
                         </svg>
                         ClefCloud Premium
                     </div>
 
-                    <h1 className="text-5xl font-extrabold text-white mb-6 drop-shadow-lg">
+                    <h1 className="text-5xl font-extrabold text-on-primary mb-6 drop-shadow-ambient">
                         Débloquez tout le potentiel de ClefCloud
                     </h1>
-                    <p className="text-xl text-white/90 mb-8 leading-relaxed">
+                    <p className="text-xl text-on-primary/90 mb-8 leading-relaxed">
                         Accès illimité à toutes les partitions, téléchargements sans restriction
                         et contenu exclusif pour les musiciens passionnés.
                     </p>
 
                     {/* Pricing Card */}
-                    <div className="inline-block bg-white rounded-2xl shadow-2xl p-8 text-left max-w-sm">
+                    <div className="inline-block bg-white rounded-2xl shadow-ambient p-8 text-left max-w-sm">
                         <div className="text-center mb-6">
-                            <p className="text-gray-500 text-sm font-medium uppercase tracking-wider">Abonnement mensuel</p>
+                            <p className="text-outline-variant text-sm font-medium uppercase tracking-wider">Abonnement mensuel</p>
                             <div className="flex items-baseline justify-center gap-1 mt-2">
                                 <span className="text-5xl font-extrabold text-gray-900">5 000</span>
-                                <span className="text-xl text-gray-500 font-medium">FCFA</span>
+                                <span className="text-xl text-outline-variant font-medium">FCFA</span>
                             </div>
-                            <p className="text-gray-400 text-sm mt-1">par mois</p>
+                            <p className="text-outline-variant text-sm mt-1">par mois</p>
                         </div>
 
                         <ul className="space-y-3 mb-8">
@@ -123,7 +123,7 @@ const Premium = () => {
                         <button
                             onClick={handleSubscribe}
                             disabled={loading}
-                            className="w-full bg-gradient-to-r from-yellow-400 to-amber-500 text-white font-bold py-4 px-6 rounded-xl hover:from-yellow-500 hover:to-amber-600 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                            className="w-full bg-gradient-to-r from-yellow-400 to-amber-500 text-on-primary font-bold py-4 px-6 rounded-xl hover:from-yellow-500 hover:to-amber-600 transition-all duration-300 shadow-ambient hover:shadow-ambient hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                         >
                             {loading ? (
                                 <span className="flex items-center justify-center gap-2">
@@ -143,7 +143,7 @@ const Premium = () => {
 
             {/* Features Grid */}
             <div className="mb-12">
-                <h2 className="text-3xl font-bold text-gray-900 dark:text-white text-center mb-10">
+                <h2 className="text-3xl font-bold text-on-surface font-display text-center mb-10">
                     Tout ce que Premium vous offre
                 </h2>
 
@@ -151,16 +151,16 @@ const Premium = () => {
                     {features.map((feature, index) => (
                         <div
                             key={index}
-                            className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-8 hover:shadow-xl hover:scale-[1.02] transition-all duration-300 border border-gray-200 dark:border-gray-700 flex gap-5"
+                            className="bg-surface-container-lowest shadow-ambient rounded-xl shadow-ambient p-8 hover:shadow-ambient hover:scale-[1.02] transition-all duration-300  flex gap-5"
                         >
-                            <div className="flex-shrink-0 w-12 h-12 bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 rounded-xl flex items-center justify-center">
+                            <div className="flex-shrink-0 w-12 h-12 bg-amber-100 dark:bg-amber-900/30 text-tertiary rounded-xl flex items-center justify-center">
                                 {feature.icon}
                             </div>
                             <div>
-                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                                <h3 className="text-lg font-semibold text-on-surface font-display mb-2">
                                     {feature.title}
                                 </h3>
-                                <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                                <p className="text-on-surface-variant leading-relaxed">
                                     {feature.description}
                                 </p>
                             </div>
@@ -170,47 +170,47 @@ const Premium = () => {
             </div>
 
             {/* Comparaison Gratuit vs Premium */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 border border-gray-200 dark:border-gray-700">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-8">
+            <div className="bg-surface-container-lowest shadow-ambient rounded-xl shadow-ambient p-8 ">
+                <h2 className="text-2xl font-bold text-on-surface font-display text-center mb-8">
                     Gratuit vs Premium
                 </h2>
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
                         <thead>
-                            <tr className="border-b border-gray-200 dark:border-gray-700">
-                                <th className="py-3 px-4 text-gray-600 dark:text-gray-400 font-medium">Fonctionnalité</th>
-                                <th className="py-3 px-4 text-center text-gray-600 dark:text-gray-400 font-medium">Gratuit</th>
+                            <tr className="bg-surface-container-low">
+                                <th className="py-3 px-4 text-on-surface-variant font-medium">Fonctionnalité</th>
+                                <th className="py-3 px-4 text-center text-on-surface-variant font-medium">Gratuit</th>
                                 <th className="py-3 px-4 text-center font-medium text-amber-600">Premium ⭐</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                             <tr>
-                                <td className="py-3 px-4 text-gray-700 dark:text-gray-300">Upload de partitions</td>
+                                <td className="py-3 px-4 text-on-surface-variant">Upload de partitions</td>
                                 <td className="py-3 px-4 text-center text-green-500">✓</td>
                                 <td className="py-3 px-4 text-center text-green-500">✓</td>
                             </tr>
                             <tr>
-                                <td className="py-3 px-4 text-gray-700 dark:text-gray-300">Voir ses propres partitions</td>
+                                <td className="py-3 px-4 text-on-surface-variant">Voir ses propres partitions</td>
                                 <td className="py-3 px-4 text-center text-green-500">✓</td>
                                 <td className="py-3 px-4 text-center text-green-500">✓</td>
                             </tr>
                             <tr>
-                                <td className="py-3 px-4 text-gray-700 dark:text-gray-300">Accès à toutes les partitions</td>
+                                <td className="py-3 px-4 text-on-surface-variant">Accès à toutes les partitions</td>
                                 <td className="py-3 px-4 text-center text-red-400">✗</td>
                                 <td className="py-3 px-4 text-center text-green-500">✓</td>
                             </tr>
                             <tr>
-                                <td className="py-3 px-4 text-gray-700 dark:text-gray-300">Téléchargements illimités</td>
+                                <td className="py-3 px-4 text-on-surface-variant">Téléchargements illimités</td>
                                 <td className="py-3 px-4 text-center text-red-400">✗</td>
                                 <td className="py-3 px-4 text-center text-green-500">✓</td>
                             </tr>
                             <tr>
-                                <td className="py-3 px-4 text-gray-700 dark:text-gray-300">Fichiers audio</td>
+                                <td className="py-3 px-4 text-on-surface-variant">Fichiers audio</td>
                                 <td className="py-3 px-4 text-center text-red-400">✗</td>
                                 <td className="py-3 px-4 text-center text-green-500">✓</td>
                             </tr>
                             <tr>
-                                <td className="py-3 px-4 text-gray-700 dark:text-gray-300">Contenu exclusif</td>
+                                <td className="py-3 px-4 text-on-surface-variant">Contenu exclusif</td>
                                 <td className="py-3 px-4 text-center text-red-400">✗</td>
                                 <td className="py-3 px-4 text-center text-green-500">✓</td>
                             </tr>

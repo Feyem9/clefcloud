@@ -36,6 +36,7 @@ export class PayunitService {
         `${this.baseUrl}/initialize`,
         {
           total_amount: amount,
+          currency: 'XAF',
           transaction_id: transactionId,
           description: description,
           return_url: this.configService.get<string>('PAYUNIT_RETURN_URL'),
@@ -47,7 +48,13 @@ export class PayunitService {
       this.logger.log(`Paiement initialisé : ${transactionId}`);
       return response.data;
     } catch (error) {
-      this.logger.error(`Erreur initialisation paiement : ${error.message}`);
+      if (error.response) {
+        this.logger.error(
+          `Erreur PayUnit (${error.response.status}): ${JSON.stringify(error.response.data)}`
+        );
+      } else {
+        this.logger.error(`Erreur initialisation paiement : ${error.message}`);
+      }
       throw error;
     }
   }

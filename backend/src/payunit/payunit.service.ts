@@ -51,7 +51,7 @@ export class PayunitService {
         { headers: this.getHeaders() }
       );
 
-      this.logger.log(`Paiement initialisé : ${transactionId}`);
+      this.logger.log(`Paiement initialisé : ${transactionId} - Response: ${JSON.stringify(response.data)}`);
       return response.data;
     } catch (error) {
       if (error.response) {

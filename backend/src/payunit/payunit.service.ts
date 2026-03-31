@@ -17,9 +17,11 @@ export class PayunitService {
     const password = (this.configService.get<string>('PAYUNIT_PASSWORD') || '').trim();
     const mode = (this.configService.get<string>('PAYUNIT_MODE', 'sandbox') || '').trim();
 
-    this.logger.debug(
-      `Headers info: API_KEY(${apiKey.length}), USER(${user.length}), PASS(${password.length}), MODE(${mode})`
-    );
+    if (!apiKey || !user || !password) {
+      throw new Error(
+        `Configuration PayUnit manquante sur le serveur (API_KEY: ${!!apiKey}, USER: ${!!user}, PASS: ${!!password}). Vérifiez vos variables d'environnement.`
+      );
+    }
 
     const auth = Buffer.from(`${user}:${password}`).toString('base64');
 

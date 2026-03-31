@@ -49,7 +49,7 @@ export class PayunitController {
     // 2. Appeler PayUnit
     const payunitResponse = await this.payunitService.initializePayment(
       partition.price,
-      transaction.id.toString(),
+      `${transaction.id}-CLEFCLOUD`,
       `Achat de la partition : ${partition.title}`
     );
 
@@ -75,7 +75,7 @@ export class PayunitController {
 
     const payunitResponse = await this.payunitService.initializePayment(
       premiumPrice,
-      transaction.id.toString(),
+      `${transaction.id}-CLEFCLOUD`,
       'Abonnement ClefCloud Premium'
     );
 

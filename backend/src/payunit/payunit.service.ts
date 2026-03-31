@@ -12,10 +12,14 @@ export class PayunitService {
   }
 
   private getHeaders() {
-    const apiKey = this.configService.get<string>('PAYUNIT_API_KEY');
-    const user = this.configService.get<string>('PAYUNIT_USER');
-    const password = this.configService.get<string>('PAYUNIT_PASSWORD');
-    const mode = this.configService.get<string>('PAYUNIT_MODE', 'sandbox');
+    const apiKey = (this.configService.get<string>('PAYUNIT_API_KEY') || '').trim();
+    const user = (this.configService.get<string>('PAYUNIT_USER') || '').trim();
+    const password = (this.configService.get<string>('PAYUNIT_PASSWORD') || '').trim();
+    const mode = (this.configService.get<string>('PAYUNIT_MODE', 'sandbox') || '').trim();
+
+    this.logger.debug(
+      `Headers info: API_KEY(${apiKey.length}), USER(${user.length}), PASS(${password.length}), MODE(${mode})`
+    );
 
     const auth = Buffer.from(`${user}:${password}`).toString('base64');
 

@@ -52,7 +52,12 @@ export class PayunitService {
       );
 
       this.logger.log(`Paiement initialisé : ${transactionId} - Response: ${JSON.stringify(response.data)}`);
-      return response.data;
+      
+      // On aplatit la réponse pour que le frontend trouve facilement transaction_url
+      return {
+        ...response.data,
+        transaction_url: response.data.transaction_url || response.data.data?.transaction_url
+      };
     } catch (error) {
       if (error.response) {
         this.logger.error(

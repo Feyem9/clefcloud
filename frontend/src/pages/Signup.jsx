@@ -37,10 +37,10 @@ const Signup = () => {
       const user = await signup(email, password); // Note: Firebase Auth de base ne prend pas le téléphone, mais on valide le formulaire
 
       if (user) {
-        setSuccess('Inscription réussie ! Un lien de confirmation a été envoyé à votre email.');
+        setSuccess('Inscription réussie ! Redirection vers les offres Premium...');
         setTimeout(() => {
-          navigate('/login');
-        }, 3000);
+          navigate('/premium');
+        }, 2000);
       }
     } catch (error) {
       setError(error.message || 'Échec de la création du compte. Email déjà utilisé ?');

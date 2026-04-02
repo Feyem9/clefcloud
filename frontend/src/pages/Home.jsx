@@ -14,16 +14,16 @@ const Home = () => {
             Bienvenue sur ClefCloud
           </h1>
           <p className="text-xl mb-8 text-on-surface-variant">
-            Votre bibliothèque de partitions musicales dans le cloud.
-            Accédez à vos partitions n'importe où, n'importe quand.
+            La bibliothèque numérique de référence pour vos partitions.
+            Accès illimité via un abonnement premium unique.
           </p>
           {!currentUser ? (
             <div className="flex gap-4 justify-center">
               <Link
                 to="/signup"
-                className="bg-green-500 text-on-primary px-8 py-3 rounded-xl font-semibold hover:bg-green-600 hover:scale-105 transition-all shadow-ambient"
+                className="bg-amber-500 text-on-primary px-8 py-3 rounded-xl font-semibold hover:bg-amber-600 hover:scale-105 transition-all shadow-ambient"
               >
-                Commencer gratuitement
+                S'inscrire et s'abonner
               </Link>
               <Link
                 to="/login"
@@ -153,11 +153,11 @@ const Home = () => {
             Prêt à commencer ?
           </h2>
           <p className="text-on-surface-variant mb-6 text-lg">
-            Créez votre compte gratuitement et commencez à sauvegarder vos partitions dès maintenant.
+            Créez votre compte et accédez à tout notre catalogue premium dès aujourd'hui.
           </p>
           <Link
             to="/signup"
-            className="bg-green-500 text-on-primary px-8 py-3 rounded-xl font-semibold hover:bg-green-600 hover:scale-105 transition-all shadow-ambient"
+            className="bg-amber-500 text-on-primary px-8 py-3 rounded-xl font-semibold hover:bg-amber-600 hover:scale-105 transition-all shadow-ambient"
           >
             Créer mon compte
           </Link>

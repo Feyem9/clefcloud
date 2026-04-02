@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { auth } from '../firebase/config';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
@@ -14,6 +15,38 @@ api.interceptors.request.use(async (config) => {
   }
   return config;
 });
+
+// Intercepteur pour gérer l'expiration du token (401 Unauthorized)
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+
+    // Si on reçoit un 401 et que ce n'est pas une tentative de validation de token infinie
+    if (error.response?.status === 401 && !originalRequest._retry && !originalRequest.url.includes('/auth/validate')) {
+      originalRequest._retry = true;
+
+      try {
+        const user = auth.currentUser;
+        if (user) {
+          console.log('🔄 Token expiré. Refresh en cours...');
+          const newToken = await user.getIdToken(true);
+          localStorage.setItem('clefcloud_token', newToken);
+          originalRequest.headers.Authorization = `Bearer ${newToken}`;
+          return api(originalRequest);
+        }
+      } catch (refreshError) {
+        console.error('❌ Échec du refresh token:', refreshError);
+        // Rediriger vers login si le refresh échoue vraiment
+        localStorage.removeItem('clefcloud_token');
+        if (!window.location.pathname.includes('/login')) {
+          window.location.href = '/login';
+        }
+      }
+    }
+    return Promise.reject(error);
+  }
+);
 
 const apiService = {
   // Authentification

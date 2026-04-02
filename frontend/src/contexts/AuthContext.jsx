@@ -26,6 +26,8 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
+  const [isPremium, setIsPremium] = useState(false);
+  const [premiumUntil, setPremiumUntil] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -134,7 +136,11 @@ export const AuthProvider = ({ children }) => {
 
         // Synchroniser immédiatement avec le backend PostgreSQL
         try {
-          await apiService.validateToken(token);
+          const dbUser = await apiService.validateToken(token);
+          if (dbUser) {
+            setIsPremium(dbUser.is_premium);
+            setPremiumUntil(dbUser.premium_until);
+          }
         } catch (err) {
           console.error('Erreur lors de la synchronisation backend de firebase:', err);
         }
@@ -142,6 +148,8 @@ export const AuthProvider = ({ children }) => {
         setCurrentUser(user);
       } else {
         setCurrentUser(null);
+        setIsPremium(false);
+        setPremiumUntil(null);
         apiService.setAuthToken(null);
       }
       setLoading(false);
@@ -160,6 +168,8 @@ export const AuthProvider = ({ children }) => {
     forgotPassword,
     updateUserProfile,
     deleteAccount,
+    isPremium,
+    premiumUntil,
     loading,
     error
   };

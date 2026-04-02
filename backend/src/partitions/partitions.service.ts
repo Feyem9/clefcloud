@@ -72,6 +72,9 @@ export class PartitionsService {
   }
 
   async findAll(user: User, search?: string, category?: string, messePart?: string) {
+    // Vérification premium
+    const isPremium = user.is_premium && (!user.premium_until || user.premium_until > new Date());
+
     const query = this.partitionRepository.createQueryBuilder('partition')
       .leftJoinAndSelect('partition.user', 'user')
       .where('partition.is_active = :isActive', { isActive: true });
@@ -101,10 +104,21 @@ export class PartitionsService {
       select: ['partition_id'],
     }).then(favs => favs.map(f => f.partition_id));
 
-    return partitions.map(p => ({
-      ...p,
-      isFavorite: favoriteIds.includes(p.id),
-    }));
+    return partitions.map(p => {
+      const isOwner = p.created_by === user.id;
+      const hasAccess = isPremium || isOwner;
+
+      return {
+        ...p,
+        isFavorite: favoriteIds.includes(p.id),
+        hasAccess,
+        // On cache les URLs si pas d'accès
+        download_url: hasAccess ? p.download_url : null,
+        audio_url: hasAccess ? p.audio_url : null,
+        storage_path: hasAccess ? p.storage_path : null,
+        audio_storage_path: hasAccess ? p.audio_storage_path : null,
+      };
+    });
   }
 
   async findFavorites(user: User) {

@@ -169,55 +169,6 @@ const Premium = () => {
                 </div>
             </div>
 
-            {/* Comparaison Gratuit vs Premium */}
-            <div className="bg-surface-container-lowest shadow-ambient rounded-xl shadow-ambient p-8 ">
-                <h2 className="text-2xl font-bold text-on-surface font-display text-center mb-8">
-                    Gratuit vs Premium
-                </h2>
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left">
-                        <thead>
-                            <tr className="bg-surface-container-low">
-                                <th className="py-3 px-4 text-on-surface-variant font-medium">Fonctionnalité</th>
-                                <th className="py-3 px-4 text-center text-on-surface-variant font-medium">Gratuit</th>
-                                <th className="py-3 px-4 text-center font-medium text-amber-600">Premium ⭐</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
-                            <tr>
-                                <td className="py-3 px-4 text-on-surface-variant">Upload de partitions</td>
-                                <td className="py-3 px-4 text-center text-green-500">✓</td>
-                                <td className="py-3 px-4 text-center text-green-500">✓</td>
-                            </tr>
-                            <tr>
-                                <td className="py-3 px-4 text-on-surface-variant">Voir ses propres partitions</td>
-                                <td className="py-3 px-4 text-center text-green-500">✓</td>
-                                <td className="py-3 px-4 text-center text-green-500">✓</td>
-                            </tr>
-                            <tr>
-                                <td className="py-3 px-4 text-on-surface-variant">Accès à toutes les partitions</td>
-                                <td className="py-3 px-4 text-center text-red-400">✗</td>
-                                <td className="py-3 px-4 text-center text-green-500">✓</td>
-                            </tr>
-                            <tr>
-                                <td className="py-3 px-4 text-on-surface-variant">Téléchargements illimités</td>
-                                <td className="py-3 px-4 text-center text-red-400">✗</td>
-                                <td className="py-3 px-4 text-center text-green-500">✓</td>
-                            </tr>
-                            <tr>
-                                <td className="py-3 px-4 text-on-surface-variant">Fichiers audio</td>
-                                <td className="py-3 px-4 text-center text-red-400">✗</td>
-                                <td className="py-3 px-4 text-center text-green-500">✓</td>
-                            </tr>
-                            <tr>
-                                <td className="py-3 px-4 text-on-surface-variant">Contenu exclusif</td>
-                                <td className="py-3 px-4 text-center text-red-400">✗</td>
-                                <td className="py-3 px-4 text-center text-green-500">✓</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
         </div>
     );
 };

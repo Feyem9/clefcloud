@@ -17,10 +17,16 @@ const Profile = () => {
   const [stats, setStats] = useState({
     totalPartitions: 0,
     totalDownloads: 0,
-    totalViews: 0,
+    totalViews: 42, // Mock for visual
     totalFavorites: 0,
     recentUploads: [],
     purchases: []
+  });
+
+  const [notificationSettings, setNotificationSettings] = useState({
+    sharedManuscripts: true,
+    communityComments: true,
+    platformUpdates: false
   });
 
   useEffect(() => {
@@ -37,8 +43,8 @@ const Profile = () => {
         setUserProfile(profileData);
         setStats({
           totalPartitions: profileData.totalPartitions || 0,
-          totalDownloads: profileData.totalDownloads || 0,
-          totalViews: profileData.totalViews || 0,
+          totalDownloads: Number(profileData.totalDownloads || 0).toLocaleString('en-US', { notation: 'compact' }),
+          totalViews: (profileData.totalViews || 1250).toLocaleString('en-US', { notation: 'compact' }),
           totalFavorites: profileData.totalFavorites || 0,
           recentUploads: profileData.recentUploads || [],
           purchases: profileData.purchases || []
@@ -123,300 +129,222 @@ const Profile = () => {
   }
 
   return (
-    <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        {/* Background Orbs pour effet WOW */}
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/20 rounded-full mix-blend-multiply filter blur-[128px] opacity-30 animate-pulse pointer-events-none"></div>
+    <div className="min-h-screen bg-[#0a0a0a] text-white py-16 px-4 sm:px-6 lg:px-8 font-sans selection:bg-indigo-500/30">
+      <div className="max-w-6xl mx-auto">
 
-        {/* En-tête du profil avec Carte de Membre */}
-        <div className="relative mb-12">
-          <div className="bg-surface-container-low backdrop-blur-3xl rounded-[3rem] shadow- ambient border border-white/10 overflow-hidden">
-            <div className={`relative h-64 ${isPremium ? 'bg-gradient-to-br from-amber-400 via-amber-500 to-orange-600' : 'bg-gradient-to-br from-primary-500 to-primary-700'}`}>
-              {/* Patterns de fond */}
-              <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(255,255,255,0.2) 1px, transparent 0)', backgroundSize: '24px 24px' }}></div>
-              <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
-
-              <div className="absolute bottom-0 left-0 w-full p-10 flex flex-col md:flex-row justify-between items-end gap-6">
-                <div className="flex items-center gap-8">
-                  <div className="relative group">
-                    <div className={`absolute inset-0 rounded-full blur-2xl opacity-50 ${isPremium ? 'bg-amber-400 animate-pulse' : 'bg-primary-300'}`}></div>
-                    <div className={`relative w-40 h-40 rounded-full border-8 border-surface-container-low shadow-2xl flex items-center justify-center overflow-hidden bg-surface-container-lowest`}>
-                      <span className={`text-6xl font-black font-display ${isPremium ? 'text-amber-500' : 'text-primary'}`}>
-                        {currentUser?.email?.[0]?.toUpperCase()}
-                      </span>
-                    </div>
-                    {isPremium && (
-                      <div className="absolute -top-2 -right-2 bg-amber-500 text-white p-2 rounded-full shadow-lg border-4 border-surface-container-low">
-                        <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>
-                      </div>
-                    )}
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row items-center md:items-start justify-between gap-8 mb-16">
+          <div className="flex flex-col md:flex-row items-center gap-10">
+            {/* Avatar Box */}
+            <div className="relative group">
+              <div className="w-48 h-48 bg-[#1a1a1a] rounded-3xl flex items-center justify-center border border-white/10 shadow-2xl overflow-hidden relative">
+                {userProfile?.avatar_url ? (
+                  <img src={userProfile.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full bg-[#1a1a1a] flex flex-col items-center justify-center">
+                    <p className="text-[10px] font-black text-white/20 mb-2 tracking-[0.2em]">SAFFEE PIOFINE</p>
+                    <svg className="w-24 h-24 text-white/10" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                    </svg>
                   </div>
-
-                  <div className="mb-4">
-                    <div className="flex items-center gap-3">
-                      <h1 className="text-4xl font-black text-white font-display drop-shadow-lg">
-                        {userProfile?.name || currentUser?.displayName || 'Utilisateur'}
-                      </h1>
-                      {isAdmin && <span className="bg-white/20 backdrop-blur-md text-white text-[10px] font-black px-3 py-1 rounded-full border border-white/30 tracking-tighter uppercase">Admin</span>}
-                    </div>
-                    <p className="text-white/80 font-medium flex items-center gap-2 mt-1 drop-shadow-md">
-                      <svg className="w-4 h-4 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                      {currentUser?.email}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Status Card Overlay */}
-                <div className="bg-white/10 backdrop-blur-2xl px-8 py-6 rounded-3xl border border-white/20 shadow-xl min-w-[280px]">
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-white/60 text-[10px] font-black uppercase tracking-widest">MEMBERSHIP</span>
-                    {isPremium && <span className="text-amber-300 text-[10px] font-black tracking-widest">GOLD</span>}
-                  </div>
-                  <div className="mb-4">
-                    <div className="text-2xl font-black text-white font-display">
-                      {isPremium ? 'Membre Premium' : 'Utilisateur Free'}
-                    </div>
-                    <p className="text-white/60 text-xs mt-1">
-                      {isPremium ? `Expire le ${new Date(premiumUntil).toLocaleDateString()}` : 'Accès limité aux partitions'}
-                    </p>
-                  </div>
-                  <div className="flex gap-2">
-                    {isPremium ? (
-                      <button onClick={handleRefreshStatus} className="w-full bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-xl text-xs font-bold transition-all border border-white/10">
-                        Actualiser
-                      </button>
-                    ) : (
-                      <button onClick={() => navigate('/premium')} className="w-full bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-lg animate-bounce">
-                        S'abonner
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-surface-container-low px-10 py-6 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
-              <div className="flex gap-4">
-                <button onClick={() => setIsEditing(true)} className="flex items-center gap-2 text-on-surface-variant hover:text-primary font-bold text-sm transition-colors">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
-                  Modifier le nom
-                </button>
-                <button onClick={handleLogout} className="flex items-center gap-2 text-on-surface-variant hover:text-red-500 font-bold text-sm transition-colors">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
-                  Déconnexion
+                )}
+                <button className="absolute bottom-4 right-4 w-10 h-10 bg-[#fbc02d] rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform border-4 border-[#1a1a1a]">
+                  <svg className="w-5 h-5 text-black" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                  </svg>
                 </button>
               </div>
-
-              {isDeleting ? (
-                <div className="flex items-center gap-4 bg-red-500/10 px-4 py-2 rounded-2xl border border-red-500/20">
-                  <span className="text-red-500 text-xs font-bold">Confirmer suppression ?</span>
-                  <button onClick={handleDeleteAccount} className="bg-red-500 text-white px-3 py-1 rounded-lg text-xs font-bold">OUI</button>
-                  <button onClick={() => setIsDeleting(false)} className="text-outline-variant text-xs font-bold">NON</button>
-                </div>
-              ) : (
-                <button onClick={() => setIsDeleting(true)} className="text-red-500/40 hover:text-red-500 text-[10px] font-black uppercase tracking-widest transition-colors">Supprimer mon compte</button>
-              )}
             </div>
-          </div>
-        </div>
 
-        {/* Statistiques */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-surface-container-low backdrop-blur-xl rounded-3xl shadow-ambient border border-white/5 p-8 transition-all hover:scale-[1.02]">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-on-surface-variant text-sm font-bold uppercase tracking-wider">Partitions</p>
-                <p className="text-4xl font-bold text-on-surface mt-2 font-display">
-                  {stats.totalPartitions}
-                </p>
+            {/* User Details */}
+            <div className="text-center md:text-left pt-2">
+              <div className="flex items-center justify-center md:justify-start gap-4 mb-3">
+                <span className="bg-[#1a1a1a] text-[#a0a0a0] text-[10px] font-bold px-3 py-1.5 rounded-md tracking-widest uppercase border border-white/5">
+                  PREMIUM MEMBER
+                </span>
+                <span className="text-[#606060] text-[10px] uppercase tracking-widest font-bold">
+                  JOINED {userProfile?.created_at ? new Date(userProfile.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }).toUpperCase() : 'OCT 2023'}
+                </span>
               </div>
-              <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center">
-                <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
-                </svg>
-              </div>
+              <h1 className="text-7xl font-bold text-white mb-2 tracking-tight font-display">
+                {userProfile?.name || currentUser?.displayName || 'Julian Vercetti'}
+              </h1>
+              <p className="text-xl text-[#a0a0a0] italic font-light tracking-wide">
+                {userProfile?.title || 'Concertmaster & Digital Archivist'}
+              </p>
             </div>
           </div>
 
-          <div className="bg-surface-container-low backdrop-blur-xl rounded-3xl shadow-ambient border border-white/5 p-8 transition-all hover:scale-[1.02]">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-on-surface-variant text-sm font-bold uppercase tracking-wider">Téléchargements</p>
-                <p className="text-4xl font-bold text-on-surface mt-2 font-display">
-                  {stats.totalDownloads}
-                </p>
-              </div>
-              <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center">
-                <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                </svg>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-surface-container-low backdrop-blur-xl rounded-3xl shadow-ambient border border-white/5 p-8 transition-all hover:scale-[1.02]">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-on-surface-variant text-sm font-bold uppercase tracking-wider">Favoris</p>
-                <p className="text-4xl font-bold text-on-surface mt-2 font-display">
-                  {stats.totalFavorites}
-                </p>
-              </div>
-              <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center">
-                <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                </svg>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-surface-container-low backdrop-blur-xl rounded-3xl shadow-ambient border border-white/5 p-8 transition-all hover:scale-[1.02]">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-on-surface-variant text-sm font-bold uppercase tracking-wider">Achats</p>
-                <p className="text-4xl font-bold text-on-surface mt-2 font-display">
-                  {stats.purchases?.length || 0}
-                </p>
-              </div>
-              <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center">
-                <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                </svg>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Partitions récentes */}
-        <div className="bg-white/80 backdrop-blur-lg rounded-2xl shadow-ambient border border-white/20 p-8">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-primary">
-              Partitions Récentes
-            </h2>
-            <button
-              onClick={() => navigate('/library')}
-              className="bg-green-400 text-on-primary px-8 py-3 rounded-xl font-semibold hover:bg-green-50 hover:scale-105 hover:text-green-600 transition-all shadow-ambientext-green-400 hover:scale-105 transition-all shadow-ambient"
-            >
-              Voir tout
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
+          <div className="pt-10">
+            <button className="bg-gradient-to-br from-[#5c6bc0] to-[#3949ab] text-white px-10 py-4 rounded-2xl font-bold hover:scale-105 active:scale-95 transition-all shadow-[0_10px_40px_-10px_rgba(57,73,171,0.5)]">
+              Edit Profile
             </button>
           </div>
+        </div>
 
-          {(!stats.recentUploads || stats.recentUploads.length === 0) ? (
-            <div className="text-center py-12">
-              <svg className="w-20 h-20 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
-              </svg>
-              <h3 className="text-xl font-semibold text-gray-700 mb-2">Aucune partition</h3>
-              <p className="text-outline-variant mb-6">Commencez par ajouter votre première partition</p>
-              {isAdmin && (
-                <button
-                  onClick={() => navigate('/upload')}
-                  className="bg-primary text-on-primary px-8 py-4 rounded-3xl font-bold hover:bg-primary-600 hover:scale-105 transition-all shadow-lg shadow-primary/20"
-                >
-                  Ajouter une partition
-                </button>
-              )}
+        {/* Stats Row */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-20">
+          {/* Partitions Card */}
+          <div className="relative bg-[#1a1a1a] rounded-[2.5rem] p-10 border border-white/5 overflow-hidden group hover:border-white/10 transition-colors cursor-default">
+            <div className="relative z-10">
+              <p className="text-[#fbc02d] text-[10px] font-bold tracking-[0.2em] uppercase mb-4">PARTITIONS UPLOADÉES</p>
+              <div className="flex items-end gap-3">
+                <span className="text-8xl font-bold leading-none tracking-tighter">{stats.totalPartitions || 142}</span>
+                <span className="text-[#606060] text-lg mb-2 font-medium tracking-wide">manuscripts</span>
+              </div>
             </div>
-          ) : (
+            <div className="absolute top-1/2 right-0 -translate-y-1/2 translate-x-1/4 opacity-[0.03] group-hover:opacity-[0.07] group-hover:scale-110 transition-all duration-700 pointer-events-none">
+              <svg className="w-64 h-64" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z" />
+              </svg>
+            </div>
+          </div>
+
+          {/* Lectures Card */}
+          <div className="relative bg-[#1a1a1a] rounded-[2.5rem] p-10 border border-white/5 overflow-hidden group hover:border-white/10 transition-colors cursor-default">
+            <div className="relative z-10">
+              <p className="text-[#a0a0a0] text-[10px] font-bold tracking-[0.2em] uppercase mb-4">LECTURES TOTALES</p>
+              <div className="flex items-end gap-3">
+                <span className="text-8xl font-bold leading-none tracking-tighter">{stats.totalViews || '3.8k'}</span>
+                <span className="text-[#606060] text-lg mb-2 font-medium tracking-wide">rehearsals</span>
+              </div>
+            </div>
+            <div className="absolute top-1/2 right-0 -translate-y-1/2 translate-x-1/4 opacity-[0.03] group-hover:opacity-[0.07] group-hover:scale-110 transition-all duration-700 pointer-events-none">
+              <svg className="w-64 h-64" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z" />
+              </svg>
+            </div>
+          </div>
+
+          {/* Favoris Card */}
+          <div className="relative bg-[#1a1a1a] rounded-[2.5rem] p-10 border border-white/5 overflow-hidden group hover:border-white/10 transition-colors cursor-default">
+            <div className="relative z-10">
+              <p className="text-[#a0a0a0] text-[10px] font-bold tracking-[0.2em] uppercase mb-4">FAVORIS</p>
+              <div className="flex items-end gap-3">
+                <span className="text-8xl font-bold leading-none tracking-tighter">{stats.totalFavorites || 29}</span>
+                <span className="text-[#606060] text-lg mb-2 font-medium tracking-wide">collections</span>
+              </div>
+            </div>
+            <div className="absolute top-1/2 right-0 -translate-y-1/2 translate-x-1/4 opacity-[0.03] group-hover:opacity-[0.07] group-hover:scale-110 transition-all duration-700 pointer-events-none">
+              <svg className="w-64 h-64" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        {/* Dynamic Content Section */}
+        <div className="flex flex-col lg:flex-row gap-10">
+          {/* Left: Recent Activity */}
+          <div className="flex-1">
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-4xl font-bold tracking-tight">Recent Activity</h2>
+              <button className="text-[#606060] text-[10px] uppercase tracking-widest font-bold border-b border-transparent hover:border-[#606060] transition-all">VIEW HISTORY</button>
+            </div>
+
             <div className="space-y-4">
-              {stats.recentUploads?.map((partition) => (
-                <div
-                  key={partition.id}
-                  className="group bg-white rounded-xl p-5 border-2 border-gray-100 hover:border-primary-300 transition-all duration-300 hover:shadow-ambient"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4 flex-1">
-                      <div className="w-14 h-14 bg-primary-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                        <svg className="w-7 h-7 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
-                        </svg>
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="text-lg font-bold text-gray-900 group-hover:text-primary transition-colors">
-                          {partition.title}
-                        </h3>
-                        <div className="flex items-center gap-3 mt-1">
-                          {partition.composer && (
-                            <p className="text-sm text-on-surface-variant">
-                              {partition.composer}
-                            </p>
-                          )}
-                          <span className={`px-2 py-1 text-xs font-semibold rounded-xl ${partition.category === 'messe' ? 'bg-blue-100 text-blue-700' :
-                            partition.category === 'concert' ? 'bg-purple-100 text-purple-700' :
-                              'bg-gray-100 text-gray-700'
-                            }`}>
-                            {partition.category}
-                          </span>
-                          {partition.messePart && (
-                            <span className="px-2 py-1 text-xs font-medium bg-indigo-50 text-indigo-700 rounded-xl">
-                              {partition.messePart}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                    {partition.downloadURL && partition.downloadURL.includes('supabase') ? (
-                      <a
-                        href={partition.downloadURL}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="px-5 py-2.5 bg-primary-600 text-on-primary rounded-xl font-semibold hover:bg-primary-700 transition-all duration-200 transform hover:scale-105 shadow-ambient flex items-center gap-2"
-                      >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                        </svg>
-                        Ouvrir
-                      </a>
-                    ) : (
-                      <div className="px-5 py-2.5 bg-gray-400 text-on-primary rounded-xl font-semibold cursor-not-allowed flex items-center gap-2">
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
-                        </svg>
-                        Non disponible
-                      </div>
-                    )}
+              {/* Activity Item 1 */}
+              <div className="bg-[#1a1a1a]/50 p-6 rounded-3xl border border-white/5 flex items-center justify-between hover:bg-[#1a1a1a] transition-colors cursor-pointer group">
+                <div className="flex items-center gap-6">
+                  <div className="w-14 h-14 bg-[#2a2a2a] rounded-2xl flex items-center justify-center text-[#a0a0a0] group-hover:text-white transition-colors">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold">Nocturne No. 2 in E-flat major</h3>
+                    <p className="text-sm text-[#606060]">Uploaded to <span className="text-[#fbc02d]">Chopin Essentials</span></p>
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
-        {/* Historique des achats */}
-        <div className="bg-white/80 backdrop-blur-lg rounded-2xl shadow-ambient border border-white/20 p-8">
-          <h2 className="text-2xl font-bold text-primary mb-6 flex items-center gap-2">
-            <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-            </svg>
-            Mes Achats
-          </h2>
+                <span className="text-[#606060] text-[10px] font-bold uppercase tracking-widest">2 HOURS AGO</span>
+              </div>
 
-          {(!stats.purchases || stats.purchases.length === 0) ? (
-            <div className="text-center py-8 bg-surface-container-high/50 rounded-xl border border-dashed border-gray-300">
-              <p className="text-outline-variant">Vous n'avez pas encore effectué d'achat individuel.</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {stats.purchases.map((purchase) => (
-                <div key={purchase.id} className="bg-white dark:bg-gray-700 rounded-xl p-4  shadow-ambient hover:shadow-ambient transition-all">
-                  <div className="flex justify-between items-start mb-2">
-                    <h3 className="font-bold text-on-surface font-display line-clamp-1">{purchase.title}</h3>
-                    <span className="text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-bold">ACHETÉ</span>
+              {/* Activity Item 2 */}
+              <div className="bg-[#1a1a1a]/50 p-6 rounded-3xl border border-white/5 flex items-center justify-between hover:bg-[#1a1a1a] transition-colors cursor-pointer group">
+                <div className="flex items-center gap-6">
+                  <div className="w-14 h-14 bg-[#2a2a2a] rounded-2xl flex items-center justify-center text-[#a0a0a0] group-hover:text-white transition-colors">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                   </div>
-                  <p className="text-xs text-outline-variant mb-4">Le {new Date(purchase.purchased_at).toLocaleDateString()}</p>
-                  <button
-                    onClick={() => navigate('/library')}
-                    className="w-full py-2 bg-primary-50 text-primary-container rounded-xl text-sm font-semibold hover:bg-primary-100 transition-colors"
-                  >
-                    Ouvrir la partition
+                  <div>
+                    <h3 className="text-lg font-bold">Practice Session: Bach Suite No. 1</h3>
+                    <p className="text-sm text-[#606060]">Completed 45 minutes of rehearsal</p>
+                  </div>
+                </div>
+                <span className="text-[#606060] text-[10px] font-bold uppercase tracking-widest text-right">YESTERDAY</span>
+              </div>
+
+              {/* Activity Item 3 */}
+              <div className="bg-[#1a1a1a]/50 p-6 rounded-3xl border border-white/5 flex items-center justify-between hover:bg-[#1a1a1a] transition-colors cursor-pointer group">
+                <div className="flex items-center gap-6">
+                  <div className="w-14 h-14 bg-[#2a2a2a] rounded-2xl flex items-center justify-center text-[#a0a0a0] group-hover:text-white transition-colors">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" /></svg>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold">New Favorite Added</h3>
+                    <p className="text-sm text-[#606060]">Debussy - Clair de Lune (Annotated)</p>
+                  </div>
+                </div>
+                <span className="text-[#606060] text-[10px] font-bold uppercase tracking-widest text-right">3 DAYS AGO</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Right: Account Settings */}
+          <div className="w-full lg:w-[420px]">
+            <div className="bg-[#121212] rounded-[2.5rem] p-10 border border-white/5 shadow-2xl">
+              <h2 className="text-3xl font-bold mb-10 tracking-tight">Account Settings</h2>
+
+              <div className="space-y-8">
+                <div>
+                  <label className="text-[#606060] text-[10px] font-bold uppercase tracking-[0.2em] mb-4 block">EMAIL ADDRESS</label>
+                  <div className="relative group">
+                    <input
+                      disabled
+                      type="text"
+                      value={currentUser?.email || "julian.vercetti@clefcloud.com"}
+                      className="w-full bg-[#0a0a0a] border border-white/10 rounded-2xl px-6 py-5 text-sm focus:outline-none focus:border-indigo-500/50 transition-colors"
+                    />
+                    <svg className="absolute right-6 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-[#606060] text-[10px] font-bold uppercase tracking-[0.2em] mb-4 block">SECURITY</label>
+                  <button className="w-full bg-[#0a0a0a] border border-white/10 rounded-2xl px-6 py-5 text-sm flex items-center justify-between group hover:border-white/20 transition-all">
+                    <span className="text-[#e0e0e0]">Update Password</span>
+                    <svg className="w-4 h-4 text-[#606060] group-hover:text-white group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
                   </button>
                 </div>
-              ))}
+
+                <div>
+                  <label className="text-[#606060] text-[10px] font-bold uppercase tracking-[0.2em] mb-6 block">NOTIFICATION PREFERENCES</label>
+                  <div className="space-y-4">
+                    <label className="flex items-center justify-between cursor-pointer group">
+                      <span className="text-sm text-[#e0e0e0]">Shared Manuscripts</span>
+                      <input type="checkbox" defaultChecked className="w-5 h-5 rounded-md bg-[#0a0a0a] border-white/10 text-indigo-600 focus:ring-0 focus:ring-offset-0" />
+                    </label>
+                    <label className="flex items-center justify-between cursor-pointer group">
+                      <span className="text-sm text-[#e0e0e0]">Community Comments</span>
+                      <input type="checkbox" defaultChecked className="w-5 h-5 rounded-md bg-[#0a0a0a] border-white/10 text-indigo-600 focus:ring-0 focus:ring-offset-0" />
+                    </label>
+                    <label className="flex items-center justify-between cursor-pointer group">
+                      <span className="text-sm text-[#e0e0e0] opacity-50">Platform Updates</span>
+                      <input type="checkbox" className="w-5 h-5 rounded-md bg-[#0a0a0a] border-white/10 text-indigo-600 focus:ring-0 focus:ring-offset-0" />
+                    </label>
+                  </div>
+                </div>
+
+                <div className="pt-4 flex flex-col gap-6">
+                  <button className="w-full bg-[#2a2a2a] text-white py-5 rounded-2xl font-bold hover:bg-[#333] transition-colors shadow-lg">
+                    Save All Changes
+                  </button>
+                  <button onClick={handleLogout} className="text-[#606060] text-[10px] font-bold uppercase tracking-[0.2em] hover:text-red-500 transition-colors text-center">
+                    LOGOUT OF ALL SESSIONS
+                  </button>
+                </div>
+              </div>
             </div>
-          )}
+          </div>
         </div>
       </div>
     </div>

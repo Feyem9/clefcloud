@@ -587,13 +587,11 @@ const Library = () => {
                     )}
 
                     {/* Actions */}
-                    <div className="flex gap-2 justify-between items-center">
+                    <div className="flex gap-2 justify-between items-center mt-auto pt-4 border-t border-gray-100 dark:border-gray-800">
                       {/* Prix */}
-                      {partition.price > 0 && !hasAccess(partition) && (
+                      {!hasAccess(partition) ? (
                         <div className="flex items-center gap-2">
-                          <span className="text-sm font-bold text-tertiary">
-                            {partition.price.toLocaleString()} FCFA
-                          </span>
+                          <span className="text-sm font-bold text-tertiary">599 FCFA</span>
                           <button
                             onClick={() => handleBuyPartition(partition)}
                             disabled={buyingId === partition.id}
@@ -602,13 +600,11 @@ const Library = () => {
                             {buyingId === partition.id ? '...' : '🛒 Acheter'}
                           </button>
                         </div>
-                      )}
-                      {partition.price > 0 && hasAccess(partition) && (
+                      ) : (
                         <span className="text-xs font-medium text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 px-2 py-1 rounded-full">
                           ✓ Débloqué
                         </span>
                       )}
-                      {(!partition.price || partition.price === 0) && <div />}
 
                       <div className="flex gap-2">
                         {hasAccess(partition) ? (
@@ -630,14 +626,10 @@ const Library = () => {
                             )}
                           </>
                         ) : (
-                          <Link
-                            to="/premium"
-                            className="text-xs text-primary font-bold hover:underline py-2"
-                          >
-                            🚀 Passer Premium
+                          <Link to="/premium" className="text-xs text-primary font-bold hover:underline py-2">
+                            🚀 Premium
                           </Link>
                         )}
-
                         {isAdmin && (
                           <button onClick={() => handleDelete(partition.id)} className="p-2 rounded-full text-outline-variant hover:bg-red-100 dark:hover:bg-gray-700 hover:text-red-600 dark:hover:text-red-400 transition-colors group" title="Supprimer">
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
@@ -653,7 +645,7 @@ const Library = () => {
 
           {/* Vue Liste */}
           {viewMode === 'list' && (
-            <div className="bg-surface-container-lowest shadow-ambient rounded-xl shadow-ambient  overflow-hidden animate-fade-in">
+            <div className="bg-surface-container-lowest shadow-ambient rounded-xl shadow-ambient overflow-hidden animate-fade-in">
               <div className="divide-y divide-gray-200 dark:divide-gray-700">
                 {sortedAndFilteredPartitions.map((partition) => (
                   <div key={partition.id} className="flex items-center justify-between p-4 hover:bg-surface-container-low transition-colors">
@@ -685,9 +677,19 @@ const Library = () => {
                       {partition.messePart && (
                         <span className="text-sm text-outline-variant">{partition.messePart}</span>
                       )}
+                      <span className="text-sm font-bold text-tertiary">599 FCFA</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      {partition.storage_path && (
+                      {!hasAccess(partition) && (
+                        <button
+                          onClick={() => handleBuyPartition(partition)}
+                          disabled={buyingId === partition.id}
+                          className="px-3 py-1 bg-amber-500 text-on-primary text-[10px] font-bold rounded-lg hover:bg-amber-600 transition-all flex items-center gap-1"
+                        >
+                          {buyingId === partition.id ? '...' : <><span>🛒</span><span>599</span></>}
+                        </button>
+                      )}
+                      {partition.storage_path && hasAccess(partition) && (
                         <>
                           <button onClick={() => handleViewPDF(partition)} className="p-2 rounded-full text-outline-variant hover:bg-blue-100 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400 transition-colors" title="Voir"><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg></button>
                           <button onClick={() => handleDownload(partition)} className="p-2 rounded-full text-outline-variant hover:bg-green-100 dark:hover:bg-gray-700 hover:text-green-600 dark:hover:text-green-400 transition-colors" title="Télécharger"><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg></button>

@@ -241,6 +241,22 @@ const Upload = () => {
               </div>
             </div>
 
+            {/* Information de Prix */}
+            <div className="mt-8 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-2xl p-6 text-center shadow-ambient">
+              <div className="flex flex-col items-center gap-2">
+                <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span className="text-lg font-bold font-display uppercase tracking-wider">Prix de vente fixe</span>
+                </div>
+                <p className="text-3xl font-black text-amber-900 dark:text-amber-100 font-display">599 FCFA</p>
+                <p className="text-sm text-amber-800 dark:text-amber-200 max-w-md mx-auto italic">
+                  Toutes les partitions chargées seront vendues à ce prix unique. Ce tarif inclut l'accès au PDF et au fichier audio si présent.
+                </p>
+              </div>
+            </div>
+
             <button type="submit" disabled={loading}
               className="w-full relative group overflow-hidden bg-gradient-to-r from-primary-600 to-orange-500 text-on-primary font-bold py-4 sm:py-5 rounded-2xl shadow-ambient hover:shadow-primary-500/40 transition-all duration-300 active:scale-[0.98] disabled:opacity-70 disabled:active:scale-100 mt-8">
               <div className="absolute inset-0 w-full h-full bg-white/20 group-hover:translate-x-full transition-transform duration-500 ease-out -skew-x-12 -translate-x-full"></div>

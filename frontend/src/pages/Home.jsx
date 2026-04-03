@@ -53,9 +53,9 @@ const Home = () => {
           <h1 className="text-5xl font-bold mb-6 drop-shadow-ambient text-on-surface font-display">
             Bienvenue sur ClefCloud
           </h1>
-          <p className="text-xl mb-8 text-on-surface-variant">
+          <p className="text-xl mb-8 text-on-surface-variant leading-relaxed max-w-2xl mx-auto">
             La bibliothèque numérique de référence pour vos partitions.
-            Abonnement premium ou achat à l'unité.
+            Profitez de notre <span className="text-primary font-bold">abonnement premium illimité</span> ou achetez vos morceaux à l'unité pour seulement <span className="text-tertiary font-bold">599 FCFA</span>.
           </p>
           {!currentUser ? (
             <div className="flex gap-4 justify-center">

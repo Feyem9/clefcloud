@@ -27,6 +27,7 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [isPremium, setIsPremium] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [premiumUntil, setPremiumUntil] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -139,6 +140,7 @@ export const AuthProvider = ({ children }) => {
           const dbUser = await apiService.validateToken(token);
           if (dbUser) {
             setIsPremium(dbUser.is_premium);
+            setIsAdmin(dbUser.is_admin);
             setPremiumUntil(dbUser.premium_until);
           }
         } catch (err) {
@@ -149,6 +151,7 @@ export const AuthProvider = ({ children }) => {
       } else {
         setCurrentUser(null);
         setIsPremium(false);
+        setIsAdmin(false);
         setPremiumUntil(null);
         apiService.setAuthToken(null);
       }
@@ -169,6 +172,7 @@ export const AuthProvider = ({ children }) => {
     updateUserProfile,
     deleteAccount,
     isPremium,
+    isAdmin,
     premiumUntil,
     loading,
     error

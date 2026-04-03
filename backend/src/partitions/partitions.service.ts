@@ -27,6 +27,10 @@ export class PartitionsService {
     user: User,
     files: { pdf?: Express.Multer.File[]; audio?: Express.Multer.File[] },
   ) {
+    if (!user.is_admin) {
+      throw new ForbiddenException('Seul l\'administrateur peut ajouter des partitions');
+    }
+
     const partition = this.partitionRepository.create({
       ...createPartitionDto,
       user,

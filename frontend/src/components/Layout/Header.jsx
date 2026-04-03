@@ -4,7 +4,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
 
 const Header = () => {
-  const { currentUser, logout } = useAuth();
+  const { currentUser, isAdmin, logout } = useAuth();
   const { isDarkMode, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -45,9 +45,11 @@ const Header = () => {
                 <Link to="/messe" className="text-on-surface-variant hover:text-primary transition font-medium active:scale-95">
                   Messe
                 </Link>
-                <Link to="/upload" className="text-on-surface-variant hover:text-primary transition font-medium active:scale-95">
-                  Ajouter
-                </Link>
+                {isAdmin && (
+                  <Link to="/upload" className="text-on-surface-variant hover:text-primary transition font-medium active:scale-95">
+                    Ajouter
+                  </Link>
+                )}
                 <Link to="/contact" className="text-on-surface-variant hover:text-primary transition font-medium active:scale-95">
                   Contact
                 </Link>
@@ -192,16 +194,18 @@ const Header = () => {
                         <span className="font-medium text-gray-700 group-hover:text-primary-600 transition-colors">Messe</span>
                       </Link>
 
-                      <Link
-                        to="/upload"
-                        onClick={closeMobileMenu}
-                        className="flex items-center space-x-3 p-4 rounded-xl hover:bg-gray-50 transition-colors group"
-                      >
-                        <svg className="w-6 h-6 text-outline-variant group-hover:text-primary-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                        </svg>
-                        <span className="font-medium text-gray-700 group-hover:text-primary-600 transition-colors">Ajouter</span>
-                      </Link>
+                      {isAdmin && (
+                        <Link
+                          to="/upload"
+                          onClick={closeMobileMenu}
+                          className="flex items-center space-x-3 p-4 rounded-xl hover:bg-gray-50 transition-colors group"
+                        >
+                          <svg className="w-6 h-6 text-outline-variant group-hover:text-primary-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                          </svg>
+                          <span className="font-medium text-gray-700 group-hover:text-primary-600 transition-colors">Ajouter</span>
+                        </Link>
+                      )}
 
                       <Link
                         to="/contact"

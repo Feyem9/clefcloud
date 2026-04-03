@@ -33,6 +33,9 @@ export class User {
 
   @Column({ default: false })
   is_premium: boolean;
+  
+  @Column({ default: false })
+  is_admin: boolean;
 
   @Column({ type: 'timestamp', nullable: true })
   premium_until: Date;

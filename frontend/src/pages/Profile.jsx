@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import apiService from '../services/api';
 
 const Profile = () => {
-  const { currentUser, logout, updateUserProfile, deleteAccount } = useAuth();
+  const { currentUser, isAdmin, logout, updateUserProfile, deleteAccount } = useAuth();
   const navigate = useNavigate();
   const [userProfile, setUserProfile] = useState(null);
   const [partitions, setPartitions] = useState([]);
@@ -105,19 +105,24 @@ const Profile = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-cyan-50 to-blue-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
+        {/* Background Orbs pour effet WOW */}
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/20 rounded-full mix-blend-multiply filter blur-[128px] opacity-30 animate-pulse pointer-events-none"></div>
+
         {/* En-tête du profil */}
-        <div className="bg-white/80 backdrop-blur-lg rounded-2xl shadow-ambient border border-white/20 overflow-hidden mb-8">
-          <div className="relative h-48 bg-primary-600">
-            <div className="absolute inset-0 bg-green-600 rounded-t-2xl"></div>
+        <div className="bg-surface-container-low backdrop-blur-xl rounded-3xl shadow-ambient border border-white/10 overflow-hidden mb-8">
+          <div className="relative h-48 bg-gradient-to-r from-primary to-primary-container">
+            <div className="absolute inset-0 bg-primary opacity-50"></div>
             <div className="absolute -bottom-16 left-8">
               <div className="relative">
-                <div className="absolute inset-0 bg-green-400 rounded-full blur-xl opacity-50 animate-pulse"></div>
-                <div className="relative w-32 h-32 bg-white rounded-full border-4 border-white shadow-ambient flex items-center justify-center">
-                  <svg className="w-16 h-16 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
+                <div className="absolute inset-0 bg-primary/40 rounded-full blur-xl opacity-50 animate-pulse"></div>
+                <div className="relative w-32 h-32 bg-surface-container-lowest rounded-full border-4 border-surface-container-lowest shadow-ambient flex items-center justify-center overflow-hidden">
+                  <div className="w-full h-full bg-primary-container/20 flex items-center justify-center">
+                    <span className="text-4xl font-bold text-primary font-display">
+                      {currentUser?.email?.[0]?.toUpperCase()}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -144,7 +149,7 @@ const Profile = () => {
                   </div>
                 ) : (
                   <div className="flex items-center gap-3">
-                    <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+                    <h1 className="text-3xl font-bold text-on-surface font-display">
                       {userProfile?.name || currentUser?.displayName || 'Utilisateur'}
                     </h1>
                     <button onClick={() => setIsEditing(true)} className="p-1.5 text-outline-variant hover:text-primary transition-colors" title="Modifier le nom">
@@ -201,16 +206,16 @@ const Profile = () => {
         </div>
 
         {/* Statistiques */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white/80 backdrop-blur-lg rounded-2xl shadow-ambient border border-white/20 p-6 transform transition-all duration-300 hover:scale-105 hover:shadow-ambient">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+          <div className="bg-surface-container-low backdrop-blur-xl rounded-3xl shadow-ambient border border-white/5 p-8 transition-all hover:scale-[1.02]">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-on-surface-variant text-sm font-medium">Total Partitions</p>
-                <p className="text-4xl font-bold text-primary mt-2">
+                <p className="text-on-surface-variant text-sm font-bold uppercase tracking-wider">Partitions</p>
+                <p className="text-4xl font-bold text-on-surface mt-2 font-display">
                   {stats.totalPartitions}
                 </p>
               </div>
-              <div className="w-16 h-16 bg-primary-100 rounded-2xl flex items-center justify-center">
+              <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center">
                 <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
                 </svg>
@@ -218,50 +223,49 @@ const Profile = () => {
             </div>
           </div>
 
-          <div className="bg-white/80 backdrop-blur-lg rounded-2xl shadow-ambient border border-white/20 p-6 transform transition-all duration-300 hover:scale-105 hover:shadow-ambient">
+          <div className="bg-surface-container-low backdrop-blur-xl rounded-3xl shadow-ambient border border-white/5 p-8 transition-all hover:scale-[1.02]">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-on-surface-variant text-sm font-medium">Téléchargements</p>
-                <p className="text-4xl font-bold text-cyan-600 mt-2">
+                <p className="text-on-surface-variant text-sm font-bold uppercase tracking-wider">Téléchargements</p>
+                <p className="text-4xl font-bold text-on-surface mt-2 font-display">
                   {stats.totalDownloads}
                 </p>
               </div>
-              <div className="w-16 h-16 bg-cyan-100 rounded-2xl flex items-center justify-center">
-                <svg className="w-8 h-8 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center">
+                <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                 </svg>
               </div>
             </div>
           </div>
 
-          <div className="bg-white/80 backdrop-blur-lg rounded-2xl shadow-ambient border border-white/20 p-6 transform transition-all duration-300 hover:scale-105 hover:shadow-ambient">
+          <div className="bg-surface-container-low backdrop-blur-xl rounded-3xl shadow-ambient border border-white/5 p-8 transition-all hover:scale-[1.02]">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-on-surface-variant text-sm font-medium">Vues</p>
-                <p className="text-4xl font-bold text-green-600 mt-2">
-                  {stats.totalViews}
+                <p className="text-on-surface-variant text-sm font-bold uppercase tracking-wider">Favoris</p>
+                <p className="text-4xl font-bold text-on-surface mt-2 font-display">
+                  {stats.totalFavorites}
                 </p>
               </div>
-              <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center">
-                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center">
+                <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                 </svg>
               </div>
             </div>
           </div>
 
-          <div className="bg-white/80 backdrop-blur-lg rounded-2xl shadow-ambient border border-white/20 p-6 transform transition-all duration-300 hover:scale-105 hover:shadow-ambient">
+          <div className="bg-surface-container-low backdrop-blur-xl rounded-3xl shadow-ambient border border-white/5 p-8 transition-all hover:scale-[1.02]">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-on-surface-variant text-sm font-medium">Favoris</p>
-                <p className="text-4xl font-bold text-yellow-600 mt-2">
-                  {stats.totalFavorites}
+                <p className="text-on-surface-variant text-sm font-bold uppercase tracking-wider">Achats</p>
+                <p className="text-4xl font-bold text-on-surface mt-2 font-display">
+                  {stats.purchases?.length || 0}
                 </p>
               </div>
-              <div className="w-16 h-16 bg-yellow-100 rounded-2xl flex items-center justify-center">
-                <svg className="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+              <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center">
+                <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                 </svg>
               </div>
             </div>
@@ -292,12 +296,14 @@ const Profile = () => {
               </svg>
               <h3 className="text-xl font-semibold text-gray-700 mb-2">Aucune partition</h3>
               <p className="text-outline-variant mb-6">Commencez par ajouter votre première partition</p>
-              <button
-                onClick={() => navigate('/upload')}
-                className="bg-green-400 text-on-primary px-8 py-3 rounded-xl font-semibold hover:bg-green-50 hover:scale-105 hover:text-green-600 transition-all shadow-ambientext-green-400 hover:scale-105 transition-all shadow-ambient"
-              >
-                Ajouter une partition
-              </button>
+              {isAdmin && (
+                <button
+                  onClick={() => navigate('/upload')}
+                  className="bg-primary text-on-primary px-8 py-4 rounded-3xl font-bold hover:bg-primary-600 hover:scale-105 transition-all shadow-lg shadow-primary/20"
+                >
+                  Ajouter une partition
+                </button>
+              )}
             </div>
           ) : (
             <div className="space-y-4">

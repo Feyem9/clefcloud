@@ -2,6 +2,7 @@ import { Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
 import PremiumRoute from './components/PremiumRoute';
+import AdminRoute from './components/AdminRoute';
 import { useTheme } from './contexts/ThemeContext';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -58,9 +59,9 @@ function App() {
           <Route
             path="/upload"
             element={
-              <PremiumRoute>
+              <AdminRoute>
                 <Upload />
-              </PremiumRoute>
+              </AdminRoute>
             }
           />
 

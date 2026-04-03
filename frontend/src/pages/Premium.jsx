@@ -75,7 +75,9 @@ const Premium = () => {
     return (
         <div className="animate-fade-in">
             {/* Hero Section */}
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-yellow-400 via-amber-500 to-orange-500 p-12 mb-12 shadow-ambient">
+            <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-amber-400 via-amber-500 to-orange-500 p-12 mb-12 shadow-ambient">
+                <div className="absolute top-0 left-1/4 w-64 h-64 bg-white/10 rounded-full blur-[80px] animate-pulse"></div>
+
                 <div className="absolute inset-0 bg-black/10"></div>
                 <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
                 <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2"></div>
@@ -97,28 +99,19 @@ const Premium = () => {
                     </p>
 
                     {/* Pricing Card */}
-                    <div className="inline-block bg-white rounded-2xl shadow-ambient p-8 text-left max-w-sm">
-                        <div className="text-center mb-6">
-                            <p className="text-outline-variant text-sm font-medium uppercase tracking-wider">Abonnement mensuel</p>
-                            <div className="flex items-baseline justify-center gap-1 mt-2">
-                                <span className="text-5xl font-extrabold text-gray-900">5 000</span>
-                                <span className="text-xl text-outline-variant font-medium">FCFA</span>
-                            </div>
-                            <p className="text-outline-variant text-sm mt-1">par mois</p>
+                    <div className="inline-block bg-surface-container-lowest rounded-[2rem] shadow-ambient p-10 text-left max-w-sm border border-white/10">
+                        <div className="flex items-center justify-between mb-6">
+                            <span className="text-on-surface-variant font-bold uppercase tracking-widest text-xs">OFFRE UNIQUE</span>
+                            <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-bold font-display">BEST VALUE</span>
                         </div>
 
-                        <ul className="space-y-3 mb-8">
-                            {features.map((feature, index) => (
-                                <li key={index} className="flex items-center gap-3">
-                                    <div className="flex-shrink-0 w-5 h-5 text-green-500">
-                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                        </svg>
-                                    </div>
-                                    <span className="text-gray-700 text-sm">{feature.title}</span>
-                                </li>
-                            ))}
-                        </ul>
+                        <div className="text-center mb-6">
+                            <p className="text-outline-variant text-sm font-medium uppercase tracking-wider">Abonnement mensuel</p>
+                            <div className="mb-8">
+                                <span className="text-5xl font-black text-on-surface font-display">5 000</span>
+                                <span className="text-on-surface-variant font-bold ml-2">FCFA / mois</span>
+                            </div>
+                        </div>
 
                         <button
                             onClick={handleSubscribe}

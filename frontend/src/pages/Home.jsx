@@ -6,9 +6,12 @@ const Home = () => {
   const { currentUser } = useAuth();
 
   return (
-    <div>
+    <div className="animate-fade-in">
       {/* Hero Section */}
-      <div className="bg-blue-600 bg-opacity-5 dark:bg-primary-900 dark:bg-opacity-20 text-on-primary rounded-2xl shadow-ambient p-12 mb-12">
+      <div className="relative overflow-hidden rounded-[2.5rem] bg-surface-container-low border border-white/10 shadow-ambient p-12 mb-12">
+        <div className="absolute top-0 left-1/4 w-64 h-64 bg-primary/10 rounded-full blur-[80px] animate-pulse"></div>
+        <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-primary/5 rounded-full blur-[80px] animate-pulse" style={{ animationDelay: '2s' }}></div>
+
         <div className="max-w-3xl mx-auto text-center">
           <h1 className="text-5xl font-bold mb-6 drop-shadow-ambient text-on-surface font-display">
             Bienvenue sur ClefCloud
@@ -21,13 +24,13 @@ const Home = () => {
             <div className="flex gap-4 justify-center">
               <Link
                 to="/signup"
-                className="bg-amber-500 text-on-primary px-8 py-3 rounded-xl font-semibold hover:bg-amber-600 hover:scale-105 transition-all shadow-ambient"
+                className="bg-primary text-on-primary px-10 py-4 rounded-2xl font-bold hover:bg-primary-600 hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-primary/20"
               >
-                S'inscrire et s'abonner
+                Commencer l'aventure
               </Link>
               <Link
                 to="/login"
-                className="bg-primary-700 text-on-primary px-8 py-3 rounded-xl font-semibold hover:bg-primary-800 hover:scale-105 transition-all border-2 border-white shadow-ambient"
+                className="bg-surface-container-highest text-on-surface px-10 py-4 rounded-2xl font-bold hover:bg-surface-container-low hover:scale-[1.02] active:scale-95 transition-all border border-white/10"
               >
                 Se connecter
               </Link>
@@ -35,7 +38,7 @@ const Home = () => {
           ) : (
             <Link
               to="/library"
-              className="inline-block bg-white text-primary px-8 py-3 rounded-xl font-semibold hover:bg-cyan-50 hover:scale-105 transition-all shadow-ambient"
+              className="inline-block bg-primary text-on-primary px-10 py-4 rounded-2xl font-bold hover:bg-primary-600 hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-primary/20"
             >
               Accéder à ma bibliothèque
             </Link>
@@ -50,9 +53,9 @@ const Home = () => {
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="bg-surface-container-high rounded-xl shadow-ambient p-8 text-center hover:shadow-ambient hover:scale-105 transition-all ">
-            <div className="w-16 h-16 bg-cyan-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-ambient">
-              <svg className="w-8 h-8 text-on-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="bg-surface-container-low backdrop-blur-xl rounded-3xl shadow-ambient border border-white/5 p-10 text-center hover:scale-[1.02] transition-all group">
+            <div className="w-20 h-20 bg-primary/10 rounded-[2rem] flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
+              <svg className="w-10 h-10 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
               </svg>
             </div>
@@ -65,9 +68,9 @@ const Home = () => {
             </p>
           </div>
 
-          <div className="bg-surface-container-high rounded-xl shadow-ambient p-8 text-center hover:shadow-ambient hover:scale-105 transition-all ">
-            <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-ambient">
-              <svg className="w-8 h-8 text-on-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="bg-surface-container-low backdrop-blur-xl rounded-3xl shadow-ambient border border-white/5 p-10 text-center hover:scale-[1.02] transition-all group">
+            <div className="w-20 h-20 bg-primary/10 rounded-[2rem] flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
+              <svg className="w-10 h-10 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
               </svg>
             </div>
@@ -80,9 +83,9 @@ const Home = () => {
             </p>
           </div>
 
-          <div className="bg-surface-container-high rounded-xl shadow-ambient p-8 text-center hover:shadow-ambient hover:scale-105 transition-all ">
-            <div className="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-ambient">
-              <svg className="w-8 h-8 text-on-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="bg-surface-container-low backdrop-blur-xl rounded-3xl shadow-ambient border border-white/5 p-10 text-center hover:scale-[1.02] transition-all group">
+            <div className="w-20 h-20 bg-primary/10 rounded-[2rem] flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
+              <svg className="w-10 h-10 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
               </svg>
             </div>

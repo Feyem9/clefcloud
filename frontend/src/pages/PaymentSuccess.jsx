@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 const PaymentSuccess = () => {
     const [searchParams] = useSearchParams();
+    const navigate = useNavigate();
     const { refreshUserStatus } = useAuth();
     const [status, setStatus] = useState('loading'); // loading, success, error
+    const [countdown, setCountdown] = useState(3);
 
     useEffect(() => {
         // PayUnit redirige ici après le paiement
@@ -25,6 +27,22 @@ const PaymentSuccess = () => {
             refreshUserStatus(); // Mettre à jour le statut premium immédiatement
         }
     }, [searchParams, refreshUserStatus]);
+
+    useEffect(() => {
+        if (status === 'success') {
+            const timer = setInterval(() => {
+                setCountdown((prev) => {
+                    if (prev <= 1) {
+                        clearInterval(timer);
+                        navigate('/library');
+                        return 0;
+                    }
+                    return prev - 1;
+                });
+            }, 1000);
+            return () => clearInterval(timer);
+        }
+    }, [status, navigate]);
 
     if (status === 'loading') {
         return (
@@ -49,10 +67,14 @@ const PaymentSuccess = () => {
                         <h1 className="text-3xl font-bold text-on-surface font-display mb-3">
                             Paiement réussi ! 🎉
                         </h1>
-                        <p className="text-on-surface-variant mb-8 leading-relaxed">
+                        <p className="text-on-surface-variant mb-4 leading-relaxed">
                             Merci pour votre achat. Votre accès a été activé avec succès.
-                            Vous pouvez maintenant profiter de toutes les fonctionnalités.
                         </p>
+                        <div className="bg-primary/5 rounded-xl p-4 mb-8 border border-primary/10">
+                            <p className="text-primary font-medium">
+                                Redirection vers la bibliothèque dans {countdown}s...
+                            </p>
+                        </div>
 
                         <div className="flex flex-col sm:flex-row gap-3 justify-center">
                             <Link

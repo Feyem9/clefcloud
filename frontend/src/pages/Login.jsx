@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import apiService from '../services/api';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -21,7 +22,13 @@ const Login = () => {
       const user = await login(email, password);
 
       if (user) {
-        navigate('/library');
+        const token = await user.getIdToken();
+        const dbUser = await apiService.validateToken(token);
+        if (dbUser?.is_admin) {
+          navigate('/admin');
+        } else {
+          navigate('/library');
+        }
       }
     } catch (error) {
       if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
@@ -41,7 +48,13 @@ const Login = () => {
       setLoading(true);
       const user = await loginWithGoogle();
       if (user) {
-        navigate('/library');
+        const token = await user.getIdToken();
+        const dbUser = await apiService.validateToken(token);
+        if (dbUser?.is_admin) {
+          navigate('/admin');
+        } else {
+          navigate('/library');
+        }
       }
     } catch (error) {
       if (error.code === 'auth/popup-closed-by-user') {

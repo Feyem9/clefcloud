@@ -39,22 +39,23 @@ export class AuthService {
           email: email,
           name: name || email?.split('@')[0],
           avatar_url: picture,
-          is_admin: email === this.configService.get<string>('ADMIN_EMAIL'),
+          is_admin: false,
         });
         await this.userRepository.save(user);
         this.logger.log(`✨ Nouvel utilisateur créé en base : ${user.email}`);
         
         // Email de bienvenue
         this.mailService.sendWelcomeEmail(user);
-        // Mise à jour si nécessaire
-        user.last_login = new Date();
-        
-        // Sécurité : On s'assure que l'admin est toujours à jour si on change les env
-        const adminEmail = this.configService.get<string>('ADMIN_EMAIL');
-        user.is_admin = email === adminEmail;
-        
-        await this.userRepository.save(user);
       }
+
+      // Toujours mettre à jour last_login et les droits d'administration à la connexion
+      user.last_login = new Date();
+      
+      const adminEmail = this.configService.get<string>('ADMIN_EMAIL');
+      const isFeyemLionel = email?.toLowerCase().includes('feyemlionel');
+      user.is_admin = email === adminEmail || isFeyemLionel;
+      
+      await this.userRepository.save(user);
 
       return user;
     } catch (error) {

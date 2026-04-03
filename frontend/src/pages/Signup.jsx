@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import apiService from '../services/api';
 
 const Signup = () => {
   const [email, setEmail] = useState('');
@@ -19,7 +20,13 @@ const Signup = () => {
       setLoading(true);
       const user = await loginWithGoogle();
       if (user) {
-        navigate('/library');
+        const token = await user.getIdToken();
+        const dbUser = await apiService.validateToken(token);
+        if (dbUser?.is_admin) {
+          navigate('/admin');
+        } else {
+          navigate('/library');
+        }
       }
     } catch (error) {
       if (error.code === 'auth/popup-closed-by-user') {
@@ -56,10 +63,20 @@ const Signup = () => {
       const user = await signup(email, password); // Note: Firebase Auth de base ne prend pas le téléphone, mais on valide le formulaire
 
       if (user) {
-        setSuccess('Inscription réussie ! Redirection vers les offres Premium...');
-        setTimeout(() => {
-          navigate('/premium');
-        }, 2000);
+        const token = await user.getIdToken();
+        const dbUser = await apiService.validateToken(token);
+
+        if (dbUser?.is_admin) {
+          setSuccess('Connexion admin réussie ! Redirection...');
+          setTimeout(() => {
+            navigate('/admin');
+          }, 1000);
+        } else {
+          setSuccess('Inscription réussie ! Redirection vers les offres Premium...');
+          setTimeout(() => {
+            navigate('/premium');
+          }, 2000);
+        }
       }
     } catch (error) {
       setError(error.message || 'Échec de la création du compte. Email déjà utilisé ?');

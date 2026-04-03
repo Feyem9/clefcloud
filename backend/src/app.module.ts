@@ -11,6 +11,8 @@ import { APP_GUARD } from '@nestjs/core';
 import { FirebaseAuthGuard } from './auth/guards/firebase-auth.guard';
 import { PayunitModule } from './payunit/payunit.module';
 import { R2Module } from './r2/r2.module';
+import { TestimonialsModule } from './testimonials/testimonials.module';
+import { ContentModule } from './content/content.module';
 
 @Module({
   imports: [
@@ -53,6 +55,8 @@ import { R2Module } from './r2/r2.module';
     PayunitModule,
     MailModule,
     HealthModule,
+    TestimonialsModule,
+    ContentModule,
   ],
   providers: [
     // On applique le Guard Firebase globalement sur TOUTES les routes

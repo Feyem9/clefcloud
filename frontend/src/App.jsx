@@ -21,6 +21,7 @@ import Profile from './pages/Profile';
 import Premium from './pages/Premium';
 import PaymentSuccess from './pages/PaymentSuccess';
 import TestBench from './pages/TestBench';
+import AdminDashboard from './pages/AdminDashboard';
 
 function App() {
   const { isDarkMode } = useTheme();
@@ -61,6 +62,14 @@ function App() {
             element={
               <AdminRoute>
                 <Upload />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              <AdminRoute>
+                <AdminDashboard />
               </AdminRoute>
             }
           />

@@ -1,9 +1,46 @@
-
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import apiService from '../services/api';
 
 const Home = () => {
   const { currentUser } = useAuth();
+  const [aboutUs, setAboutUs] = useState('Chargement...');
+  const [testimonials, setTestimonials] = useState([]);
+  const [userTestimony, setUserTestimony] = useState('');
+  const [submittingTestimony, setSubmittingTestimony] = useState(false);
+  const [testimonySubmitted, setTestimonySubmitted] = useState(false);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [aboutData, testimonialsData] = await Promise.all([
+          apiService.getSiteContent('about_us').catch(() => ({ content: '' })),
+          apiService.getTestimonials().catch(() => [])
+        ]);
+        setAboutUs(aboutData.content || "Chorale spécialisée dans les œuvres liturgiques, partageant notre amour de la musique.");
+        setTestimonials(testimonialsData || []);
+      } catch (error) {
+        console.error('Erreur lors du chargement de la page d\'accueil:', error);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const handleTestimonySubmit = async (e) => {
+    e.preventDefault();
+    if (!userTestimony.trim()) return;
+    setSubmittingTestimony(true);
+    try {
+      await apiService.submitTestimonial({ content: userTestimony, rating: 5 });
+      setTestimonySubmitted(true);
+      setUserTestimony('');
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setSubmittingTestimony(false);
+    }
+  };
 
   return (
     <div className="animate-fade-in">
@@ -150,6 +187,50 @@ const Home = () => {
           </div>
         </div>
       </div>
+      {/* About Us Section */}
+      <div className="bg-surface-container-low rounded-xl shadow-ambient p-10 mb-12 border border-white/5">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-3xl font-bold text-on-surface font-display mb-6">
+            À propos de nous
+          </h2>
+          <p className="text-lg text-on-surface-variant leading-relaxed whitespace-pre-wrap">
+            {aboutUs}
+          </p>
+        </div>
+      </div>
+
+      {/* Testimonials Section */}
+      {testimonials.length > 0 && (
+        <div className="mb-12">
+          <h2 className="text-3xl font-bold text-on-surface font-display text-center mb-10">
+            Ce que disent nos membres
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {testimonials.map((testy) => (
+              <div key={testy.id} className="bg-surface-container-high p-8 rounded-2xl shadow-ambient relative">
+                <div className="text-primary text-4xl leading-none absolute top-4 left-6 opacity-30">"</div>
+                <p className="text-on-surface-variant italic mb-6 relative z-10 pt-4">
+                  {testy.content}
+                </p>
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center text-primary font-bold overflow-hidden">
+                    {testy.user?.avatar_url ? (
+                      <img src={apiService.getAvatarUrl(testy.user.avatar_url)} alt="avatar" className="w-full h-full object-cover" crossOrigin="anonymous" />
+                    ) : testy.user?.name?.[0]?.toUpperCase() || 'A'}
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-on-surface">{testy.user?.name || 'Utilisateur'}</h4>
+                    <div className="flex text-yellow-500 text-xs">
+                      {[...Array(testy.rating || 5)].map((_, i) => <span key={i}>⭐</span>)}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {!currentUser && (
         <div className="bg-surface-container-low rounded-xl p-10 text-center shadow-ambient ">
           <h2 className="text-3xl font-bold text-primary mb-4">
@@ -166,6 +247,41 @@ const Home = () => {
           </Link>
         </div>
       )}
+
+      {/* Give Testimony Block */}
+      {currentUser && (
+        <div className="max-w-xl mx-auto bg-surface-container-low rounded-3xl shadow-ambient p-10 text-center mt-6 mb-12 border border-white/5">
+          {!testimonySubmitted ? (
+            <form onSubmit={handleTestimonySubmit}>
+              <h3 className="text-2xl font-bold font-display text-primary mb-4">Donnez votre avis</h3>
+              <p className="text-on-surface-variant mb-6">Votre avis compte beaucoup pour nous ! Partagez votre expérience avec la communauté.</p>
+              <textarea
+                required
+                value={userTestimony}
+                onChange={(e) => setUserTestimony(e.target.value)}
+                className="w-full px-5 py-4 rounded-xl mb-4 bg-surface-container-highest shadow-ambient text-on-surface focus:ring-4 focus:ring-primary-500/20 focus:border-primary border-transparent outline-none transition-all placeholder-gray-400 resize-none h-32"
+                placeholder="Que pensez-vous de ClefCloud ?"
+              ></textarea>
+              <button
+                type="submit"
+                disabled={submittingTestimony}
+                className="bg-primary text-on-primary px-8 py-3 rounded-xl font-bold hover:bg-primary-600 hover:scale-[1.02] active:scale-95 transition-all w-full disabled:opacity-50"
+              >
+                {submittingTestimony ? 'Envoi...' : 'Envoyer mon témoignage'}
+              </button>
+            </form>
+          ) : (
+            <div className="py-6">
+              <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 text-green-500 rounded-full flex justify-center items-center mx-auto mb-4">
+                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
+              </div>
+              <h3 className="text-xl font-bold font-display text-on-surface mb-2">Merci pour votre retour !</h3>
+              <p className="text-on-surface-variant">Votre témoignage a été envoyé et sera examiné par l'équipe.</p>
+            </div>
+          )}
+        </div>
+      )}
+
     </div>
   );
 };

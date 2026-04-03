@@ -165,6 +165,43 @@ const apiService = {
     return path;
   },
 
+  // Site Content
+  getSiteContent: async (section) => {
+    const response = await api.get(`/content/${section}`);
+    return response.data;
+  },
+
+  updateSiteContent: async (section, data) => {
+    const response = await api.put(`/content/${section}`, data);
+    return response.data;
+  },
+
+  // Testimonials
+  getTestimonials: async () => {
+    const response = await api.get('/testimonials');
+    return response.data;
+  },
+
+  getAdminTestimonials: async () => {
+    const response = await api.get('/testimonials/admin');
+    return response.data;
+  },
+
+  submitTestimonial: async (data) => {
+    const response = await api.post('/testimonials', data);
+    return response.data;
+  },
+
+  updateTestimonialStatus: async (id, isPublished) => {
+    const response = await api.patch(`/testimonials/${id}/status`, { is_published: isPublished });
+    return response.data;
+  },
+
+  deleteTestimonial: async (id) => {
+    const response = await api.delete(`/testimonials/${id}`);
+    return response.data;
+  },
+
   deleteProfile: async () => {
     const response = await api.delete('/auth/profile');
     return response.data;

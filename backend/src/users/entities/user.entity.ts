@@ -7,6 +7,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { Partition } from '../../partitions/entities/partition.entity';
+import { Testimonial } from '../../testimonials/entities/testimonial.entity';
 
 @Entity('users')
 export class User {
@@ -48,6 +49,9 @@ export class User {
 
   @OneToMany(() => Partition, (partition) => partition.user)
   partitions: Partition[];
+
+  @OneToMany(() => Testimonial, (testimonial) => testimonial.user)
+  testimonials: Testimonial[];
 
   @CreateDateColumn()
   created_at: Date;

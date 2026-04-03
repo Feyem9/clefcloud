@@ -45,8 +45,8 @@ export class UsersController {
   @ApiResponse({ status: 404, description: 'Utilisateur non trouvé' })
   async update(
     @Param('id', ParseIntPipe) id: number,
-    @Body('name') name: string,
+    @Body() data: { name?: string; title?: string; avatar_url?: string },
   ) {
-    return this.usersService.update(id, name);
+    return this.usersService.update(id, data);
   }
 }

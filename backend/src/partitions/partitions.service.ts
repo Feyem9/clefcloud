@@ -114,10 +114,17 @@ export class PartitionsService {
       select: ['partition_id'],
     }).then(favs => favs.map(f => f.partition_id));
 
+    // Récupérer les IDs des partitions achetées individuellement
+    const purchasedIds = await this.userPartitionRepository.find({
+      where: { user_id: user.id },
+      select: ['partition_id'],
+    }).then(ups => ups.map(up => up.partition_id));
+
     return partitions.map(p => {
       const isOwner = p.created_by === user.id;
+      const isPurchased = purchasedIds.includes(p.id);
       // UN SEUL ENDROIT POUR LE CALCUL DE L'ACCÈS
-      const hasAccess = isPremium || isOwner || user.is_admin; 
+      const hasAccess = isPremium || isOwner || user.is_admin || isPurchased; 
       
       if (!hasAccess && p.price > 0) {
         this.logger.debug(`Accès refusé pour ${user.email} sur partition ${p.id} (${p.title})`);

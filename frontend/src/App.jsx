@@ -50,9 +50,9 @@ function App() {
           <Route
             path="/library"
             element={
-              <PremiumRoute>
+              <ProtectedRoute>
                 <Library />
-              </PremiumRoute>
+              </ProtectedRoute>
             }
           />
 
@@ -68,9 +68,9 @@ function App() {
           <Route
             path="/messe"
             element={
-              <PremiumRoute>
+              <ProtectedRoute>
                 <Messe />
-              </PremiumRoute>
+              </ProtectedRoute>
             }
           />
 

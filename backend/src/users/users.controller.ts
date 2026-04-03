@@ -77,7 +77,21 @@ export class UsersController {
   })
   async uploadAvatar(@Req() req, @UploadedFile() file: Express.Multer.File) {
     const userId = req.user.id;
-    const cleanPath = `avatars/${userId}-${Date.now()}-${file.originalname}`;
+    
+    // Assainissement du nom de fichier : minuscules, pas d'espaces, pas de caractères spéciaux
+    const extension = file.originalname.split('.').pop();
+    const sanitizedName = file.originalname
+      .split('.')[0]
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '') // Supprime les accents
+      .replace(/[^a-z0-p0-9]/g, '-')   // Remplace tout ce qui n'est pas alphanumérique par des tirets
+      .replace(/-+/g, '-')             // Évite les tirets multiples
+      .replace(/^-|-$/g, '');          // Supprime les tirets au début ou à la fin
+
+    const fileName = `${userId}-${Date.now()}-${sanitizedName}.${extension}`;
+    const cleanPath = `avatars/${fileName}`;
+    
     const result = await this.r2Service.uploadFile(userId, file, cleanPath);
     
     // Mettre à jour l'utilisateur avec la nouvelle URL

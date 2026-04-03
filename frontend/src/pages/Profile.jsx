@@ -207,6 +207,7 @@ const Profile = () => {
                     src={`${userProfile.avatar_url}${userProfile.avatar_url.includes('?') ? '&' : '?'}t=${Date.now()}`}
                     alt="Avatar"
                     className="w-full h-full object-cover"
+                    crossOrigin="anonymous"
                     onError={(e) => {
                       console.error("Image load error:", e);
                       toast.error("L'image n'a pas pu être chargée. Vérifiez les permissions R2.");

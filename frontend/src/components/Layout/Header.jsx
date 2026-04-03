@@ -60,7 +60,7 @@ const Header = () => {
                 <Link to="/profile" className="flex items-center space-x-2 group">
                   <div className="w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center text-white font-semibold shadow-md group-hover:scale-110 transition-transform active:scale-95 overflow-hidden">
                     {currentUser.avatar_url ? (
-                      <img src={currentUser.avatar_url} alt="" className="w-full h-full object-cover" />
+                      <img src={currentUser.avatar_url} alt="" className="w-full h-full object-cover" crossOrigin="anonymous" />
                     ) : (
                       currentUser.email?.[0].toUpperCase()
                     )}
@@ -165,7 +165,7 @@ const Header = () => {
                     >
                       <div className="w-12 h-12 bg-primary-600 rounded-full flex items-center justify-center text-on-primary font-bold text-lg shadow-lg overflow-hidden">
                         {currentUser.avatar_url ? (
-                          <img src={currentUser.avatar_url} alt="" className="w-full h-full object-cover" />
+                          <img src={currentUser.avatar_url} alt="" className="w-full h-full object-cover" crossOrigin="anonymous" />
                         ) : (
                           currentUser.email?.[0].toUpperCase()
                         )}

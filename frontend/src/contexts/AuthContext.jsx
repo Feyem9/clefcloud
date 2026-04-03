@@ -162,10 +162,13 @@ export const AuthProvider = ({ children }) => {
           try {
             const dbUser = await apiService.validateToken(token);
             if (dbUser) {
-              setIsPremium(dbUser.is_premium);
+              const now = new Date();
+              const isPremiumActive = dbUser.is_premium && (!dbUser.premium_until || new Date(dbUser.premium_until) > now);
+
+              setIsPremium(isPremiumActive);
               setIsAdmin(dbUser.is_admin);
               setPremiumUntil(dbUser.premium_until);
-              return dbUser;
+              return { ...dbUser, isPremiumActive };
             }
           } catch (err) {
             console.error('Erreur lors de la synchronisation backend:', err);

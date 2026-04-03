@@ -76,8 +76,13 @@ export class PartitionsService {
   }
 
   async findAll(user: User, search?: string, category?: string, messePart?: string) {
-    // Vérification premium
-    const isPremium = user.is_premium && (!user.premium_until || user.premium_until > new Date());
+    // Vérification premium robuste
+    const now = new Date();
+    const isPremium = user.is_premium && (!user.premium_until || new Date(user.premium_until) > now);
+    
+    if (user.is_premium) {
+      this.logger.log(`Vérification accès pour user premium ${user.email} (Expire le: ${user.premium_until})`);
+    }
 
     const query = this.partitionRepository.createQueryBuilder('partition')
       .leftJoinAndSelect('partition.user', 'user')
@@ -110,7 +115,12 @@ export class PartitionsService {
 
     return partitions.map(p => {
       const isOwner = p.created_by === user.id;
-      const hasAccess = isPremium || isOwner;
+      // UN SEUL ENDROIT POUR LE CALCUL DE L'ACCÈS
+      const hasAccess = isPremium || isOwner || user.is_admin; 
+      
+      if (!hasAccess && p.price > 0) {
+        this.logger.debug(`Accès refusé pour ${user.email} sur partition ${p.id} (${p.title})`);
+      }
 
       return {
         ...p,

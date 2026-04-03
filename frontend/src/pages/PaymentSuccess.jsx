@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 const PaymentSuccess = () => {
     const [searchParams] = useSearchParams();
+    const { refreshUserStatus } = useAuth();
     const [status, setStatus] = useState('loading'); // loading, success, error
 
     useEffect(() => {
@@ -18,7 +20,11 @@ const PaymentSuccess = () => {
             // Si pas de paramètres, on suppose que c'est un succès (retour normal)
             setStatus('success');
         }
-    }, [searchParams]);
+
+        if (paymentStatus === 'SUCCESS' || paymentStatus === 'COMPLETE' || !paymentStatus) {
+            refreshUserStatus(); // Mettre à jour le statut premium immédiatement
+        }
+    }, [searchParams, refreshUserStatus]);
 
     if (status === 'loading') {
         return (

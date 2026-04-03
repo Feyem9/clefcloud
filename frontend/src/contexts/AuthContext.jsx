@@ -199,6 +199,7 @@ export const AuthProvider = ({ children }) => {
     updateUserProfile,
     deleteAccount,
     refreshUserStatus,
+    setCurrentUser,
     isPremium,
     isAdmin,
     premiumUntil,

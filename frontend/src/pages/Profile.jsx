@@ -5,7 +5,7 @@ import apiService from '../services/api';
 import { toast } from 'react-toastify';
 
 const Profile = () => {
-  const { currentUser, isAdmin, isPremium, premiumUntil, logout, updateUserProfile, deleteAccount, refreshUserStatus } = useAuth();
+  const { currentUser, isAdmin, isPremium, premiumUntil, logout, updateUserProfile, deleteAccount, refreshUserStatus, setCurrentUser } = useAuth();
   const navigate = useNavigate();
   const [userProfile, setUserProfile] = useState(null);
   const [partitions, setPartitions] = useState([]);
@@ -120,7 +120,9 @@ const Profile = () => {
         avatar_url: editAvatarUrl
       };
       const updatedUser = await updateUserProfile(updateData);
-      setUserProfile(updatedUser || { ...userProfile, ...updateData });
+      const FinalUser = updatedUser || { ...userProfile, ...updateData };
+      setUserProfile(FinalUser);
+      setCurrentUser(FinalUser);
       setIsEditing(false);
       toast.success('Profil mis à jour avec succès !');
     } catch (err) {
@@ -138,6 +140,7 @@ const Profile = () => {
       const updatedUser = await apiService.uploadAvatar(file);
       setUserProfile(updatedUser);
       setEditAvatarUrl(updatedUser.avatar_url);
+      setCurrentUser(updatedUser);
       toast.success('Avatar mis à jour avec succès !');
     } catch (err) {
       console.error('Erreur upload avatar:', err);
@@ -200,7 +203,15 @@ const Profile = () => {
             <div className="relative group animate-float">
               <div className="w-48 h-48 bg-[#1a1a1a] rounded-3xl flex items-center justify-center border border-white/10 shadow-2xl overflow-hidden relative group-hover:border-[#fbc02d]/50 transition-colors">
                 {userProfile?.avatar_url ? (
-                  <img src={userProfile.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
+                  <img
+                    src={`${userProfile.avatar_url}${userProfile.avatar_url.includes('?') ? '&' : '?'}t=${Date.now()}`}
+                    alt="Avatar"
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      console.error("Image load error:", e);
+                      toast.error("L'image n'a pas pu être chargée. Vérifiez les permissions R2.");
+                    }}
+                  />
                 ) : (
                   <div className="w-full h-full bg-[#1a1a1a] flex flex-col items-center justify-center">
                     <p className="text-[10px] font-black text-white/20 mb-2 tracking-[0.2em]">SAFFEE PIOFINE</p>

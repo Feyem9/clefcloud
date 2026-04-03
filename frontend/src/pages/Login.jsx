@@ -8,7 +8,7 @@ const Login = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, loginWithGoogle } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -35,9 +35,24 @@ const Login = () => {
     }
   };
 
-  // Google login désactivé temporairement (non implémenté dans AWS Cognito)
   const handleGoogleLogin = async () => {
-    setError('La connexion avec Google n\'est pas encore disponible. Utilisez votre email et mot de passe.');
+    try {
+      setError('');
+      setLoading(true);
+      const user = await loginWithGoogle();
+      if (user) {
+        navigate('/library');
+      }
+    } catch (error) {
+      if (error.code === 'auth/popup-closed-by-user') {
+        // L'utilisateur a fermé la fenêtre, on ne fait rien de spécial
+        return;
+      }
+      setError(error.message || 'Échec de la connexion avec Google.');
+      console.error("Google Auth Error:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

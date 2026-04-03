@@ -170,6 +170,21 @@ const apiService = {
     return response.data;
   },
 
+  // Fallback dev pour valider le paiement localement sans attendre le webhook
+  verifyLocalPayment: async (transaction_id, status) => {
+    try {
+      const response = await api.post('/payments/callback', {
+        transaction_id,
+        status,
+        payunit_transaction_id: `local-verification-${Date.now()}`
+      });
+      return response.data;
+    } catch (error) {
+      console.warn('verifyLocalPayment ignoré:', error.message);
+      return null;
+    }
+  },
+
   // Utilisateur — stats et partitions
   getUserStats: async () => {
     const response = await api.get('/auth/profile');

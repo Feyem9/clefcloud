@@ -97,6 +97,10 @@ export class PayunitController {
       return { message: 'Transaction non trouvée' };
     }
 
+    if (transaction.status !== TransactionStatus.PENDING) {
+      return { message: 'Transaction déjà traitée' };
+    }
+
     if (status === 'SUCCESS') {
       transaction.status = TransactionStatus.SUCCESS;
       transaction.payunit_transaction_id = payunit_transaction_id;

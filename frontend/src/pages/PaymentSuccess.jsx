@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
+import apiService from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 
 const PaymentSuccess = () => {
@@ -10,22 +11,33 @@ const PaymentSuccess = () => {
     const [countdown, setCountdown] = useState(3);
 
     useEffect(() => {
-        // PayUnit redirige ici après le paiement
-        const transactionId = searchParams.get('transaction_id');
-        const paymentStatus = searchParams.get('status');
+        const verifyPaymentStatus = async () => {
+            const transactionId = searchParams.get('transaction_id');
+            const paymentStatus = searchParams.get('status');
 
-        if (paymentStatus === 'SUCCESS' || paymentStatus === 'COMPLETE') {
-            setStatus('success');
-        } else if (paymentStatus === 'FAILED' || paymentStatus === 'CANCELLED') {
-            setStatus('error');
-        } else {
-            // Si pas de paramètres, on suppose que c'est un succès (retour normal)
-            setStatus('success');
-        }
+            if (paymentStatus === 'SUCCESS' || paymentStatus === 'COMPLETE') {
+                setStatus('success');
 
-        if (paymentStatus === 'SUCCESS' || paymentStatus === 'COMPLETE' || !paymentStatus) {
-            refreshUserStatus(); // Mettre à jour le statut premium immédiatement
-        }
+                // FIX LOCAL SERVER: Forcer la validation si le webhook de PayUnit n'atteint pas localhost
+                if (transactionId) {
+                    await apiService.verifyLocalPayment(
+                        transactionId.split('-')[0], // Extract just the numeric ID if it has '-CLEFCLOUD'
+                        'SUCCESS'
+                    );
+                }
+            } else if (paymentStatus === 'FAILED' || paymentStatus === 'CANCELLED') {
+                setStatus('error');
+            } else {
+                // Si pas de paramètres, on suppose que c'est un succès (retour normal)
+                setStatus('success');
+            }
+
+            if (paymentStatus === 'SUCCESS' || paymentStatus === 'COMPLETE' || !paymentStatus) {
+                await refreshUserStatus(); // Mettre à jour le statut premium immédiatement
+            }
+        };
+
+        verifyPaymentStatus();
     }, [searchParams, refreshUserStatus]);
 
     useEffect(() => {

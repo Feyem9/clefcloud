@@ -147,11 +147,21 @@ const apiService = {
 
   getAvatarUrl: (path) => {
     if (!path) return null;
-    if (path.startsWith('http')) return path;
-    const baseURL = API_URL.replace('/api', '');
-    if (path.startsWith('/api')) {
+
+    // Si c'est déjà une URL de notre proxy, on s'assure qu'elle est absolue ou gérée par Vite
+    if (path.startsWith('/api/users/avatar/')) {
+      const baseURL = API_URL.replace('/api', '');
       return `${baseURL}${path}`;
     }
+
+    // FIX CRITIQUE : Si c'est l'URL directe R2 (qui bloque en CORS), on la transforme en URL proxy
+    if (path.includes('r2.dev/avatars/')) {
+      const fileName = path.split('/avatars/').pop().split('?')[0];
+      const baseURL = API_URL.replace('/api', '');
+      return `${baseURL}/api/users/avatar/${fileName}`;
+    }
+
+    if (path.startsWith('http')) return path;
     return path;
   },
 

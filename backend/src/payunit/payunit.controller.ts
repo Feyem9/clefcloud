@@ -28,18 +28,21 @@ export class PayunitController {
    */
   @Post('checkout/partition')
   async checkoutPartition(@Body() body: { partitionId: number }, @Req() req: RequestWithUser) {
-    const userId = req.user.id; // Récupéré via le Firebase Guard global
+    const userId = req.user.id;
     const partition = await this.partitionRepository.findOneBy({ id: body.partitionId });
 
     if (!partition) {
       throw new BadRequestException('Partition introuvable');
     }
 
+    // Prix fixe pour toutes les partitions (ignore la valeur en base qui peut être 0 pour les anciennes)
+    const FIXED_PRICE = 599;
+
     // 1. Créer une transaction en attente
     const transactionData: DeepPartial<Transaction> = {
       user_id: userId,
       type: TransactionType.PARTITION,
-      amount: partition.price,
+      amount: FIXED_PRICE,
       partition_id: partition.id,
       status: TransactionStatus.PENDING,
     };
@@ -48,7 +51,7 @@ export class PayunitController {
 
     // 2. Appeler PayUnit
     const payunitResponse = await this.payunitService.initializePayment(
-      partition.price,
+      FIXED_PRICE,
       `${transaction.id}-CLEFCLOUD`,
       `Achat de la partition : ${partition.title}`
     );

@@ -1,17 +1,21 @@
 import {
   Controller,
   Get,
-  Put,
-  Param,
+  Post,
   Body,
+  Param,
   Query,
   UseGuards,
   ParseIntPipe,
-  Post,
   UseInterceptors,
   UploadedFile,
   Req,
+  Res,
+  NotFoundException,
+  Put,
 } from '@nestjs/common';
+import { Response } from 'express';
+import { Readable } from 'stream';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiConsumes, ApiBody } from '@nestjs/swagger';
 import { UsersService } from './users.service';
@@ -92,9 +96,43 @@ export class UsersController {
     const fileName = `${userId}-${Date.now()}-${sanitizedName}.${extension}`;
     const cleanPath = `avatars/${fileName}`;
     
-    const result = await this.r2Service.uploadFile(userId, file, cleanPath);
+    await this.r2Service.uploadFile(userId, file, cleanPath);
     
-    // Mettre à jour l'utilisateur avec la nouvelle URL
-    return this.usersService.update(userId, { avatar_url: result.downloadUrl });
+    // Au lieu de l'URL directe R2 qui a des problèmes CORS/401, on utilise notre PROXY local
+    const proxyUrl = `/api/users/avatar/${fileName}`;
+    
+    return this.usersService.update(userId, { avatar_url: proxyUrl });
+  }
+
+  @Get('avatar/:filename')
+  @ApiOperation({ summary: 'Afficher l\'avatar via proxy (fix CORS/401)' })
+  async getAvatar(@Param('filename') filename: string, @Res() res: Response) {
+    try {
+      const key = `avatars/${filename}`;
+      const fileData = await this.r2Service.getFile(key);
+      
+      res.setHeader('Content-Type', fileData.ContentType || 'image/png');
+      res.setHeader('Cache-Control', 'public, max-age=31536000'); // Cache 1 an
+      
+      const body = fileData.Body;
+      if (body instanceof Readable) {
+        body.pipe(res);
+      } else if (body instanceof Uint8Array || Buffer.isBuffer(body)) {
+        res.send(Buffer.from(body));
+      } else if (typeof body === 'string') {
+        res.send(body);
+      } else {
+        // Fallback pour les environnements bizarres
+        const stream = body as any;
+        if (stream.transformToByteArray) {
+            res.send(Buffer.from(await stream.transformToByteArray()));
+        } else {
+            res.status(500).send('Format de body R2 non supporté');
+        }
+      }
+    } catch (error) {
+      console.error(`Erreur proxy avatar: ${error.message}`);
+      res.status(404).send('Avatar non trouvé');
+    }
   }
 }

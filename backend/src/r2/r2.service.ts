@@ -91,4 +91,15 @@ export class R2Service {
     });
     return getSignedUrl(this.s3Client, command, { expiresIn });
   }
+
+  /**
+   * Récupère un fichier depuis R2
+   */
+  async getFile(key: string) {
+    const command = new GetObjectCommand({
+      Bucket: this.bucketName,
+      Key: key,
+    });
+    return this.s3Client.send(command);
+  }
 }

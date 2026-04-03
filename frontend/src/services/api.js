@@ -145,6 +145,16 @@ const apiService = {
     return response.data;
   },
 
+  getAvatarUrl: (path) => {
+    if (!path) return null;
+    if (path.startsWith('http')) return path;
+    const baseURL = API_URL.replace('/api', '');
+    if (path.startsWith('/api')) {
+      return `${baseURL}${path}`;
+    }
+    return path;
+  },
+
   deleteProfile: async () => {
     const response = await api.delete('/auth/profile');
     return response.data;

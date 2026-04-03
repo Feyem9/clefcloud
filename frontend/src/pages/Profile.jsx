@@ -204,7 +204,7 @@ const Profile = () => {
               <div className="w-48 h-48 bg-[#1a1a1a] rounded-3xl flex items-center justify-center border border-white/10 shadow-2xl overflow-hidden relative group-hover:border-[#fbc02d]/50 transition-colors">
                 {userProfile?.avatar_url ? (
                   <img
-                    src={`${userProfile.avatar_url}${userProfile.avatar_url.includes('?') ? '&' : '?'}t=${Date.now()}`}
+                    src={`${apiService.getAvatarUrl(userProfile.avatar_url)}${userProfile.avatar_url?.includes('?') ? '&' : '?'}t=${Date.now()}`}
                     alt="Avatar"
                     className="w-full h-full object-cover"
                     crossOrigin="anonymous"

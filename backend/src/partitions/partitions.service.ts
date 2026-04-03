@@ -33,6 +33,7 @@ export class PartitionsService {
 
     const partition = this.partitionRepository.create({
       ...createPartitionDto,
+      price: 599, // Prix fixe imposé
       user,
       created_by: user.id,
     });

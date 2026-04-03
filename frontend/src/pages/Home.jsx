@@ -188,7 +188,7 @@ const Home = () => {
         </div>
       </div>
       {/* About Us Section */}
-      <div className="bg-surface-container-low rounded-xl shadow-ambient p-10 mb-12 border border-white/5">
+      <div id="about" className="bg-surface-container-low rounded-xl shadow-ambient p-10 mb-12 border border-white/5">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl font-bold text-on-surface font-display mb-6">
             À propos de nous
@@ -201,7 +201,7 @@ const Home = () => {
 
       {/* Testimonials Section */}
       {testimonials.length > 0 && (
-        <div className="mb-12">
+        <div id="testimonials" className="mb-12">
           <h2 className="text-3xl font-bold text-on-surface font-display text-center mb-10">
             Ce que disent nos membres
           </h2>

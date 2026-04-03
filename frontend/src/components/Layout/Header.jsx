@@ -56,6 +56,12 @@ const Header = () => {
                     </Link>
                   </>
                 )}
+                <a href="/#about" className="text-on-surface-variant hover:text-primary transition font-medium active:scale-95">
+                  À propos
+                </a>
+                <a href="/#testimonials" className="text-on-surface-variant hover:text-primary transition font-medium active:scale-95">
+                  Témoignages
+                </a>
                 <Link to="/contact" className="text-on-surface-variant hover:text-primary transition font-medium active:scale-95">
                   Contact
                 </Link>
@@ -78,6 +84,12 @@ const Header = () => {
               </>
             ) : (
               <>
+                <a href="/#about" className="text-on-surface hover:text-primary transition font-medium active:scale-95">
+                  À propos
+                </a>
+                <a href="/#testimonials" className="text-on-surface hover:text-primary transition font-medium active:scale-95">
+                  Témoignages
+                </a>
                 <Link to="/contact" className="text-on-surface hover:text-primary transition font-medium active:scale-95">
                   Contact
                 </Link>
@@ -233,6 +245,28 @@ const Header = () => {
                         </>
                       )}
 
+                      <a
+                        href="/#about"
+                        onClick={closeMobileMenu}
+                        className="flex items-center space-x-3 p-4 rounded-xl hover:bg-gray-50 transition-colors group"
+                      >
+                        <svg className="w-6 h-6 text-outline-variant group-hover:text-primary-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span className="font-medium text-gray-700 group-hover:text-primary-600 transition-colors">À propos</span>
+                      </a>
+
+                      <a
+                        href="/#testimonials"
+                        onClick={closeMobileMenu}
+                        className="flex items-center space-x-3 p-4 rounded-xl hover:bg-gray-50 transition-colors group"
+                      >
+                        <svg className="w-6 h-6 text-outline-variant group-hover:text-primary-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                        </svg>
+                        <span className="font-medium text-gray-700 group-hover:text-primary-600 transition-colors">Témoignages</span>
+                      </a>
+
                       <Link
                         to="/contact"
                         onClick={closeMobileMenu}
@@ -258,6 +292,28 @@ const Header = () => {
                   </div>
                 ) : (
                   <div className="space-y-2 px-4">
+                    <a
+                      href="/#about"
+                      onClick={closeMobileMenu}
+                      className="flex items-center space-x-3 p-4 rounded-xl hover:bg-gray-50 transition-colors group"
+                    >
+                      <svg className="w-6 h-6 text-outline-variant group-hover:text-primary-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <span className="font-medium text-gray-700 group-hover:text-primary-600 transition-colors">À propos</span>
+                    </a>
+
+                    <a
+                      href="/#testimonials"
+                      onClick={closeMobileMenu}
+                      className="flex items-center space-x-3 p-4 rounded-xl hover:bg-gray-50 transition-colors group"
+                    >
+                      <svg className="w-6 h-6 text-outline-variant group-hover:text-primary-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                      </svg>
+                      <span className="font-medium text-gray-700 group-hover:text-primary-600 transition-colors">Témoignages</span>
+                    </a>
+
                     <Link
                       to="/contact"
                       onClick={closeMobileMenu}

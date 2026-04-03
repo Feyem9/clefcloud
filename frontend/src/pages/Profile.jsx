@@ -12,6 +12,8 @@ const Profile = () => {
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState('');
+  const [editTitle, setEditTitle] = useState('');
+  const [editAvatarUrl, setEditAvatarUrl] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState('');
   const [stats, setStats] = useState({
@@ -29,6 +31,13 @@ const Profile = () => {
     platformUpdates: false
   });
 
+  const toggleNotification = (key) => {
+    setNotificationSettings(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
+  };
+
   useEffect(() => {
     if (!currentUser) {
       navigate('/login');
@@ -41,15 +50,39 @@ const Profile = () => {
         // Récupérer le profil complet (avec stats et achats)
         const profileData = await apiService.getProfile();
         setUserProfile(profileData);
+
+        // Combiner les activités (uploads et achats) et les trier par date
+        const uploads = (profileData.recentUploads || []).map(p => ({
+          id: `up-${p.id}`,
+          type: 'UPLOAD',
+          title: p.title,
+          subtitle: `Uploaded to ${p.category || 'General'}`,
+          date: p.created_at,
+          data: p
+        }));
+
+        const purchases = (profileData.purchases || []).map(p => ({
+          id: `pur-${p.id}`,
+          type: 'PURCHASE',
+          title: p.title,
+          subtitle: `Purchased individual copy`,
+          date: p.purchased_at || p.created_at,
+          data: p
+        }));
+
+        const allActivities = [...uploads, ...purchases].sort((a, b) => new Date(b.date) - new Date(a.date));
+
         setStats({
           totalPartitions: profileData.totalPartitions || 0,
-          totalDownloads: Number(profileData.totalDownloads || 0).toLocaleString('en-US', { notation: 'compact' }),
-          totalViews: (profileData.totalViews || 1250).toLocaleString('en-US', { notation: 'compact' }),
+          totalDownloads: profileData.totalDownloads || 0,
+          totalViews: profileData.totalViews || 0,
           totalFavorites: profileData.totalFavorites || 0,
-          recentUploads: profileData.recentUploads || [],
+          recentActivities: allActivities.slice(0, 5),
           purchases: profileData.purchases || []
         });
         setEditName(profileData.name || currentUser?.displayName || '');
+        setEditTitle(profileData.title || '');
+        setEditAvatarUrl(profileData.avatar_url || '');
 
         // Récupérer les partitions de l'utilisateur
         if (profileData.id) {
@@ -80,9 +113,15 @@ const Profile = () => {
     try {
       setError('');
       setLoading(true);
-      await updateUserProfile(editName);
-      setUserProfile({ ...userProfile, name: editName });
+      const updateData = {
+        name: editName,
+        title: editTitle,
+        avatar_url: editAvatarUrl
+      };
+      const updatedUser = await updateUserProfile(updateData);
+      setUserProfile(updatedUser || { ...userProfile, ...updateData });
       setIsEditing(false);
+      toast.success('Profil mis à jour avec succès !');
     } catch (err) {
       setError('Erreur lors de la modification : ' + err.message);
     } finally {
@@ -130,14 +169,14 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white py-16 px-4 sm:px-6 lg:px-8 font-sans selection:bg-indigo-500/30">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-6xl mx-auto animate-slide-up opacity-0">
 
         {/* Header Section */}
         <div className="flex flex-col md:flex-row items-center md:items-start justify-between gap-8 mb-16">
           <div className="flex flex-col md:flex-row items-center gap-10">
             {/* Avatar Box */}
-            <div className="relative group">
-              <div className="w-48 h-48 bg-[#1a1a1a] rounded-3xl flex items-center justify-center border border-white/10 shadow-2xl overflow-hidden relative">
+            <div className="relative group animate-float">
+              <div className="w-48 h-48 bg-[#1a1a1a] rounded-3xl flex items-center justify-center border border-white/10 shadow-2xl overflow-hidden relative group-hover:border-[#fbc02d]/50 transition-colors">
                 {userProfile?.avatar_url ? (
                   <img src={userProfile.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
                 ) : (
@@ -148,7 +187,10 @@ const Profile = () => {
                     </svg>
                   </div>
                 )}
-                <button className="absolute bottom-4 right-4 w-10 h-10 bg-[#fbc02d] rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform border-4 border-[#1a1a1a]">
+                <button
+                  onClick={() => setIsEditing(!isEditing)}
+                  className="absolute bottom-4 right-4 w-10 h-10 bg-[#fbc02d] rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-all border-4 border-[#1a1a1a] z-20 group-hover:rotate-12"
+                >
                   <svg className="w-5 h-5 text-black" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
                   </svg>
@@ -159,25 +201,48 @@ const Profile = () => {
             {/* User Details */}
             <div className="text-center md:text-left pt-2">
               <div className="flex items-center justify-center md:justify-start gap-4 mb-3">
-                <span className="bg-[#1a1a1a] text-[#a0a0a0] text-[10px] font-bold px-3 py-1.5 rounded-md tracking-widest uppercase border border-white/5">
+                <span className="bg-[#1a1a1a] text-[#a0a0a0] text-[10px] font-bold px-3 py-1.5 rounded-md tracking-widest uppercase border border-white/5 animate-pulse-glow">
                   PREMIUM MEMBER
                 </span>
                 <span className="text-[#606060] text-[10px] uppercase tracking-widest font-bold">
                   JOINED {userProfile?.created_at ? new Date(userProfile.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }).toUpperCase() : 'OCT 2023'}
                 </span>
               </div>
-              <h1 className="text-7xl font-bold text-white mb-2 tracking-tight font-display">
-                {userProfile?.name || currentUser?.displayName || 'Julian Vercetti'}
-              </h1>
-              <p className="text-xl text-[#a0a0a0] italic font-light tracking-wide">
-                {userProfile?.title || 'Concertmaster & Digital Archivist'}
-              </p>
+              {isEditing ? (
+                <input
+                  type="text"
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  className="text-7xl font-bold text-white mb-2 tracking-tight font-display bg-transparent border-b-2 border-[#fbc02d] outline-none w-full"
+                  autoFocus
+                />
+              ) : (
+                <h1 className="text-7xl font-bold text-white mb-2 tracking-tight font-display">
+                  {userProfile?.name || currentUser?.displayName || 'Julian Vercetti'}
+                </h1>
+              )}
+              {isEditing ? (
+                <input
+                  type="text"
+                  value={editTitle}
+                  onChange={(e) => setEditTitle(e.target.value)}
+                  placeholder="Professional Title (e.g. Concertmaster)"
+                  className="text-xl text-[#fbc02d] italic font-light tracking-wide bg-transparent border-b border-white/10 outline-none w-full"
+                />
+              ) : (
+                <p className="text-xl text-[#a0a0a0] italic font-light tracking-wide">
+                  {userProfile?.title || 'Concertmaster & Digital Archivist'}
+                </p>
+              )}
             </div>
           </div>
 
           <div className="pt-10">
-            <button className="bg-gradient-to-br from-[#5c6bc0] to-[#3949ab] text-white px-10 py-4 rounded-2xl font-bold hover:scale-105 active:scale-95 transition-all shadow-[0_10px_40px_-10px_rgba(57,73,171,0.5)]">
-              Edit Profile
+            <button
+              onClick={isEditing ? handleUpdateProfile : () => setIsEditing(true)}
+              className="bg-gradient-to-br from-[#5c6bc0] to-[#3949ab] text-white px-10 py-4 rounded-2xl font-bold hover:scale-105 active:scale-95 transition-all shadow-[0_10px_40px_-10px_rgba(57,73,171,0.5)] hover:shadow-[0_15px_50px_-10px_rgba(57,73,171,0.7)]"
+            >
+              {isEditing ? 'Save Profile' : 'Edit Profile'}
             </button>
           </div>
         </div>
@@ -189,7 +254,7 @@ const Profile = () => {
             <div className="relative z-10">
               <p className="text-[#fbc02d] text-[10px] font-bold tracking-[0.2em] uppercase mb-4">PARTITIONS UPLOADÉES</p>
               <div className="flex items-end gap-3">
-                <span className="text-8xl font-bold leading-none tracking-tighter">{stats.totalPartitions || 142}</span>
+                <span className="text-8xl font-bold leading-none tracking-tighter">{stats.totalPartitions}</span>
                 <span className="text-[#606060] text-lg mb-2 font-medium tracking-wide">manuscripts</span>
               </div>
             </div>
@@ -205,7 +270,7 @@ const Profile = () => {
             <div className="relative z-10">
               <p className="text-[#a0a0a0] text-[10px] font-bold tracking-[0.2em] uppercase mb-4">LECTURES TOTALES</p>
               <div className="flex items-end gap-3">
-                <span className="text-8xl font-bold leading-none tracking-tighter">{stats.totalViews || '3.8k'}</span>
+                <span className="text-8xl font-bold leading-none tracking-tighter">{Number(stats.totalViews).toLocaleString('en-US', { notation: 'compact' })}</span>
                 <span className="text-[#606060] text-lg mb-2 font-medium tracking-wide">rehearsals</span>
               </div>
             </div>
@@ -221,7 +286,7 @@ const Profile = () => {
             <div className="relative z-10">
               <p className="text-[#a0a0a0] text-[10px] font-bold tracking-[0.2em] uppercase mb-4">FAVORIS</p>
               <div className="flex items-end gap-3">
-                <span className="text-8xl font-bold leading-none tracking-tighter">{stats.totalFavorites || 29}</span>
+                <span className="text-8xl font-bold leading-none tracking-tighter">{stats.totalFavorites}</span>
                 <span className="text-[#606060] text-lg mb-2 font-medium tracking-wide">collections</span>
               </div>
             </div>
@@ -243,47 +308,35 @@ const Profile = () => {
             </div>
 
             <div className="space-y-4">
-              {/* Activity Item 1 */}
-              <div className="bg-[#1a1a1a]/50 p-6 rounded-3xl border border-white/5 flex items-center justify-between hover:bg-[#1a1a1a] transition-colors cursor-pointer group">
-                <div className="flex items-center gap-6">
-                  <div className="w-14 h-14 bg-[#2a2a2a] rounded-2xl flex items-center justify-center text-[#a0a0a0] group-hover:text-white transition-colors">
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+              {stats.recentActivities?.length > 0 ? (
+                stats.recentActivities.map((activity) => (
+                  <div key={activity.id} className="bg-[#1a1a1a]/50 p-6 rounded-3xl border border-white/5 flex items-center justify-between hover:bg-[#1a1a1a] transition-colors cursor-pointer group">
+                    <div className="flex items-center gap-6">
+                      <div className="w-14 h-14 bg-[#2a2a2a] rounded-2xl flex items-center justify-center text-[#a0a0a0] group-hover:text-white transition-colors">
+                        {activity.type === 'UPLOAD' ? (
+                          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                        ) : (
+                          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
+                        )}
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-bold">{activity.title}</h3>
+                        <p className="text-sm text-[#606060]">{activity.subtitle}</p>
+                      </div>
+                    </div>
+                    <span className="text-[#606060] text-[10px] font-bold uppercase tracking-widest text-right">
+                      {new Date(activity.date).toLocaleDateString() === new Date().toLocaleDateString() ? 'TODAY' : new Date(activity.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toUpperCase()}
+                    </span>
                   </div>
-                  <div>
-                    <h3 className="text-lg font-bold">Nocturne No. 2 in E-flat major</h3>
-                    <p className="text-sm text-[#606060]">Uploaded to <span className="text-[#fbc02d]">Chopin Essentials</span></p>
-                  </div>
+                ))
+              ) : (
+                <div className="py-20 text-center bg-[#1a1a1a]/20 rounded-[2.5rem] border border-dashed border-white/5 opacity-50">
+                  <svg className="w-16 h-16 text-white/5 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <p className="text-[#606060] text-sm font-medium tracking-wide">No recent activities found</p>
                 </div>
-                <span className="text-[#606060] text-[10px] font-bold uppercase tracking-widest">2 HOURS AGO</span>
-              </div>
-
-              {/* Activity Item 2 */}
-              <div className="bg-[#1a1a1a]/50 p-6 rounded-3xl border border-white/5 flex items-center justify-between hover:bg-[#1a1a1a] transition-colors cursor-pointer group">
-                <div className="flex items-center gap-6">
-                  <div className="w-14 h-14 bg-[#2a2a2a] rounded-2xl flex items-center justify-center text-[#a0a0a0] group-hover:text-white transition-colors">
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-bold">Practice Session: Bach Suite No. 1</h3>
-                    <p className="text-sm text-[#606060]">Completed 45 minutes of rehearsal</p>
-                  </div>
-                </div>
-                <span className="text-[#606060] text-[10px] font-bold uppercase tracking-widest text-right">YESTERDAY</span>
-              </div>
-
-              {/* Activity Item 3 */}
-              <div className="bg-[#1a1a1a]/50 p-6 rounded-3xl border border-white/5 flex items-center justify-between hover:bg-[#1a1a1a] transition-colors cursor-pointer group">
-                <div className="flex items-center gap-6">
-                  <div className="w-14 h-14 bg-[#2a2a2a] rounded-2xl flex items-center justify-center text-[#a0a0a0] group-hover:text-white transition-colors">
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" /></svg>
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-bold">New Favorite Added</h3>
-                    <p className="text-sm text-[#606060]">Debussy - Clair de Lune (Annotated)</p>
-                  </div>
-                </div>
-                <span className="text-[#606060] text-[10px] font-bold uppercase tracking-widest text-right">3 DAYS AGO</span>
-              </div>
+              )}
             </div>
           </div>
 
@@ -309,6 +362,19 @@ const Profile = () => {
                 </div>
 
                 <div>
+                  <label className="text-[#606060] text-[10px] font-bold uppercase tracking-[0.2em] mb-4 block">AVATAR URL</label>
+                  <div className="relative group">
+                    <input
+                      type="text"
+                      value={editAvatarUrl}
+                      onChange={(e) => setEditAvatarUrl(e.target.value)}
+                      placeholder="https://example.com/avatar.jpg"
+                      className="w-full bg-[#0a0a0a] border border-white/10 rounded-2xl px-6 py-5 text-sm focus:outline-none focus:border-[#fbc02d]/50 transition-colors"
+                    />
+                  </div>
+                </div>
+
+                <div>
                   <label className="text-[#606060] text-[10px] font-bold uppercase tracking-[0.2em] mb-4 block">SECURITY</label>
                   <button className="w-full bg-[#0a0a0a] border border-white/10 rounded-2xl px-6 py-5 text-sm flex items-center justify-between group hover:border-white/20 transition-all">
                     <span className="text-[#e0e0e0]">Update Password</span>
@@ -320,23 +386,41 @@ const Profile = () => {
                   <label className="text-[#606060] text-[10px] font-bold uppercase tracking-[0.2em] mb-6 block">NOTIFICATION PREFERENCES</label>
                   <div className="space-y-4">
                     <label className="flex items-center justify-between cursor-pointer group">
-                      <span className="text-sm text-[#e0e0e0]">Shared Manuscripts</span>
-                      <input type="checkbox" defaultChecked className="w-5 h-5 rounded-md bg-[#0a0a0a] border-white/10 text-indigo-600 focus:ring-0 focus:ring-offset-0" />
+                      <span className="text-sm text-[#e0e0e0] group-hover:text-white transition-colors">Shared Manuscripts</span>
+                      <input
+                        type="checkbox"
+                        checked={notificationSettings.sharedManuscripts}
+                        onChange={() => toggleNotification('sharedManuscripts')}
+                        className="w-5 h-5 rounded-md bg-[#0a0a0a] border-white/10 text-indigo-600 focus:ring-0 focus:ring-offset-0 cursor-pointer"
+                      />
                     </label>
                     <label className="flex items-center justify-between cursor-pointer group">
-                      <span className="text-sm text-[#e0e0e0]">Community Comments</span>
-                      <input type="checkbox" defaultChecked className="w-5 h-5 rounded-md bg-[#0a0a0a] border-white/10 text-indigo-600 focus:ring-0 focus:ring-offset-0" />
+                      <span className="text-sm text-[#e0e0e0] group-hover:text-white transition-colors">Community Comments</span>
+                      <input
+                        type="checkbox"
+                        checked={notificationSettings.communityComments}
+                        onChange={() => toggleNotification('communityComments')}
+                        className="w-5 h-5 rounded-md bg-[#0a0a0a] border-white/10 text-indigo-600 focus:ring-0 focus:ring-offset-0 cursor-pointer"
+                      />
                     </label>
                     <label className="flex items-center justify-between cursor-pointer group">
-                      <span className="text-sm text-[#e0e0e0] opacity-50">Platform Updates</span>
-                      <input type="checkbox" className="w-5 h-5 rounded-md bg-[#0a0a0a] border-white/10 text-indigo-600 focus:ring-0 focus:ring-offset-0" />
+                      <span className="text-sm text-[#e0e0e0] group-hover:text-white transition-colors">Platform Updates</span>
+                      <input
+                        type="checkbox"
+                        checked={notificationSettings.platformUpdates}
+                        onChange={() => toggleNotification('platformUpdates')}
+                        className="w-5 h-5 rounded-md bg-[#0a0a0a] border-white/10 text-indigo-600 focus:ring-0 focus:ring-offset-0 cursor-pointer"
+                      />
                     </label>
                   </div>
                 </div>
 
                 <div className="pt-4 flex flex-col gap-6">
-                  <button className="w-full bg-[#2a2a2a] text-white py-5 rounded-2xl font-bold hover:bg-[#333] transition-colors shadow-lg">
-                    Save All Changes
+                  <button
+                    onClick={handleUpdateProfile}
+                    className="w-full bg-[#2a2a2a] text-white py-5 rounded-2xl font-bold hover:bg-[#333] transition-colors shadow-lg active:scale-95"
+                  >
+                    {loading ? 'Saving...' : 'Save All Changes'}
                   </button>
                   <button onClick={handleLogout} className="text-[#606060] text-[10px] font-bold uppercase tracking-[0.2em] hover:text-red-500 transition-colors text-center">
                     LOGOUT OF ALL SESSIONS

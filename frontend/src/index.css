@@ -6,14 +6,14 @@
   --color-primary: var(--color-primary);
   --color-primary-container: var(--color-primary-container);
   --color-on-primary: var(--color-on-primary);
-  
+
   --color-surface: var(--color-surface);
   --color-surface-container-lowest: var(--color-surface-container-lowest);
   --color-surface-container-low: var(--color-surface-container-low);
   --color-surface-container-high: var(--color-surface-container-high);
   --color-surface-container-highest: var(--color-surface-container-highest);
   --color-surface-variant: var(--color-surface-variant);
-  
+
   --color-outline-variant: var(--color-outline-variant);
   --color-on-surface: var(--color-on-surface);
   --color-on-surface-variant: var(--color-on-surface-variant);
@@ -23,7 +23,7 @@
 
   --font-display: var(--font-display-family);
   --font-body: var(--font-body-family);
-  
+
   --shadow-ambient: var(--shadow-ambient);
 }
 
@@ -31,26 +31,26 @@
   /* Modern Clef - Light Mode */
   --font-display-family: 'Plus Jakarta Sans', sans-serif;
   --font-body-family: 'Inter', sans-serif;
-  
+
   --color-primary: #00236F;
   --color-primary-container: #1E3A8A;
   --color-on-primary: #FFFFFF;
-  
+
   --color-surface: #F8F9FB;
   --color-surface-container-lowest: #FFFFFF;
   --color-surface-container-low: #F3F4F6;
   --color-surface-container-high: #E2E8F0;
   --color-surface-container-highest: #F1F5F9;
   --color-surface-variant: #E2E8F0;
-  
+
   --color-outline-variant: #C5C5D3;
   --color-on-surface: #191C1E;
   --color-on-surface-variant: #444651;
   --color-on-background: #191C1E;
-  
+
   --color-tertiary: #4B1C00;
   --color-error: #BA1A1A;
-  
+
   --shadow-ambient: 0 20px 40px rgba(0, 35, 111, 0.06);
 }
 
@@ -58,26 +58,26 @@
   /* Nocturne Cloud - Dark Mode */
   --font-display-family: 'Noto Serif', serif;
   --font-body-family: 'Manrope', sans-serif;
-  
+
   --color-primary: #bac3ff;
   --color-primary-container: #14267a;
   --color-on-primary: #000000;
-  
+
   --color-surface: #131313;
   --color-surface-container-lowest: #0e0e0e;
   --color-surface-container-low: #1c1b1b;
   --color-surface-container-high: #2a2a2a;
   --color-surface-container-highest: #353534;
   --color-surface-variant: #222222;
-  
+
   --color-outline-variant: #454652;
   --color-on-surface: #e3e2e6;
   --color-on-surface-variant: #a0a0a5;
   --color-on-background: #e3e2e6;
-  
+
   --color-tertiary: #e9c349;
   --color-error: #ffb4ab;
-  
+
   --shadow-ambient: 0 20px 40px rgba(0, 0, 0, 0.4);
 }
 
@@ -89,20 +89,116 @@ body {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
-.animate-fade-in { animation: fadeIn 0.5s ease-in-out; }
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
 
 @keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-  20%, 40%, 60%, 80% { transform: translateX(5px); }
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-5px);
+  }
+
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(5px);
+  }
 }
-.animate-shake { animation: shake 0.5s ease-in-out; }
+
+.animate-shake {
+  animation: shake 0.5s ease-in-out;
+}
 
 .skeleton {
   background-color: var(--color-surface-container-high);
   border-radius: 0.25rem;
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes pulse-glow {
+
+  0%,
+  100% {
+    box-shadow: 0 0 15px rgba(251, 192, 45, 0.2);
+  }
+
+  50% {
+    box-shadow: 0 0 30px rgba(251, 192, 45, 0.5);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+.delay-100 {
+  animation-delay: 100ms;
+}
+
+.delay-200 {
+  animation-delay: 200ms;
+}
+
+.delay-300 {
+  animation-delay: 300ms;
+}
+
+.delay-400 {
+  animation-delay: 400ms;
+}
+
+.delay-500 {
+  animation-delay: 500ms;
 }

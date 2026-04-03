@@ -90,18 +90,22 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Mise à jour de profil
-  const updateUserProfile = async (displayName) => {
+  const updateUserProfile = async (data) => {
     setError(null);
     try {
       if (!currentUser) throw new Error('Utilisateur non connecté');
 
-      // Update Firebase
-      await updateProfile(currentUser, { displayName });
-      // Update Postgres
-      await apiService.updateProfile({ name: displayName });
+      // Update Firebase (only name is standard here)
+      if (data.name) {
+        await updateProfile(currentUser, { displayName: data.name });
+      }
+
+      // Update Postgres (Full Profile)
+      const updatedDbUser = await apiService.updateProfile(data);
 
       // Actualiser le currentUser localement
-      setCurrentUser({ ...currentUser, displayName });
+      setCurrentUser({ ...currentUser, ...updatedDbUser });
+      return updatedDbUser;
     } catch (err) {
       setError(err.message);
       throw err;

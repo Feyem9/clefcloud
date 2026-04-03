@@ -103,10 +103,13 @@ export class UsersService {
     };
   }
 
-  async update(id: number, name: string) {
+  async update(id: number, data: { name?: string; title?: string; avatar_url?: string }) {
     const user = await this.findOne(id);
 
-    user.name = name;
+    if (data.name) user.name = data.name;
+    if (data.title !== undefined) user.title = data.title;
+    if (data.avatar_url !== undefined) user.avatar_url = data.avatar_url;
+    
     user.updated_at = new Date();
 
     const updatedUser = await this.userRepository.save(user);

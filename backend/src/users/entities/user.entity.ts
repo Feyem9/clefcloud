@@ -26,6 +26,9 @@ export class User {
   name: string;
 
   @Column({ nullable: true })
+  title: string;
+
+  @Column({ nullable: true })
   avatar_url: string;
 
   @Column({ default: true })

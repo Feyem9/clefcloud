@@ -29,8 +29,8 @@ export class AuthController {
   @Put('profile')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Met à jour le profil de l\'utilisateur connecté' })
-  async updateProfile(@Req() req, @Body('name') name: string) {
-    return this.authService.updateProfile(req.user, name);
+  async updateProfile(@Req() req, @Body() data: { name?: string; title?: string; avatar_url?: string }) {
+    return this.authService.updateProfile(req.user, data);
   }
 
   @Delete('profile')

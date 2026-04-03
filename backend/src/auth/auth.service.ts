@@ -73,8 +73,8 @@ export class AuthService {
   /**
    * Met à jour le profil de l'utilisateur connecté
    */
-  async updateProfile(user: User, name: string) {
-    return this.usersService.update(user.id, name);
+  async updateProfile(user: User, data: { name?: string; title?: string; avatar_url?: string }) {
+    return this.usersService.update(user.id, data);
   }
 
   /**

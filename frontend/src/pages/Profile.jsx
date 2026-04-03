@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import apiService from '../services/api';
@@ -15,11 +15,12 @@ const Profile = () => {
   const [editTitle, setEditTitle] = useState('');
   const [editAvatarUrl, setEditAvatarUrl] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
+  const fileInputRef = useRef(null);
   const [error, setError] = useState('');
   const [stats, setStats] = useState({
     totalPartitions: 0,
     totalDownloads: 0,
-    totalViews: 42, // Mock for visual
+    totalViews: 0,
     totalFavorites: 0,
     recentUploads: [],
     purchases: []
@@ -128,6 +129,27 @@ const Profile = () => {
       setLoading(false);
     }
   };
+  const handleAvatarUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setLoading(true);
+      const updatedUser = await apiService.uploadAvatar(file);
+      setUserProfile(updatedUser);
+      setEditAvatarUrl(updatedUser.avatar_url);
+      toast.success('Avatar mis à jour avec succès !');
+    } catch (err) {
+      console.error('Erreur upload avatar:', err);
+      toast.error('Erreur lors de l\'upload : ' + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const triggerAvatarUpload = () => {
+    fileInputRef.current?.click();
+  };
 
   const handleRefreshStatus = async () => {
     try {
@@ -187,12 +209,21 @@ const Profile = () => {
                     </svg>
                   </div>
                 )}
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleAvatarUpload}
+                  accept="image/*"
+                  className="hidden"
+                />
                 <button
-                  onClick={() => setIsEditing(!isEditing)}
+                  type="button"
+                  onClick={isEditing ? triggerAvatarUpload : () => setIsEditing(true)}
                   className="absolute bottom-4 right-4 w-10 h-10 bg-[#fbc02d] rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-all border-4 border-[#1a1a1a] z-20 group-hover:rotate-12"
+                  title={isEditing ? "Changer d'avatar" : "Modifier le profil"}
                 >
                   <svg className="w-5 h-5 text-black" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                    <path d={isEditing ? "M4 5a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2h-1.586a1 1 0 01-.707-.293l-1.121-1.121A2 2 0 0011.172 3H8.828a2 2 0 00-1.414.586L6.293 4.707A1 1 0 015.586 5H4zm6 9a3 3 0 100-6 3 3 0 000 6z" : "M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"} />
                   </svg>
                 </button>
               </div>
@@ -205,7 +236,7 @@ const Profile = () => {
                   PREMIUM MEMBER
                 </span>
                 <span className="text-[#606060] text-[10px] uppercase tracking-widest font-bold">
-                  JOINED {userProfile?.created_at ? new Date(userProfile.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }).toUpperCase() : 'OCT 2023'}
+                  JOINED {userProfile?.created_at ? new Date(userProfile.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }).toUpperCase() : new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' }).toUpperCase()}
                 </span>
               </div>
               {isEditing ? (
@@ -218,7 +249,7 @@ const Profile = () => {
                 />
               ) : (
                 <h1 className="text-7xl font-bold text-white mb-2 tracking-tight font-display">
-                  {userProfile?.name || currentUser?.displayName || 'Julian Vercetti'}
+                  {userProfile?.name || currentUser?.displayName || currentUser?.email?.split('@')[0] || 'User'}
                 </h1>
               )}
               {isEditing ? (
@@ -231,7 +262,7 @@ const Profile = () => {
                 />
               ) : (
                 <p className="text-xl text-[#a0a0a0] italic font-light tracking-wide">
-                  {userProfile?.title || 'Concertmaster & Digital Archivist'}
+                  {userProfile?.title || 'ClefCloud Member'}
                 </p>
               )}
             </div>
@@ -270,7 +301,7 @@ const Profile = () => {
             <div className="relative z-10">
               <p className="text-[#a0a0a0] text-[10px] font-bold tracking-[0.2em] uppercase mb-4">LECTURES TOTALES</p>
               <div className="flex items-end gap-3">
-                <span className="text-8xl font-bold leading-none tracking-tighter">{Number(stats.totalViews).toLocaleString('en-US', { notation: 'compact' })}</span>
+                <span className="text-8xl font-bold leading-none tracking-tighter">{Number(stats.totalViews || 0).toLocaleString('en-US', { notation: 'compact' })}</span>
                 <span className="text-[#606060] text-lg mb-2 font-medium tracking-wide">rehearsals</span>
               </div>
             </div>

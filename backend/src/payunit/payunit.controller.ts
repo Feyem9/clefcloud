@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Transaction } from '../users/entities/transaction.entity';
 import { User } from '../users/entities/user.entity';
+import { UserPartition } from '../users/entities/user-partition.entity';
 import { Partition } from '../partitions/entities/partition.entity';
 import { Public } from '../common/decorators/public.decorator';
 import { TransactionStatus, TransactionType } from '../common/enums/transaction.enum';
@@ -123,7 +124,7 @@ export class PayunitController {
       // Si c'est l'achat d'une partition individuelle
       if (transaction.type === TransactionType.PARTITION && transaction.partition_id) {
         // Accorder l'accès permanent à cette partition
-        const userPartition = this.transactionRepository.manager.create('UserPartition', {
+        const userPartition = this.transactionRepository.manager.create(UserPartition, {
           user_id: transaction.user_id,
           partition_id: transaction.partition_id
         });

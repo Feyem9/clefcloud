@@ -138,9 +138,12 @@ const Library = () => {
 
   // Vérifie si l'utilisateur a accès au contenu d'une partition
   const hasAccess = (partition) => {
+    // Les admins et les premium ont accès à tout
+    if (isAdmin || isPremium) return true;
     // L'auteur a toujours accès
     if (partition.created_by === currentUser?.id) return true;
-    // Si la partition a des URLs de contenu, le backend a validé l'accès
+    // Si la partition a été achetée (backend doit renvoyer check_purchased ou similaire)
+    // Pour l'instant on se base sur la présence de données protégées renvoyées par l'API
     if (partition.storage_path || partition.audio_url) return true;
     // Pas de prix = gratuit = accès pour tous
     if (!partition.price || partition.price === 0) return true;
@@ -471,6 +474,25 @@ const Library = () => {
                   {/* Header coloré */}
                   <div className="h-2 bg-gradient-to-r from-primary-500 to-primary-600"></div>
 
+                  {/* Thumbnail / Blur Overlay */}
+                  <div className="relative h-40 bg-surface-container-high overflow-hidden border-b border-gray-100 dark:border-gray-800">
+                    <div className={`absolute inset-0 flex items-center justify-center transition-all duration-700 ${!hasAccess(partition) ? 'blur-lg scale-110 opacity-50' : 'group-hover:scale-105'}`}>
+                      <svg className="w-20 h-20 text-primary/10" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 14.5c-2.49 0-4.5-2.01-4.5-4.5S9.51 7.5 12 7.5s4.5 2.01 4.5 4.5-2.01 4.5-4.5 4.5zm0-5.5c-.55 0-1 .45-1 1s.45 1 1 1 1-.45 1-1-.45-1-1-1z" />
+                      </svg>
+                    </div>
+                    {!hasAccess(partition) && (
+                      <div className="absolute inset-0 bg-black/10 backdrop-blur-[2px] flex flex-col items-center justify-center p-4 text-center">
+                        <div className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center mb-2 shadow-ambient">
+                          <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                          </svg>
+                        </div>
+                        <span className="text-white text-[10px] font-bold tracking-[0.2em] uppercase">Contenu Protégé</span>
+                      </div>
+                    )}
+                  </div>
+
                   <div className="p-6 flex-1 flex flex-col">
                     {/* Titre et catégorie */}
                     <div className="flex justify-between items-start mb-3 gap-3">
@@ -595,20 +617,33 @@ const Library = () => {
                       {(!partition.price || partition.price === 0) && <div />}
 
                       <div className="flex gap-2">
-                        {hasAccess(partition) && partition.storage_path ? (
+                        {hasAccess(partition) ? (
                           <>
-                            <button onClick={() => handleViewPDF(partition)} className="p-2 rounded-full text-outline-variant hover:bg-blue-100 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400 transition-colors group" title="Voir">
-                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-                            </button>
-                            <button onClick={() => handleDownload(partition)} className="p-2 rounded-full text-outline-variant hover:bg-green-100 dark:hover:bg-gray-700 hover:text-green-600 dark:hover:text-green-400 transition-colors group" title="Télécharger">
-                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                            </button>
+                            {partition.storage_path && (
+                              <>
+                                <button onClick={() => handleViewPDF(partition)} className="p-2 rounded-full text-outline-variant hover:bg-blue-100 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400 transition-colors group" title="Voir">
+                                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                  </svg>
+                                </button>
+                                <button onClick={() => handleDownload(partition)} className="p-2 rounded-full text-outline-variant hover:bg-green-100 dark:hover:bg-gray-700 hover:text-green-600 dark:hover:text-green-400 transition-colors" title="Télécharger">
+                                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                  </svg>
+                                </button>
+                              </>
+                            )}
                           </>
-                        ) : !hasAccess(partition) && partition.storage_path ? (
-                          <div className="p-2 text-gray-300 dark:text-on-surface-variant" title="Accès restreint">
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
-                          </div>
-                        ) : null}
+                        ) : (
+                          <Link
+                            to="/premium"
+                            className="text-xs text-primary font-bold hover:underline py-2"
+                          >
+                            🚀 Passer Premium
+                          </Link>
+                        )}
+
                         {isAdmin && (
                           <button onClick={() => handleDelete(partition.id)} className="p-2 rounded-full text-outline-variant hover:bg-red-100 dark:hover:bg-gray-700 hover:text-red-600 dark:hover:text-red-400 transition-colors group" title="Supprimer">
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>

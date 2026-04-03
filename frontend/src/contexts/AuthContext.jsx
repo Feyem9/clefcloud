@@ -127,6 +127,24 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Refresh user status manually
+  const refreshUserStatus = async () => {
+    if (!currentUser) return null;
+    try {
+      const token = await currentUser.getIdToken(true); // Force refresh token
+      const dbUser = await apiService.validateToken(token);
+      if (dbUser) {
+        setIsPremium(dbUser.is_premium);
+        setIsAdmin(dbUser.is_admin);
+        setPremiumUntil(dbUser.premium_until);
+        return dbUser;
+      }
+    } catch (err) {
+      console.error('Erreur refresh status:', err);
+    }
+    return null;
+  };
+
   // Surveillance de l'état de l'utilisateur
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -136,17 +154,22 @@ export const AuthProvider = ({ children }) => {
         apiService.setAuthToken(token);
 
         // Synchroniser immédiatement avec le backend PostgreSQL
-        try {
-          const dbUser = await apiService.validateToken(token);
-          if (dbUser) {
-            setIsPremium(dbUser.is_premium);
-            setIsAdmin(dbUser.is_admin);
-            setPremiumUntil(dbUser.premium_until);
+        const syncUser = async (token) => {
+          try {
+            const dbUser = await apiService.validateToken(token);
+            if (dbUser) {
+              setIsPremium(dbUser.is_premium);
+              setIsAdmin(dbUser.is_admin);
+              setPremiumUntil(dbUser.premium_until);
+              return dbUser;
+            }
+          } catch (err) {
+            console.error('Erreur lors de la synchronisation backend:', err);
           }
-        } catch (err) {
-          console.error('Erreur lors de la synchronisation backend de firebase:', err);
-        }
+          return null;
+        };
 
+        syncUser(token);
         setCurrentUser(user);
       } else {
         setCurrentUser(null);
@@ -171,6 +194,7 @@ export const AuthProvider = ({ children }) => {
     forgotPassword,
     updateUserProfile,
     deleteAccount,
+    refreshUserStatus,
     isPremium,
     isAdmin,
     premiumUntil,

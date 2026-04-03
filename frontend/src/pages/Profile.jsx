@@ -2,9 +2,10 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import apiService from '../services/api';
+import { toast } from 'react-toastify';
 
 const Profile = () => {
-  const { currentUser, isAdmin, logout, updateUserProfile, deleteAccount } = useAuth();
+  const { currentUser, isAdmin, isPremium, premiumUntil, logout, updateUserProfile, deleteAccount, refreshUserStatus } = useAuth();
   const navigate = useNavigate();
   const [userProfile, setUserProfile] = useState(null);
   const [partitions, setPartitions] = useState([]);
@@ -83,6 +84,23 @@ const Profile = () => {
     }
   };
 
+  const handleRefreshStatus = async () => {
+    try {
+      setLoading(true);
+      const updated = await refreshUserStatus();
+      if (updated) {
+        toast.success('Statut mis à jour !');
+        // Re-fetch profile data to sync stats
+        const profileData = await apiService.getProfile();
+        setUserProfile(profileData);
+      }
+    } catch (err) {
+      toast.error('Erreur lors du rafraîchissement');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleDeleteAccount = async () => {
     try {
       setError('');
@@ -110,97 +128,94 @@ const Profile = () => {
         {/* Background Orbs pour effet WOW */}
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/20 rounded-full mix-blend-multiply filter blur-[128px] opacity-30 animate-pulse pointer-events-none"></div>
 
-        {/* En-tête du profil */}
-        <div className="bg-surface-container-low backdrop-blur-xl rounded-3xl shadow-ambient border border-white/10 overflow-hidden mb-8">
-          <div className="relative h-48 bg-gradient-to-r from-primary to-primary-container">
-            <div className="absolute inset-0 bg-primary opacity-50"></div>
-            <div className="absolute -bottom-16 left-8">
-              <div className="relative">
-                <div className="absolute inset-0 bg-primary/40 rounded-full blur-xl opacity-50 animate-pulse"></div>
-                <div className="relative w-32 h-32 bg-surface-container-lowest rounded-full border-4 border-surface-container-lowest shadow-ambient flex items-center justify-center overflow-hidden">
-                  <div className="w-full h-full bg-primary-container/20 flex items-center justify-center">
-                    <span className="text-4xl font-bold text-primary font-display">
-                      {currentUser?.email?.[0]?.toUpperCase()}
-                    </span>
+        {/* En-tête du profil avec Carte de Membre */}
+        <div className="relative mb-12">
+          <div className="bg-surface-container-low backdrop-blur-3xl rounded-[3rem] shadow- ambient border border-white/10 overflow-hidden">
+            <div className={`relative h-64 ${isPremium ? 'bg-gradient-to-br from-amber-400 via-amber-500 to-orange-600' : 'bg-gradient-to-br from-primary-500 to-primary-700'}`}>
+              {/* Patterns de fond */}
+              <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(255,255,255,0.2) 1px, transparent 0)', backgroundSize: '24px 24px' }}></div>
+              <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
+
+              <div className="absolute bottom-0 left-0 w-full p-10 flex flex-col md:flex-row justify-between items-end gap-6">
+                <div className="flex items-center gap-8">
+                  <div className="relative group">
+                    <div className={`absolute inset-0 rounded-full blur-2xl opacity-50 ${isPremium ? 'bg-amber-400 animate-pulse' : 'bg-primary-300'}`}></div>
+                    <div className={`relative w-40 h-40 rounded-full border-8 border-surface-container-low shadow-2xl flex items-center justify-center overflow-hidden bg-surface-container-lowest`}>
+                      <span className={`text-6xl font-black font-display ${isPremium ? 'text-amber-500' : 'text-primary'}`}>
+                        {currentUser?.email?.[0]?.toUpperCase()}
+                      </span>
+                    </div>
+                    {isPremium && (
+                      <div className="absolute -top-2 -right-2 bg-amber-500 text-white p-2 rounded-full shadow-lg border-4 border-surface-container-low">
+                        <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="mb-4">
+                    <div className="flex items-center gap-3">
+                      <h1 className="text-4xl font-black text-white font-display drop-shadow-lg">
+                        {userProfile?.name || currentUser?.displayName || 'Utilisateur'}
+                      </h1>
+                      {isAdmin && <span className="bg-white/20 backdrop-blur-md text-white text-[10px] font-black px-3 py-1 rounded-full border border-white/30 tracking-tighter uppercase">Admin</span>}
+                    </div>
+                    <p className="text-white/80 font-medium flex items-center gap-2 mt-1 drop-shadow-md">
+                      <svg className="w-4 h-4 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                      {currentUser?.email}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Status Card Overlay */}
+                <div className="bg-white/10 backdrop-blur-2xl px-8 py-6 rounded-3xl border border-white/20 shadow-xl min-w-[280px]">
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-white/60 text-[10px] font-black uppercase tracking-widest">MEMBERSHIP</span>
+                    {isPremium && <span className="text-amber-300 text-[10px] font-black tracking-widest">GOLD</span>}
+                  </div>
+                  <div className="mb-4">
+                    <div className="text-2xl font-black text-white font-display">
+                      {isPremium ? 'Membre Premium' : 'Utilisateur Free'}
+                    </div>
+                    <p className="text-white/60 text-xs mt-1">
+                      {isPremium ? `Expire le ${new Date(premiumUntil).toLocaleDateString()}` : 'Accès limité aux partitions'}
+                    </p>
+                  </div>
+                  <div className="flex gap-2">
+                    {isPremium ? (
+                      <button onClick={handleRefreshStatus} className="w-full bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-xl text-xs font-bold transition-all border border-white/10">
+                        Actualiser
+                      </button>
+                    ) : (
+                      <button onClick={() => navigate('/premium')} className="w-full bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-lg animate-bounce">
+                        S'abonner
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <div className="pt-20 pb-8 px-8">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-              <div className="flex-1 w-full">
-                {error && <p className="text-red-500 mb-2 text-sm">{error}</p>}
-
-                {isEditing ? (
-                  <div className="flex flex-col gap-3">
-                    <input
-                      type="text"
-                      className="text-2xl font-bold text-gray-900 border-2 border-primary-300 rounded-xl px-3 py-1 bg-white/50 focus:outline-none focus:border-primary border-transparent w-full sm:w-80"
-                      value={editName}
-                      onChange={(e) => setEditName(e.target.value)}
-                      placeholder="Votre nom"
-                    />
-                    <div className="flex gap-2">
-                      <button onClick={handleUpdateProfile} className="px-4 py-1.5 bg-green-500 text-on-primary rounded-xl text-sm font-semibold hover:bg-green-600">Enregistrer</button>
-                      <button onClick={() => { setIsEditing(false); setEditName(userProfile?.name || currentUser?.displayName || ''); }} className="px-4 py-1.5 bg-gray-200 text-gray-700 rounded-xl text-sm font-semibold hover:bg-gray-300">Annuler</button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-3">
-                    <h1 className="text-3xl font-bold text-on-surface font-display">
-                      {userProfile?.name || currentUser?.displayName || 'Utilisateur'}
-                    </h1>
-                    <button onClick={() => setIsEditing(true)} className="p-1.5 text-outline-variant hover:text-primary transition-colors" title="Modifier le nom">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
-                    </button>
-                    {userProfile?.is_premium && (
-                      <span className="px-3 py-1 bg-gradient-to-r from-amber-400 to-amber-600 text-on-primary text-xs font-bold rounded-full shadow-ambient animate-pulse">
-                        PREMIUM
-                      </span>
-                    )}
-                  </div>
-                )}
-
-                <p className="text-on-surface-variant mt-2 flex items-center gap-2">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                  </svg>
-                  {currentUser?.email}
-                </p>
-              </div>
-              <div className="flex flex-col gap-3 shrink-0 mt-4 sm:mt-0">
-                <button
-                  onClick={handleLogout}
-                  className="px-6 py-2.5 bg-gray-100 text-gray-800 rounded-xl font-semibold hover:bg-surface-container-high transition-all duration-200 flex justify-center items-center gap-2 border border-gray-200"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                  </svg>
+            <div className="bg-surface-container-low px-10 py-6 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
+              <div className="flex gap-4">
+                <button onClick={() => setIsEditing(true)} className="flex items-center gap-2 text-on-surface-variant hover:text-primary font-bold text-sm transition-colors">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                  Modifier le nom
+                </button>
+                <button onClick={handleLogout} className="flex items-center gap-2 text-on-surface-variant hover:text-red-500 font-bold text-sm transition-colors">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
                   Déconnexion
                 </button>
-
-                {isDeleting ? (
-                  <div className="bg-red-50 border border-red-200 rounded-xl p-3 flex flex-col gap-2 shadow-inner">
-                    <p className="text-xs text-red-700 font-semibold text-center">Toutes vos données seront effacées. Sûr ?</p>
-                    <div className="flex gap-2 justify-center">
-                      <button onClick={handleDeleteAccount} className="px-3 py-1.5 bg-red-600 text-on-primary rounded-xl text-sm font-bold hover:bg-red-700">Oui, supprimer</button>
-                      <button onClick={() => setIsDeleting(false)} className="px-3 py-1.5 bg-white text-gray-700 border border-gray-300 rounded-xl text-sm font-bold hover:bg-gray-50">Annuler</button>
-                    </div>
-                  </div>
-                ) : (
-                  <button
-                    onClick={() => setIsDeleting(true)}
-                    className="px-6 py-2 border-2 border-red-100 bg-red-50 text-red-600 rounded-xl font-semibold hover:bg-red-100 hover:border-red-200 transition-all duration-200 flex items-center justify-center gap-2 text-sm"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                    Supprimer le compte
-                  </button>
-                )}
               </div>
+
+              {isDeleting ? (
+                <div className="flex items-center gap-4 bg-red-500/10 px-4 py-2 rounded-2xl border border-red-500/20">
+                  <span className="text-red-500 text-xs font-bold">Confirmer suppression ?</span>
+                  <button onClick={handleDeleteAccount} className="bg-red-500 text-white px-3 py-1 rounded-lg text-xs font-bold">OUI</button>
+                  <button onClick={() => setIsDeleting(false)} className="text-outline-variant text-xs font-bold">NON</button>
+                </div>
+              ) : (
+                <button onClick={() => setIsDeleting(true)} className="text-red-500/40 hover:text-red-500 text-[10px] font-black uppercase tracking-widest transition-colors">Supprimer mon compte</button>
+              )}
             </div>
           </div>
         </div>

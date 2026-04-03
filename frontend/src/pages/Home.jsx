@@ -18,7 +18,7 @@ const Home = () => {
           </h1>
           <p className="text-xl mb-8 text-on-surface-variant">
             La bibliothèque numérique de référence pour vos partitions.
-            Accès illimité via un abonnement premium unique.
+            Abonnement premium ou achat à l'unité.
           </p>
           {!currentUser ? (
             <div className="flex gap-4 justify-center">
@@ -138,7 +138,7 @@ const Home = () => {
           </h2>
           <p className="text-on-surface-variant mb-8 text-lg leading-relaxed">
             Avec Premium, débloquez l'accès illimité à toute la bibliothèque,
-            téléchargez sans restriction et profitez du contenu exclusif.
+            ou achetez vos partitions préférées à l'unité.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link

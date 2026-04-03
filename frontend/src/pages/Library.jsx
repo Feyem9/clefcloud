@@ -188,18 +188,6 @@ const Library = () => {
     return colors[index % colors.length];
   };
 
-  if (loading) {
-    return (
-      <div className="animate-fade-in">
-        <div className="h-10 bg-surface-container-high rounded w-1/3 mb-8 animate-pulse"></div>
-        <div className="h-40 bg-surface-container-high rounded-xl mb-6 animate-pulse"></div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[...Array(6)].map((_, i) => <PartitionCardSkeleton key={i} />)}
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="animate-fade-in">
       {/* Header avec actions */}
@@ -433,7 +421,11 @@ const Library = () => {
       </div>
 
       {/* Liste des partitions */}
-      {sortedAndFilteredPartitions.length === 0 ? (
+      {loading && partitions.length === 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[...Array(6)].map((_, i) => <PartitionCardSkeleton key={i} />)}
+        </div>
+      ) : sortedAndFilteredPartitions.length === 0 ? (
         <div className="bg-surface-container-lowest shadow-ambient rounded-xl shadow-ambient p-12 text-center transition-colors ">
           <div className="max-w-md mx-auto">
             <div className="w-20 h-20 bg-surface-container-high rounded-full flex items-center justify-center mx-auto mb-4">

@@ -347,7 +347,7 @@ const Profile = () => {
           <div className="flex-1">
             <div className="flex items-center justify-between mb-8">
               <h2 className="text-4xl font-bold tracking-tight">Recent Activity</h2>
-              <button className="text-[#606060] text-[10px] uppercase tracking-widest font-bold border-b border-transparent hover:border-[#606060] transition-all">VIEW HISTORY</button>
+              <button onClick={() => navigate('/my-purchases')} className="text-[#606060] text-[10px] uppercase tracking-widest font-bold border-b border-transparent hover:border-[#606060] transition-all">VIEW PURCHASES</button>
             </div>
 
             <div className="space-y-4">

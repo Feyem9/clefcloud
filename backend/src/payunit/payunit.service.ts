@@ -34,6 +34,30 @@ export class PayunitService {
   }
 
   /**
+   * Vérifie le statut d'une transaction auprès de PayUnit
+   */
+  async checkTransactionStatus(transactionId: string): Promise<{ status: string; data?: any }> {
+    try {
+      const response = await axios.get(
+        `${this.baseUrl}/paymentstatus/${transactionId}`,
+        { headers: this.getHeaders() }
+      );
+
+      this.logger.log(`Statut PayUnit pour ${transactionId}: ${JSON.stringify(response.data)}`);
+
+      const status = response.data?.transaction_status
+        || response.data?.data?.transaction_status
+        || response.data?.status
+        || 'UNKNOWN';
+
+      return { status: status.toUpperCase(), data: response.data };
+    } catch (error) {
+      this.logger.warn(`Impossible de vérifier le statut PayUnit pour ${transactionId}: ${error.message}`);
+      return { status: 'UNKNOWN' };
+    }
+  }
+
+  /**
    * Initialise un paiement via PayUnit
    */
   async initializePayment(amount: number, transactionId: string, description: string) {

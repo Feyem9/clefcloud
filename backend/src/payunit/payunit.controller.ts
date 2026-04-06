@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Query, Req, UseGuards, BadRequestException, Logger } from '@nestjs/common';
+import { Controller, Post, Body, Get, Query, Req, UseGuards, BadRequestException, Logger, Param } from '@nestjs/common';
 import { PayunitService } from './payunit.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -12,12 +12,15 @@ import { RequestWithUser } from '../common/interfaces/request-with-user.interfac
 import { PayunitCallbackDto } from './dto/payunit-callback.dto';
 import { DeepPartial } from 'typeorm';
 
+import { PaymentVerificationService } from './payment-verification.service';
+
 @Controller('payments')
 export class PayunitController {
   private readonly logger = new Logger(PayunitController.name);
 
   constructor(
     private readonly payunitService: PayunitService,
+    private readonly paymentVerificationService: PaymentVerificationService,
     @InjectRepository(Transaction)
     private transactionRepository: Repository<Transaction>,
     @InjectRepository(User)
@@ -150,5 +153,48 @@ export class PayunitController {
     }
 
     return { status: 'ok' };
+  }
+
+  /**
+   * Récupère l'historique des transactions de l'utilisateur
+   */
+  @Get('my-transactions')
+  async getMyTransactions(@Req() req: RequestWithUser) {
+    return this.transactionRepository.find({
+      where: { user_id: req.user.id },
+      order: { created_at: 'DESC' },
+      relations: ['partition'],
+    });
+  }
+
+  /**
+   * Force la vérification d'une transaction manuellement par l'utilisateur
+   */
+  @Post('verify/:id')
+  async verifyPayment(@Param('id') id: string, @Req() req: RequestWithUser) {
+    return this.paymentVerificationService.verifyAndFulfill(parseInt(id), req.user.id);
+  }
+
+  /**
+   * ADMIN : Récupère toutes les transactions du système
+   */
+  @Get('admin/transactions')
+  async getAllTransactionsAdmin(@Req() req: RequestWithUser) {
+    if (!req.user.is_admin) throw new BadRequestException('Accès refusé');
+
+    return this.transactionRepository.find({
+      order: { created_at: 'DESC' },
+      relations: ['user', 'partition'],
+    });
+  }
+
+  /**
+   * ADMIN : Force le déblocage d'une transaction, indépendamment de son statut PayUnit
+   */
+  @Post('admin/force-unlock/:id')
+  async forceUnlockAdmin(@Param('id') id: string, @Req() req: RequestWithUser) {
+    if (!req.user.is_admin) throw new BadRequestException('Accès refusé');
+    
+    return this.paymentVerificationService.forceUnlock(parseInt(id));
   }
 }

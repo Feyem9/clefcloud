@@ -7,12 +7,14 @@ import { User } from '../users/entities/user.entity';
 import { UserPartition } from '../users/entities/user-partition.entity';
 import { Partition } from '../partitions/entities/partition.entity';
 
+import { PaymentVerificationService } from './payment-verification.service';
+
 @Module({
   imports: [
     TypeOrmModule.forFeature([Transaction, User, UserPartition, Partition]),
   ],
   controllers: [PayunitController],
-  providers: [PayunitService],
-  exports: [PayunitService],
+  providers: [PayunitService, PaymentVerificationService],
+  exports: [PayunitService, PaymentVerificationService],
 })
 export class PayunitModule {}

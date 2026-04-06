@@ -13,6 +13,7 @@ import { PayunitModule } from './payunit/payunit.module';
 import { R2Module } from './r2/r2.module';
 import { TestimonialsModule } from './testimonials/testimonials.module';
 import { ContentModule } from './content/content.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -21,6 +22,9 @@ import { ContentModule } from './content/content.module';
       isGlobal: true,
       envFilePath: '.env',
     }),
+    
+    // Planification des tâches (CRON)
+    ScheduleModule.forRoot(),
 
     // Base de données (Supabase / Postgres)
     TypeOrmModule.forRootAsync({

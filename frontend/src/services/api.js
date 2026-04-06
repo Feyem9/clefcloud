@@ -250,6 +250,26 @@ const apiService = {
     const response = await api.post('/payments/checkout/premium');
     return response.data;
   },
+
+  getMyTransactions: async () => {
+    const response = await api.get('/payments/my-transactions');
+    return response.data;
+  },
+
+  verifyTransaction: async (id) => {
+    const response = await api.post(`/payments/verify/${id}`);
+    return response.data;
+  },
+
+  getAdminTransactions: async () => {
+    const response = await api.get('/payments/admin/transactions');
+    return response.data;
+  },
+
+  forceUnlockTransaction: async (id) => {
+    const response = await api.post(`/payments/admin/force-unlock/${id}`);
+    return response.data;
+  },
 };
 
 export default apiService;

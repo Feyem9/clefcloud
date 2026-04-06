@@ -20,6 +20,7 @@ import Contact from './pages/Contact';
 import Profile from './pages/Profile';
 import Premium from './pages/Premium';
 import PaymentSuccess from './pages/PaymentSuccess';
+import MyPurchases from './pages/MyPurchases';
 import TestBench from './pages/TestBench';
 import AdminDashboard from './pages/AdminDashboard';
 
@@ -95,6 +96,16 @@ function App() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/premium" element={<Premium />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
+
+          <Route
+            path="/my-purchases"
+            element={
+              <ProtectedRoute>
+                <MyPurchases />
+              </ProtectedRoute>
+            }
+          />
+
           <Route path="/test-bench" element={<TestBench />} />
         </Routes>
       </Layout>

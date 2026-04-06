@@ -7,7 +7,9 @@ const AdminDashboard = () => {
     const { currentUser, isAdmin } = useAuth();
     const [aboutUs, setAboutUs] = useState('');
     const [testimonials, setTestimonials] = useState([]);
+    const [adminTransactions, setAdminTransactions] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [unlockingId, setUnlockingId] = useState(null);
 
     useEffect(() => {
         fetchAdminData();
@@ -16,12 +18,14 @@ const AdminDashboard = () => {
     const fetchAdminData = async () => {
         try {
             setLoading(true);
-            const [aboutData, testimonialsData] = await Promise.all([
+            const [aboutData, testimonialsData, transactionsData] = await Promise.all([
                 apiService.getSiteContent('about_us').catch(() => ({ content: '' })),
-                apiService.getAdminTestimonials().catch(() => [])
+                apiService.getAdminTestimonials().catch(() => []),
+                apiService.getAdminTransactions().catch(() => [])
             ]);
             setAboutUs(aboutData.content || '');
             setTestimonials(testimonialsData || []);
+            setAdminTransactions(transactionsData || []);
         } catch (error) {
             console.error(error);
             toast.error('Erreur de chargement');
@@ -58,6 +62,40 @@ const AdminDashboard = () => {
             toast.success('Témoignage supprimé');
         } catch (err) {
             toast.error('Erreur lors de la suppression');
+        }
+    };
+
+    const handleForceUnlock = async (id) => {
+        if (!window.confirm(`Voulez-vous forcer le déblocage de la transaction #${id} ? Assurez-vous que le client a bien payé.`)) return;
+
+        try {
+            setUnlockingId(id);
+            const result = await apiService.forceUnlockTransaction(id);
+            if (result.success) {
+                toast.success(result.message);
+                await fetchAdminData(); // Rafraîchir la liste
+            } else {
+                toast.error(result.message);
+            }
+        } catch (error) {
+            toast.error('Erreur lors du déblocage forcé');
+        } finally {
+            setUnlockingId(null);
+        }
+    };
+
+    const getStatusBadge = (status) => {
+        switch (status.toLowerCase()) {
+            case 'success':
+                return <span className="px-2 py-1 bg-green-500/20 text-green-500 rounded-lg text-xs font-bold">SUCCESS</span>;
+            case 'pending':
+                return <span className="px-2 py-1 bg-yellow-500/20 text-yellow-500 rounded-lg text-xs font-bold">PENDING</span>;
+            case 'failed':
+                return <span className="px-2 py-1 bg-red-500/20 text-red-500 rounded-lg text-xs font-bold">FAILED</span>;
+            case 'expired':
+                return <span className="px-2 py-1 bg-gray-500/20 text-gray-500 rounded-lg text-xs font-bold">EXPIRED</span>;
+            default:
+                return <span className="px-2 py-1 bg-surface-container-highest rounded-lg text-xs">{status}</span>;
         }
     };
 
@@ -133,6 +171,65 @@ const AdminDashboard = () => {
                             ))}
                             {testimonials.length === 0 && (
                                 <p className="text-outline-variant text-center py-10">Aucun témoignage pour le moment.</p>
+                            )}
+                        </div>
+                    )}
+                </div>
+
+                {/* Section Transactions */}
+                <div className="bg-surface-container-low rounded-xl shadow-ambient p-8 border border-white/5 lg:col-span-2">
+                    <h2 className="text-2xl font-bold text-blue-500 mb-6 flex items-center gap-2">
+                        Historique des Transactions (PayUnit)
+                        <span className="bg-blue-500/20 text-blue-500 text-sm px-3 py-1 rounded-full">{adminTransactions.length}</span>
+                    </h2>
+
+                    {loading ? (
+                        <div className="animate-pulse h-32 bg-surface-container-high rounded-xl"></div>
+                    ) : (
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left text-sm whitespace-nowrap">
+                                <thead className="text-outline-variant uppercase bg-surface-container-highest/50">
+                                    <tr>
+                                        <th className="px-4 py-3 rounded-tl-lg">ID</th>
+                                        <th className="px-4 py-3">Réf PayUnit</th>
+                                        <th className="px-4 py-3">Utilisateur</th>
+                                        <th className="px-4 py-3">Montant</th>
+                                        <th className="px-4 py-3">Statut</th>
+                                        <th className="px-4 py-3">Date</th>
+                                        <th className="px-4 py-3 rounded-tr-lg text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {adminTransactions.map((t) => (
+                                        <tr key={t.id} className="border-b border-white/5 hover:bg-surface-container-highest/30 transition-colors">
+                                            <td className="px-4 py-3 font-mono font-bold">{t.id}</td>
+                                            <td className="px-4 py-3 font-mono text-outline-variant">{t.payunit_transaction_id || '-'}</td>
+                                            <td className="px-4 py-3">{t.user?.email}</td>
+                                            <td className="px-4 py-3 font-bold">{t.amount} FCFA</td>
+                                            <td className="px-4 py-3">{getStatusBadge(t.status)}</td>
+                                            <td className="px-4 py-3 text-outline-variant">
+                                                {new Date(t.created_at).toLocaleString('fr-FR', {
+                                                    day: '2-digit', month: '2-digit', year: '2-digit',
+                                                    hour: '2-digit', minute: '2-digit'
+                                                })}
+                                            </td>
+                                            <td className="px-4 py-3 text-right">
+                                                {(t.status === 'pending' || t.status === 'failed' || t.status === 'expired') && (
+                                                    <button
+                                                        onClick={() => handleForceUnlock(t.id)}
+                                                        disabled={unlockingId === t.id}
+                                                        className="px-3 py-1 text-xs font-bold rounded-lg bg-green-500/20 text-green-500 hover:bg-green-500/40 transition-colors disabled:opacity-50"
+                                                    >
+                                                        {unlockingId === t.id ? '...' : 'Forcer le déblocage'}
+                                                    </button>
+                                                )}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                            {adminTransactions.length === 0 && (
+                                <p className="text-center py-6 text-outline-variant">Aucune transaction trouvée.</p>
                             )}
                         </div>
                     )}

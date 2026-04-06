@@ -117,7 +117,9 @@ export class PayunitController {
       return { message: 'Transaction déjà traitée' };
     }
 
-    if (status === 'SUCCESS') {
+    const normalizedStatus = status?.toUpperCase();
+
+    if (normalizedStatus === 'SUCCESS' || normalizedStatus === 'COMPLETE') {
       transaction.status = TransactionStatus.SUCCESS;
       transaction.payunit_transaction_id = payunit_transaction_id;
       await this.transactionRepository.save(transaction);

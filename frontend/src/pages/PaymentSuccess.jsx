@@ -13,27 +13,29 @@ const PaymentSuccess = () => {
     useEffect(() => {
         const verifyPaymentStatus = async () => {
             const transactionId = searchParams.get('transaction_id');
-            const paymentStatus = searchParams.get('status');
+            const paymentStatus = searchParams.get('status') || searchParams.get('transaction_status');
 
-            if (paymentStatus === 'SUCCESS' || paymentStatus === 'COMPLETE') {
+            console.log('🔍 Checking payment:', { transactionId, paymentStatus });
+
+            // On accepte SUCCESS, COMPLETE ou un retour sans statut (success par défaut)
+            const isActuallySuccess = paymentStatus === 'SUCCESS' || paymentStatus === 'COMPLETE' || !paymentStatus;
+
+            if (isActuallySuccess) {
                 setStatus('success');
 
-                // FIX LOCAL SERVER: Forcer la validation si le webhook de PayUnit n'atteint pas localhost
+                // On force la validation backend si on a un ID de transaction
                 if (transactionId) {
-                    await apiService.verifyLocalPayment(
-                        transactionId.split('-')[0], // Extract just the numeric ID if it has '-CLEFCLOUD'
-                        'SUCCESS'
-                    );
+                    const cleanId = transactionId.split('-')[0];
+                    console.log('🔄 Requesting server unlock for transaction:', cleanId);
+                    await apiService.verifyLocalPayment(cleanId, 'SUCCESS');
+
+                    // On rafraîchit le statut utilisateur pour débloquer les boutons Premium/Download
+                    await refreshUserStatus();
                 }
             } else if (paymentStatus === 'FAILED' || paymentStatus === 'CANCELLED') {
                 setStatus('error');
             } else {
-                // Si pas de paramètres, on suppose que c'est un succès (retour normal)
-                setStatus('success');
-            }
-
-            if (paymentStatus === 'SUCCESS' || paymentStatus === 'COMPLETE' || !paymentStatus) {
-                await refreshUserStatus(); // Mettre à jour le statut premium immédiatement
+                setStatus('error');
             }
         };
 

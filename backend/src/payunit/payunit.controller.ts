@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Query, Req, UseGuards, BadRequestException } from '@nestjs/common';
+import { Controller, Post, Body, Get, Query, Req, UseGuards, BadRequestException, Logger } from '@nestjs/common';
 import { PayunitService } from './payunit.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -14,6 +14,8 @@ import { DeepPartial } from 'typeorm';
 
 @Controller('payments')
 export class PayunitController {
+  private readonly logger = new Logger(PayunitController.name);
+
   constructor(
     private readonly payunitService: PayunitService,
     @InjectRepository(Transaction)
@@ -95,9 +97,19 @@ export class PayunitController {
     // Note: Dans une version réelle, il faudrait vérifier la signature/IP de PayUnit
     const { transaction_id, payunit_transaction_id, status } = body;
 
-    const transaction = await this.transactionRepository.findOneBy({ id: parseInt(transaction_id) });
+    // FIX: Nettoyer l'ID de transaction (ex: "32-CLEFCLOUD" -> 32)
+    const cleanIdString = transaction_id ? transaction_id.toString().split('-')[0] : '';
+    const cleanId = parseInt(cleanIdString);
+
+    if (!cleanId || isNaN(cleanId)) {
+      this.logger.error(`ID de transaction invalide reçu : ${transaction_id}`);
+      return { message: 'ID de transaction invalide' };
+    }
+
+    const transaction = await this.transactionRepository.findOneBy({ id: cleanId });
 
     if (!transaction) {
+      this.logger.error(`Transaction non trouvée en base pour ID : ${cleanId}`);
       return { message: 'Transaction non trouvée' };
     }
 

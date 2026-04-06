@@ -14,6 +14,7 @@ import { R2Module } from './r2/r2.module';
 import { TestimonialsModule } from './testimonials/testimonials.module';
 import { ContentModule } from './content/content.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 
 @Module({
   imports: [
@@ -25,6 +26,12 @@ import { ScheduleModule } from '@nestjs/schedule';
     
     // Planification des tâches (CRON)
     ScheduleModule.forRoot(),
+
+    // Protection DDoS (Rate Limiting)
+    ThrottlerModule.forRoot([{
+      ttl: 60000, // 60 secondes
+      limit: 100, // 100 requêtes max par IP / minute
+    }]),
 
     // Base de données (Supabase / Postgres)
     TypeOrmModule.forRootAsync({
@@ -68,6 +75,11 @@ import { ScheduleModule } from '@nestjs/schedule';
     {
       provide: APP_GUARD,
       useClass: FirebaseAuthGuard,
+    },
+    // Limiteur de requêtes global
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
     },
   ],
 })

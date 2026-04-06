@@ -10,6 +10,8 @@ async function bootstrap() {
   dns.setDefaultResultOrder('ipv4first');
   
   const app = await NestFactory.create(AppModule);
+  // Tell express to trust the proxy (important for Render to get real client IPs)
+  app.getHttpAdapter().getInstance().set('trust proxy', 1);
   const logger = new Logger('Bootstrap');
 
   // Global validation pipe

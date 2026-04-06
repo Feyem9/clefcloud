@@ -4,6 +4,7 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { Logger } from '@nestjs/common';
 import * as dns from 'node:dns';
+import { DataSource } from 'typeorm';
 
 async function bootstrap() {
   // Force IPv4 for DNS resolution to avoid ENETUNREACH in Render Free Tier
@@ -13,6 +14,15 @@ async function bootstrap() {
   // Tell express to trust the proxy (important for Render to get real client IPs)
   app.getHttpAdapter().getInstance().set('trust proxy', 1);
   const logger = new Logger('Bootstrap');
+
+  // Fix: PostgreSQL ENUM Migration for 'expired' status
+  const dataSource = app.get(DataSource);
+  try {
+    await dataSource.query("ALTER TYPE transactions_status_enum ADD VALUE IF NOT EXISTS 'expired'");
+    logger.log('Database Enum migrations applied (transactions_status_enum).');
+  } catch (error) {
+    logger.warn(`Could not update transactions_status_enum : ${error.message}`);
+  }
 
   // Global validation pipe
   app.useGlobalPipes(

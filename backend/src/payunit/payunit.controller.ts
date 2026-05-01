@@ -1,4 +1,5 @@
-import { Controller, Post, Body, Get, Query, Req, UseGuards, BadRequestException, Logger, Param } from '@nestjs/common';
+import { Controller, Post, Body, Get, Req, BadRequestException, UnauthorizedException, Logger, Param, Headers } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { PayunitService } from './payunit.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -21,6 +22,7 @@ export class PayunitController {
   constructor(
     private readonly payunitService: PayunitService,
     private readonly paymentVerificationService: PaymentVerificationService,
+    private readonly configService: ConfigService,
     @InjectRepository(Transaction)
     private transactionRepository: Repository<Transaction>,
     @InjectRepository(User)
@@ -96,8 +98,17 @@ export class PayunitController {
    */
   @Public()
   @Post('callback')
-  async handleCallback(@Body() body: PayunitCallbackDto) {
-    // Note: Dans une version réelle, il faudrait vérifier la signature/IP de PayUnit
+  async handleCallback(
+    @Body() body: PayunitCallbackDto,
+    @Headers('x-payunit-token') payunitToken: string,
+  ) {
+    // Vérification du token secret partagé avec PayUnit
+    const expectedToken = this.configService.get<string>('PAYUNIT_WEBHOOK_SECRET');
+    if (!expectedToken || !payunitToken || payunitToken !== expectedToken) {
+      this.logger.warn(`Webhook PayUnit rejeté — token invalide ou manquant (IP source non vérifiée)`);
+      throw new UnauthorizedException('Token webhook invalide');
+    }
+
     const { transaction_id, payunit_transaction_id, status } = body;
 
     // FIX: Nettoyer l'ID de transaction (ex: "32-CLEFCLOUD" -> 32)

@@ -48,12 +48,11 @@ export class AuthService {
         this.mailService.sendWelcomeEmail(user);
       }
 
-      // Toujours mettre à jour last_login et les droits d'administration à la connexion
+      // Toujours mettre à jour last_login à la connexion
       user.last_login = new Date();
       
       const adminEmail = this.configService.get<string>('ADMIN_EMAIL');
-      const isFeyemLionel = email?.toLowerCase().includes('feyemlionel');
-      user.is_admin = email === adminEmail || isFeyemLionel;
+      user.is_admin = email === adminEmail;
       
       await this.userRepository.save(user);
 

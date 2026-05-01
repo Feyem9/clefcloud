@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  CanActivate,
-  ExecutionContext,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from '../auth.service';
 
 @Injectable()
@@ -26,7 +21,7 @@ export class AuthGuard implements CanActivate {
 
     try {
       const user = await this.authService.validateFirebaseUser(token);
-      
+
       if (!user) {
         throw new UnauthorizedException('User not found');
       }

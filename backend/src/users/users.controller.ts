@@ -1,16 +1,6 @@
-import {
-  Controller,
-  Get,
-  Put,
-  Param,
-  Body,
-  Query,
-  UseGuards,
-  ParseIntPipe,
-} from '@nestjs/common';
+import { Controller, Get, Put, Param, Body, Query, ParseIntPipe } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { UsersService } from './users.service';
-import { AuthGuard } from '../auth/guards/auth.guard';
 
 @ApiTags('users')
 @Controller('users')
@@ -18,7 +8,7 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get(':id')
-  @ApiOperation({ summary: 'Récupérer le profil d\'un utilisateur' })
+  @ApiOperation({ summary: "Récupérer le profil d'un utilisateur" })
   @ApiResponse({ status: 200, description: 'Profil utilisateur' })
   @ApiResponse({ status: 404, description: 'Utilisateur non trouvé' })
   async findOne(@Param('id', ParseIntPipe) id: number) {
@@ -26,7 +16,7 @@ export class UsersController {
   }
 
   @Get(':id/partitions')
-  @ApiOperation({ summary: 'Récupérer les partitions d\'un utilisateur' })
+  @ApiOperation({ summary: "Récupérer les partitions d'un utilisateur" })
   @ApiResponse({ status: 200, description: 'Liste des partitions' })
   @ApiResponse({ status: 404, description: 'Utilisateur non trouvé' })
   async findPartitions(
@@ -43,10 +33,7 @@ export class UsersController {
   @ApiResponse({ status: 200, description: 'Profil mis à jour' })
   @ApiResponse({ status: 401, description: 'Non authentifié' })
   @ApiResponse({ status: 404, description: 'Utilisateur non trouvé' })
-  async update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body('name') name: string,
-  ) {
+  async update(@Param('id', ParseIntPipe) id: number, @Body('name') name: string) {
     return this.usersService.update(id, name);
   }
 }

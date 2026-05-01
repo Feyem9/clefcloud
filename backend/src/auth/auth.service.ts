@@ -28,19 +28,19 @@ export class AuthService {
       const { uid, email, name, picture } = decodedToken;
 
       let user = await this.userRepository.findOne({
-        where: { cognito_sub: uid },
+        where: { firebase_uid: uid },
       });
 
       if (!user) {
         user = this.userRepository.create({
-          cognito_sub: uid, // UID Firebase
+          firebase_uid: uid,
           email: email,
           name: name || email?.split('@')[0],
           avatar_url: picture,
         });
         await this.userRepository.save(user);
         this.logger.log(`✨ Nouvel utilisateur créé en base : ${user.email}`);
-        
+
         // Email de bienvenue
         this.mailService.sendWelcomeEmail(user);
       } else {
@@ -78,7 +78,7 @@ export class AuthService {
   }
 
   /**
-   * Note : Les fonctions signUp, signIn, changePassword, etc. 
+   * Note : Les fonctions signUp, signIn, changePassword, etc.
    * sont maintenant gérées directement par le Frontend via le SDK Firebase.
    * Le backend ne sert plus qu'à VALIDER le token et synchroniser les infos.
    */

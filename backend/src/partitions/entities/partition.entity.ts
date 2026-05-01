@@ -6,10 +6,14 @@ import {
   UpdateDateColumn,
   ManyToOne,
   JoinColumn,
+  Index,
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 
 @Entity('partitions')
+@Index('idx_partitions_created_by', ['created_by'])
+@Index('idx_partitions_category', ['category'])
+@Index('idx_partitions_is_active', ['is_active'])
 export class Partition {
   @PrimaryGeneratedColumn()
   id: number;
@@ -36,22 +40,22 @@ export class Partition {
   tags: string[];
 
   // Fichier PDF / Image de la partition
-  @Column({ nullable: true })
-  storage_path: string;
+  @Column({ nullable: true, type: 'varchar' })
+  storage_path: string | null;
 
-  @Column({ nullable: true })
-  download_url: string;
+  @Column({ nullable: true, type: 'varchar' })
+  download_url: string | null;
 
   // Fichier Audio
-  @Column({ nullable: true })
-  audio_url: string;
+  @Column({ nullable: true, type: 'varchar' })
+  audio_url: string | null;
 
-  @Column({ nullable: true })
-  audio_storage_path: string;
+  @Column({ nullable: true, type: 'varchar' })
+  audio_storage_path: string | null;
 
   // Image de couverture optionnelle
-  @Column({ nullable: true })
-  cover_url: string;
+  @Column({ nullable: true, type: 'varchar' })
+  cover_url: string | null;
 
   @Column({ nullable: true })
   file_size: number;

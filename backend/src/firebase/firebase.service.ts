@@ -63,13 +63,15 @@ export class FirebaseService implements OnModuleInit {
   }
 
   /**
-   * Upload d'un fichier (Partition ou Audio)
+   * Upload d'un fichier (Partition ou Audio).
+   * Retourne uniquement le storagePath — ne pas stocker download_url en base.
+   * Les URLs d'accès sont générées à la demande via getSignedUrl().
    */
   async uploadFile(
     userId: number,
     file: Express.Multer.File,
     cleanPath: string,
-  ): Promise<{ storagePath: string; downloadUrl: string }> {
+  ): Promise<{ storagePath: string }> {
     const bucket = this.storage;
     const fileRef = bucket.file(cleanPath);
 
@@ -82,14 +84,49 @@ export class FirebaseService implements OnModuleInit {
       },
     });
 
-    // Rendre le fichier public via URL standard (Google Cloud IAM strict)
-    // Format : https://firebasestorage.googleapis.com/v0/b/<bucket_name>/o/<encoded_path>?alt=media
-    const encodedPath = encodeURIComponent(cleanPath).replace(/%2F/g, '/');
-    const downloadUrl = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodedPath}?alt=media`;
-
     this.logger.log(`Fichier uploadé : ${cleanPath}`);
+    return { storagePath: cleanPath };
+  }
 
-    return { storagePath: cleanPath, downloadUrl };
+  /**
+   * Upload d'un fichier public (cover image).
+   * Le fichier est rendu public et son URL est permanente — c'est intentionnel
+   * car c'est une image de prévisualisation, pas un fichier protégé.
+   */
+  async uploadPublicFile(
+    userId: number,
+    file: Express.Multer.File,
+    cleanPath: string,
+  ): Promise<string> {
+    const bucket = this.storage;
+    const fileRef = bucket.file(cleanPath);
+
+    await fileRef.save(file.buffer, {
+      contentType: file.mimetype,
+      metadata: { metadata: { uploadedBy: String(userId) } },
+    });
+
+    await fileRef.makePublic();
+
+    const publicUrl = `https://storage.googleapis.com/${bucket.name}/${cleanPath}`;
+    this.logger.log(`Fichier public uploadé : ${cleanPath}`);
+    return publicUrl;
+  }
+
+  /**
+   * Génère une URL signée temporaire pour accéder à un fichier protégé.
+   * L'URL expire après le délai spécifié (défaut : 15 minutes).
+   * Ne jamais stocker cette URL en base — la générer à chaque demande.
+   */
+  async getSignedUrl(storagePath: string, expiresInMs = 15 * 60 * 1000): Promise<string> {
+    const [signedUrl] = await this.storage.file(storagePath).getSignedUrl({
+      action: 'read',
+      expires: Date.now() + expiresInMs,
+    });
+    this.logger.log(
+      `URL signée générée pour : ${storagePath} (expire dans ${expiresInMs / 60000} min)`,
+    );
+    return signedUrl;
   }
 
   /**

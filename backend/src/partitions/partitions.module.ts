@@ -10,10 +10,7 @@ import { AuthModule } from '../auth/auth.module';
 import { FirebaseService } from '../firebase/firebase.service';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Partition, Favorite, User, UserPartition]),
-    AuthModule,
-  ],
+  imports: [TypeOrmModule.forFeature([Partition, Favorite, User, UserPartition]), AuthModule],
   controllers: [PartitionsController],
   providers: [PartitionsService, FirebaseService],
   exports: [PartitionsService],

@@ -1,39 +1,50 @@
-# 🎵 ClefCloud - Gestionnaire de Partitions Musicales
+# 🎵 ClefCloud — Plateforme de partitions musicales
 
-ClefCloud est une application web moderne permettant aux musiciens, choristes et chefs de chœur de stocker, organiser et consulter leurs partitions musicales (PDF/Images) accompagnées de leurs démos audio.
+ClefCloud est une plateforme web de sauvegarde et vente de partitions musicales (PDF) avec démos audio. Les partitions sont protégées par des URLs signées temporaires et accessibles uniquement aux utilisateurs autorisés (acheteurs ou abonnés premium).
 
-## 🚀 Stack Technique
-- **Frontend :** React 19, Vite, TailwindCSS 4
-- **Backend :** NestJS 10, TypeORM
-- **Auth & Storage :** Firebase (Auth + Storage)
-- **Base de données :** Supabase (PostgreSQL)
-- **Emails :** Brevo API
+## Stack technique
 
-## 🛠️ Installation
+- Frontend : React 19 + Vite + TailwindCSS 4 + React Router 7
+- Backend : NestJS 10 + TypeORM + PostgreSQL (Supabase)
+- Auth : Firebase (Email/Password)
+- Stockage : Firebase Storage (URLs signées temporaires)
+- Paiement : PayUnit
+- Email : SMTP via @nestjs-modules/mailer
+- Déploiement : Docker + Render
 
-### 1. Backend
+## Installation
+
+### Backend
 ```bash
 cd backend
 npm install
-cp .env.example .env # Puis remplissez vos clés
+cp .env.example .env   # Remplir les variables requises
 npm run start:dev
 ```
 
-### 2. Frontend
+### Frontend
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
 
-## 🤝 Contribution
-Pour contribuer au projet, merci de lire attentivement le fichier [CONTRIBUTING.md](./CONTRIBUTING.md) et de mettre à jour le [CHANGELOG.md](./CHANGELOG.md).
+## Variables d'environnement requises
 
-## 🌍 Licence
+Voir `backend/.env.example` pour la liste complète. Les variables critiques au démarrage sont :
+- `FIREBASE_PROJECT_ID`, `FIREBASE_CLIENT_EMAIL`, `FIREBASE_PRIVATE_KEY`, `FIREBASE_STORAGE_BUCKET`
+- `DB_HOST`, `DB_PORT`, `DB_USERNAME`, `DB_PASSWORD`, `DB_DATABASE`
+- `MAIL_USER`, `MAIL_PASSWORD`, `MAIL_FROM_EMAIL`
+- `PAYUNIT_WEBHOOK_SECRET`
+
+## Déploiement production
+
+```bash
+NODE_ENV=production   # Désactive TypeORM synchronize
+```
+
+Avant le premier déploiement en production après un changement de schéma, exécuter les migrations manuellement. Voir `backend/migrations/`.
+
+## Licence
+
 Propriété de ClefCloud. Tous droits réservés.
-\n- Déploiement CI/CD configuré le 09/03/2026
-\n- ✨ Tentative de déploiement suite à correction du secret : 09/03/2026 13:48
-\n- ✨ Tentative de connexion via Connection Pooler (IPv4) : 09/03/2026 14:44
-\n- ✨ Mise à jour Firebase API Key : 09/03/2026 20:10
-\n- ✨ Déploiement final avec secrets Firebase validés : 09/03/2026 20:23
-\n- ✨ Injection de l'URL Backend de Production : 10/03/2026 10:35

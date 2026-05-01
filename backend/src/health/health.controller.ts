@@ -2,7 +2,7 @@ import { Controller, Get } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { MailService } from './mail.service';
+import { MailService } from '../mail.service';
 import { HealthStatus, DatabaseStatus } from '../common/enums/health.enum';
 import { Public } from '../common/decorators/public.decorator';
 

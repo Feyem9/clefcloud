@@ -1,4 +1,5 @@
 import { Routes, Route } from 'react-router-dom';
+import { lazy, Suspense } from 'react';
 import Layout from './components/Layout/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
 import { useTheme } from './contexts/ThemeContext';
@@ -18,7 +19,9 @@ import Contact from './pages/Contact';
 import Profile from './pages/Profile';
 import Premium from './pages/Premium';
 import PaymentSuccess from './pages/PaymentSuccess';
-import TestBench from './pages/TestBench';
+
+// TestBench uniquement en développement — exclu du bundle de production
+const TestBench = import.meta.env.DEV ? lazy(() => import('./pages/TestBench')) : null;
 
 function App() {
   const { isDarkMode } = useTheme();
@@ -84,7 +87,13 @@ function App() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/premium" element={<Premium />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
-          <Route path="/test-bench" element={<TestBench />} />
+          {import.meta.env.DEV && TestBench && (
+            <Route path="/test-bench" element={
+              <Suspense fallback={null}>
+                <TestBench />
+              </Suspense>
+            } />
+          )}
         </Routes>
       </Layout>
     </>

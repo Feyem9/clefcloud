@@ -35,7 +35,7 @@ const Login = () => {
     }
   };
 
-  // Google login désactivé temporairement (non implémenté dans AWS Cognito)
+  // Google login non encore implémenté
   const handleGoogleLogin = async () => {
     setError('La connexion avec Google n\'est pas encore disponible. Utilisez votre email et mot de passe.');
   };

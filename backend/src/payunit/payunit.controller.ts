@@ -1,4 +1,16 @@
-import { Controller, Post, Body, Get, Query, Req, UseGuards, BadRequestException } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  Query,
+  Req,
+  BadRequestException,
+  Headers,
+  UnauthorizedException,
+  Logger,
+} from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { PayunitService } from './payunit.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -13,8 +25,11 @@ import { DeepPartial } from 'typeorm';
 
 @Controller('payments')
 export class PayunitController {
+  private readonly logger = new Logger(PayunitController.name);
+
   constructor(
     private readonly payunitService: PayunitService,
+    private readonly configService: ConfigService,
     @InjectRepository(Transaction)
     private transactionRepository: Repository<Transaction>,
     @InjectRepository(User)
@@ -50,7 +65,7 @@ export class PayunitController {
     const payunitResponse = await this.payunitService.initializePayment(
       partition.price,
       transaction.id.toString(),
-      `Achat de la partition : ${partition.title}`
+      `Achat de la partition : ${partition.title}`,
     );
 
     return payunitResponse;
@@ -76,7 +91,7 @@ export class PayunitController {
     const payunitResponse = await this.payunitService.initializePayment(
       premiumPrice,
       transaction.id.toString(),
-      'Abonnement ClefCloud Premium'
+      'Abonnement ClefCloud Premium',
     );
 
     return payunitResponse;
@@ -87,11 +102,21 @@ export class PayunitController {
    */
   @Public()
   @Post('callback')
-  async handleCallback(@Body() body: PayunitCallbackDto) {
-    // Note: Dans une version réelle, il faudrait vérifier la signature/IP de PayUnit
+  async handleCallback(
+    @Body() body: PayunitCallbackDto,
+    @Headers('x-payunit-token') payunitToken: string,
+  ) {
+    // Vérification du token secret partagé avec PayUnit
+    const expectedToken = this.configService.get<string>('PAYUNIT_WEBHOOK_SECRET');
+    if (!expectedToken || !payunitToken || payunitToken !== expectedToken) {
+      this.logger.warn(`Webhook PayUnit rejeté — token invalide ou manquant`);
+      throw new UnauthorizedException('Token webhook invalide');
+    }
     const { transaction_id, payunit_transaction_id, status } = body;
 
-    const transaction = await this.transactionRepository.findOneBy({ id: parseInt(transaction_id) });
+    const transaction = await this.transactionRepository.findOneBy({
+      id: parseInt(transaction_id),
+    });
 
     if (!transaction) {
       return { message: 'Transaction non trouvée' };
@@ -105,20 +130,23 @@ export class PayunitController {
       // Si c'est un abonnement premium
       if (transaction.type === TransactionType.PREMIUM) {
         const user = await this.userRepository.findOneBy({ id: transaction.user_id });
+        if (!user) {
+          this.logger.error(`Utilisateur introuvable pour la transaction ${transaction.id}`);
+          return { status: 'ok' };
+        }
         user.is_premium = true;
-        // Ajouter 30 jours (exemple)
         const expiry = new Date();
         expiry.setDate(expiry.getDate() + 30);
         user.premium_until = expiry;
         await this.userRepository.save(user);
       }
-      
+
       // Si c'est l'achat d'une partition individuelle
       if (transaction.type === TransactionType.PARTITION && transaction.partition_id) {
         // Accorder l'accès permanent à cette partition
         const userPartition = this.transactionRepository.manager.create('UserPartition', {
           user_id: transaction.user_id,
-          partition_id: transaction.partition_id
+          partition_id: transaction.partition_id,
         });
         await this.transactionRepository.manager.save(userPartition);
       }

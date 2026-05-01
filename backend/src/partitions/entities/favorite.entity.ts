@@ -6,12 +6,15 @@ import {
   JoinColumn,
   Column,
   Unique,
+  Index,
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { Partition } from './partition.entity';
 
 @Entity('favorites')
 @Unique(['user_id', 'partition_id'])
+@Index('idx_favorites_user_id', ['user_id'])
+@Index('idx_favorites_partition_id', ['partition_id'])
 export class Favorite {
   @PrimaryGeneratedColumn()
   id: number;

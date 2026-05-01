@@ -22,11 +22,11 @@ export class UsersService {
   ) {}
 
   /**
-   * Trouve un utilisateur à partir de son UID Firebase (stocké dans cognito_sub)
+   * Trouve un utilisateur à partir de son UID Firebase
    */
   async findByFirebaseUid(uid: string): Promise<User | null> {
     return this.userRepository.findOne({
-      where: { cognito_sub: uid },
+      where: { firebase_uid: uid },
     });
   }
 
@@ -96,7 +96,7 @@ export class UsersService {
       totalViews,
       totalFavorites,
       recentUploads,
-      purchases: purchases.map(p => ({
+      purchases: purchases.map((p) => ({
         ...p.partition,
         purchased_at: p.created_at,
       })),
@@ -124,11 +124,10 @@ export class UsersService {
 
   async deleteUser(id: number) {
     const user = await this.findOne(id);
-    // Supprimer l'utilisateur de la base de données.
-    // L'ON DELETE CASCADE défini dans la DB s'occupera des favoris et partitions associées, 
-    // ou lever une erreur s'il y a des violations de contrainte à gérer.
-    await this.userRepository.delete(user.id);
-    this.logger.log(`Utilisateur supprimé : ${id}`);
+    // Soft delete : remplit deleted_at, l'utilisateur n'apparaît plus dans les requêtes
+    // mais ses données restent en base pour audit/récupération
+    await this.userRepository.softDelete(user.id);
+    this.logger.log(`Utilisateur soft-supprimé : ${id}`);
     return { success: true };
   }
 }

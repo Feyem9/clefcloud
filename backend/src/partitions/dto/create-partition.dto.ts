@@ -40,7 +40,10 @@ export class CreatePartitionDto {
         return Array.isArray(parsed) ? parsed : [];
       } catch {
         // Si ce n'est pas du JSON, split par virgule
-        return value.split(',').map(tag => tag.trim()).filter(tag => tag);
+        return value
+          .split(',')
+          .map((tag) => tag.trim())
+          .filter((tag) => tag);
       }
     }
     return [];

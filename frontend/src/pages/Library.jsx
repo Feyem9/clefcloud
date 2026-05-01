@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import apiService from '../services/api';
 import PDFViewer from '../components/PDFViewer';
 import AudioPlayer from '../components/AudioPlayer';
+import AudioPlayerSecure from '../components/AudioPlayerSecure';
 import PartitionCardSkeleton from '../components/PartitionCardSkeleton';
 import { MESSE_PARTS } from '../constants';
 import { toast } from 'react-toastify';
@@ -14,6 +15,10 @@ const Library = () => {
   const { currentUser } = useAuth();
   const [partitions, setPartitions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [total, setTotal] = useState(0);
+  const [offset, setOffset] = useState(0);
+  const LIMIT = 24;
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [messePartFilter, setMessePartFilter] = useState('all');
@@ -35,34 +40,46 @@ const Library = () => {
   // Fetch partitions avec filtres
   useEffect(() => {
     if (!currentUser) return;
-
+    setOffset(0);
+    setPartitions([]);
     const timer = setTimeout(() => {
-      fetchData();
+      fetchData(0, false);
     }, searchTerm ? 500 : 0);
-
     return () => clearTimeout(timer);
   }, [currentUser, searchTerm, categoryFilter, messePartFilter, showFavorites]);
 
-  const fetchData = async () => {
+  const fetchData = async (currentOffset = 0, append = false) => {
     try {
-      setLoading(true);
+      append ? setLoadingMore(true) : setLoading(true);
       let data;
       if (showFavorites) {
         data = await apiService.getFavorites();
+        setPartitions(data || []);
+        setTotal(data?.length || 0);
       } else {
         data = await apiService.getPartitions({
           search: searchTerm,
           category: categoryFilter,
-          messePart: messePartFilter
+          messePart: messePartFilter,
+          limit: LIMIT,
+          offset: currentOffset,
         });
+        setPartitions(prev => append ? [...prev, ...(data.data || [])] : (data.data || []));
+        setTotal(data.total || 0);
       }
-      setPartitions(data || []);
     } catch (error) {
       console.error('❌ Erreur lors du chargement des partitions:', error);
       toast.error('Erreur lors du chargement des partitions');
     } finally {
       setLoading(false);
+      setLoadingMore(false);
     }
+  };
+
+  const handleLoadMore = () => {
+    const newOffset = offset + LIMIT;
+    setOffset(newOffset);
+    fetchData(newOffset, true);
   };
 
   const handleDelete = async (id) => {
@@ -140,8 +157,8 @@ const Library = () => {
   const hasAccess = (partition) => {
     // L'auteur a toujours accès
     if (partition.created_by === currentUser?.id) return true;
-    // Si la partition a des URLs de contenu, le backend a validé l'accès
-    if (partition.storage_path || partition.audio_url) return true;
+    // Le backend indique l'accès via le champ hasAccess
+    if (partition.hasAccess) return true;
     // Pas de prix = gratuit = accès pour tous
     if (!partition.price || partition.price === 0) return true;
     return false;
@@ -464,8 +481,18 @@ const Library = () => {
                   key={partition.id}
                   className="bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 flex flex-col border border-gray-200 dark:border-gray-700 overflow-hidden group"
                 >
-                  {/* Header coloré */}
-                  <div className="h-2 bg-gradient-to-r from-primary-500 to-primary-600"></div>
+                  {/* Cover ou header coloré */}
+                  {partition.cover_url ? (
+                    <div className="h-40 overflow-hidden">
+                      <img
+                        src={partition.cover_url}
+                        alt={`Couverture ${partition.title}`}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    </div>
+                  ) : (
+                    <div className="h-2 bg-gradient-to-r from-primary-500 to-primary-600"></div>
+                  )}
 
                   <div className="p-6 flex-1 flex flex-col">
                     {/* Titre et catégorie */}
@@ -559,10 +586,10 @@ const Library = () => {
                       </div>
                     </div>
 
-                    {/* Lecteur Audio Avancé */}
-                    {partition.audio_url && (
+                    {/* Lecteur Audio — URL signée chargée à la demande */}
+                    {partition.audio_url === 'available' && (
                       <div className="mb-4">
-                        <AudioPlayer src={partition.audio_url} />
+                        <AudioPlayerSecure partitionId={partition.id} />
                       </div>
                     )}
 
@@ -672,7 +699,31 @@ const Library = () => {
 
           <div className="mt-6 text-center text-gray-600 dark:text-gray-400">
             {sortedAndFilteredPartitions.length} partition{sortedAndFilteredPartitions.length > 1 ? 's' : ''} affichée{sortedAndFilteredPartitions.length > 1 ? 's' : ''}
+            {!showFavorites && total > 0 && ` sur ${total}`}
           </div>
+
+          {/* Bouton Charger plus */}
+          {!showFavorites && partitions.length < total && (
+            <div className="mt-6 flex justify-center">
+              <button
+                onClick={handleLoadMore}
+                disabled={loadingMore}
+                className="px-8 py-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-xl font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-all shadow-sm disabled:opacity-50 flex items-center gap-2"
+              >
+                {loadingMore ? (
+                  <>
+                    <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    </svg>
+                    Chargement...
+                  </>
+                ) : (
+                  <>Charger plus ({total - partitions.length} restantes)</>
+                )}
+              </button>
+            </div>
+          )}
         </>
       )}
 

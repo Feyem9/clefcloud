@@ -1,9 +1,19 @@
-import { TransactionStatus } from "../../common/enums/transaction.enum";
+import { IsString, IsNumber, IsOptional, IsIn } from 'class-validator';
 
-export interface PayunitCallbackDto {
+export class PayunitCallbackDto {
+  @IsString()
   transaction_id: string;
+
+  @IsString()
   payunit_transaction_id: string;
-  status: 'SUCCESS' | 'FAILED'; // Statut brut envoyé par PayUnit
+
+  @IsIn(['SUCCESS', 'FAILED'])
+  status: 'SUCCESS' | 'FAILED';
+
+  @IsNumber()
   amount: number;
+
+  @IsOptional()
+  @IsString()
   message?: string;
 }

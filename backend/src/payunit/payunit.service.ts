@@ -22,8 +22,8 @@ export class PayunitService {
     return {
       'Content-Type': 'application/json',
       'x-api-key': apiKey,
-      'Authorization': `Basic ${auth}`,
-      'mode': mode,
+      Authorization: `Basic ${auth}`,
+      mode: mode,
     };
   }
 
@@ -41,7 +41,7 @@ export class PayunitService {
           return_url: this.configService.get<string>('PAYUNIT_RETURN_URL'),
           notify_url: this.configService.get<string>('PAYUNIT_CALLBACK_URL'),
         },
-        { headers: this.getHeaders() }
+        { headers: this.getHeaders() },
       );
 
       this.logger.log(`Paiement initialisé : ${transactionId}`);

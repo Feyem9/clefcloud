@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { HealthController } from './health.controller';
-import { MailModule } from './mail.module';
+import { MailModule } from '../mail.module';
 
 @Module({
   imports: [MailModule],

@@ -27,13 +27,16 @@ const Upload = () => {
 
   const [file, setFile] = useState(null);
   const [audioFile, setAudioFile] = useState(null);
+  const [coverFile, setCoverFile] = useState(null);
+  const [coverPreviewUrl, setCoverPreviewUrl] = useState(null);
 
   // Cleanup effect for preview URLs
   useEffect(() => {
     return () => {
       if (audioPreviewUrl) URL.revokeObjectURL(audioPreviewUrl);
+      if (coverPreviewUrl) URL.revokeObjectURL(coverPreviewUrl);
     };
-  }, [audioPreviewUrl]);
+  }, [audioPreviewUrl, coverPreviewUrl]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -76,12 +79,27 @@ const Upload = () => {
         return;
       }
       setAudioFile(selectedAudio);
-
-      // Create preview URL
       if (audioPreviewUrl) URL.revokeObjectURL(audioPreviewUrl);
       setAudioPreviewUrl(URL.createObjectURL(selectedAudio));
       toast.success(`🎵 Audio ${selectedAudio.name} sélectionné`);
     }
+  };
+
+  const handleCoverChange = (e) => {
+    const selected = e.target.files[0];
+    if (!selected) return;
+    if (!['image/png', 'image/jpeg', 'image/jpg', 'image/webp'].includes(selected.type)) {
+      toast.error('Format non supporté. Utilisez PNG, JPG ou WebP.');
+      return;
+    }
+    if (selected.size > 5 * 1024 * 1024) {
+      toast.error('Image trop volumineuse (Max 5MB)');
+      return;
+    }
+    setCoverFile(selected);
+    if (coverPreviewUrl) URL.revokeObjectURL(coverPreviewUrl);
+    setCoverPreviewUrl(URL.createObjectURL(selected));
+    toast.success(`🖼️ Couverture ${selected.name} sélectionnée`);
   };
 
   const handleSubmit = async (e) => {
@@ -99,6 +117,7 @@ const Upload = () => {
       const data = new FormData();
       data.append('pdf', file);
       if (audioFile) data.append('audio', audioFile);
+      if (coverFile) data.append('cover', coverFile);
 
       data.append('title', formData.title);
       data.append('composer', formData.composer);
@@ -224,6 +243,27 @@ const Upload = () => {
                       </p>
                     </div>
                   )}
+                </div>
+              </div>
+
+              {/* Zone de Drop Cover — image de prévisualisation publique */}
+              <div className="mt-6">
+                <div className="relative group flex items-center gap-6 p-5 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-2xl hover:border-green-500 dark:hover:border-green-400 transition-all duration-300 bg-white/50 dark:bg-gray-800/80 hover:bg-green-50/50 dark:hover:bg-green-900/20 overflow-hidden">
+                  <input type="file" accept="image/png,image/jpeg,image/jpg,image/webp" onChange={handleCoverChange} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
+                  {coverPreviewUrl ? (
+                    <img src={coverPreviewUrl} alt="Aperçu couverture" className="w-20 h-20 object-cover rounded-xl border border-gray-200 dark:border-gray-600 shadow-sm flex-shrink-0" />
+                  ) : (
+                    <div className="w-20 h-20 rounded-xl bg-green-100 dark:bg-green-900/50 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-all">
+                      <svg className="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                  )}
+                  <div>
+                    <p className="text-sm font-bold text-gray-900 dark:text-white">Image de couverture <span className="text-gray-400 font-normal ml-1">Optionnel</span></p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Visible par tous avant achat — PNG, JPG, WebP (Max 5MB)</p>
+                    {coverFile && <p className="text-xs text-green-600 dark:text-green-400 mt-1 font-medium">✓ {coverFile.name}</p>}
+                  </div>
                 </div>
               </div>
 

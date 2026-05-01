@@ -15,7 +15,9 @@ export class MailService {
   ) {
     this.fromEmail = this.configService.get('MAIL_FROM_EMAIL', 'pasyves43@gmail.com');
     this.fromName = this.configService.get('MAIL_FROM_NAME', 'ClefCloud');
-    this.logger.log(`📧 Mail Service initialized using SMTP - From: ${this.fromName} <${this.fromEmail}>`);
+    this.logger.log(
+      `📧 Mail Service initialized using SMTP - From: ${this.fromName} <${this.fromEmail}>`,
+    );
   }
 
   async sendTestEmail(to: string) {

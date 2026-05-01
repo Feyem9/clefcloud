@@ -5,11 +5,14 @@ import {
   CreateDateColumn,
   ManyToOne,
   JoinColumn,
+  Index,
 } from 'typeorm';
 import { User } from './user.entity';
 import { Partition } from '../../partitions/entities/partition.entity';
 
 @Entity('user_partitions')
+@Index('idx_user_partitions_user_id', ['user_id'])
+@Index('idx_user_partitions_partition_id', ['partition_id'])
 export class UserPartition {
   @PrimaryGeneratedColumn()
   id: number;

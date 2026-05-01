@@ -337,11 +337,9 @@ const Profile = () => {
                         </div>
                       </div>
                     </div>
-                    {partition.downloadURL && partition.downloadURL.includes('supabase') ? (
-                      <a
-                        href={partition.downloadURL}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                    {partition.storage_path || partition.id ? (
+                      <button
+                        onClick={() => window.open(`/api/partitions/${partition.id}/download`, '_blank')}
                         className="px-5 py-2.5 bg-primary-600 text-white rounded-xl font-semibold hover:bg-primary-700 transition-all duration-200 transform hover:scale-105 shadow-lg flex items-center gap-2"
                       >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -349,7 +347,7 @@ const Profile = () => {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                         </svg>
                         Ouvrir
-                      </a>
+                      </button>
                     ) : (
                       <div className="px-5 py-2.5 bg-gray-400 text-white rounded-xl font-semibold cursor-not-allowed flex items-center gap-2">
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

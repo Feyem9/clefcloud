@@ -4,13 +4,21 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { Logger } from '@nestjs/common';
 import * as dns from 'node:dns';
+import helmet from 'helmet';
+import { validateEnv } from './config/env.validation';
 
 async function bootstrap() {
   // Force IPv4 for DNS resolution to avoid ENETUNREACH in Render Free Tier
   dns.setDefaultResultOrder('ipv4first');
-  
+
+  // Vérification des variables d'env critiques avant tout démarrage
+  validateEnv();
+
   const app = await NestFactory.create(AppModule);
   const logger = new Logger('Bootstrap');
+
+  // Security headers
+  app.use(helmet());
 
   // Global validation pipe
   app.useGlobalPipes(
@@ -33,11 +41,13 @@ async function bootstrap() {
   // Swagger documentation
   const config = new DocumentBuilder()
     .setTitle('ClefCloud API')
-    .setDescription('API Backend pour ClefCloud - Gestion de partitions musicales')
+    .setDescription('API Backend pour ClefCloud - Plateforme de partitions musicales')
     .setVersion('1.0')
-    .addTag('auth', 'Authentification avec AWS Cognito')
+    .addTag('auth', 'Authentification Firebase')
     .addTag('partitions', 'Gestion des partitions')
     .addTag('users', 'Gestion des utilisateurs')
+    .addTag('payments', 'Paiements via PayUnit')
+    .addTag('health', 'Santé du service')
     .addBearerAuth()
     .build();
 

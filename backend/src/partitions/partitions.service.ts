@@ -25,7 +25,11 @@ export class PartitionsService {
   async create(
     createPartitionDto: CreatePartitionDto,
     user: User,
-    files: { pdf?: Express.Multer.File[]; audio?: Express.Multer.File[] },
+    files: {
+      pdf?: Express.Multer.File[];
+      audio?: Express.Multer.File[];
+      cover?: Express.Multer.File[];
+    },
   ) {
     const partition = this.partitionRepository.create({
       ...createPartitionDto,
@@ -43,24 +47,35 @@ export class PartitionsService {
     try {
       // 1. Gérer le PDF
       if (files.pdf && files.pdf[0]) {
-        const { storagePath, downloadUrl } = await this.firebaseService.uploadFile(
+        const { storagePath } = await this.firebaseService.uploadFile(
           user.id,
           files.pdf[0],
           `${baseFolder}/partition.pdf`,
         );
         savedPartition.storage_path = storagePath;
-        savedPartition.download_url = downloadUrl;
+        savedPartition.download_url = null; // Plus de stockage d'URL publique
       }
 
       // 2. Gérer l'Audio
       if (files.audio && files.audio[0]) {
-        const { storagePath, downloadUrl } = await this.firebaseService.uploadFile(
+        const { storagePath } = await this.firebaseService.uploadFile(
           user.id,
           files.audio[0],
           `${baseFolder}/demo.mp3`,
         );
         savedPartition.audio_storage_path = storagePath;
-        savedPartition.audio_url = downloadUrl;
+        savedPartition.audio_url = null; // Plus de stockage d'URL publique
+      }
+
+      // 3. Gérer la cover (image publique de prévisualisation)
+      if (files.cover && files.cover[0]) {
+        const ext = files.cover[0].originalname.split('.').pop();
+        const coverUrl = await this.firebaseService.uploadPublicFile(
+          user.id,
+          files.cover[0],
+          `${baseFolder}/cover.${ext}`,
+        );
+        savedPartition.cover_url = coverUrl;
       }
 
       return await this.partitionRepository.save(savedPartition);
@@ -71,8 +86,16 @@ export class PartitionsService {
     }
   }
 
-  async findAll(user: User, search?: string, category?: string, messePart?: string) {
-    const query = this.partitionRepository.createQueryBuilder('partition')
+  async findAll(
+    user: User,
+    search?: string,
+    category?: string,
+    messePart?: string,
+    limit = 50,
+    offset = 0,
+  ) {
+    const query = this.partitionRepository
+      .createQueryBuilder('partition')
       .leftJoinAndSelect('partition.user', 'user')
       .where('partition.is_active = :isActive', { isActive: true });
 
@@ -91,20 +114,27 @@ export class PartitionsService {
       query.andWhere('partition.messe_part = :messePart', { messePart });
     }
 
-    query.orderBy('partition.created_at', 'DESC');
+    query.orderBy('partition.created_at', 'DESC').take(limit).skip(offset);
 
-    const partitions = await query.getMany();
+    const [partitions, total] = await query.getManyAndCount();
 
     // Ajouter l'info isFavorite pour chaque partition
-    const favoriteIds = await this.favoriteRepository.find({
-      where: { user_id: user.id },
-      select: ['partition_id'],
-    }).then(favs => favs.map(f => f.partition_id));
+    const favoriteIds = await this.favoriteRepository
+      .find({
+        where: { user_id: user.id },
+        select: ['partition_id'],
+      })
+      .then((favs) => favs.map((f) => f.partition_id));
 
-    return partitions.map(p => ({
-      ...p,
-      isFavorite: favoriteIds.includes(p.id),
-    }));
+    return {
+      data: partitions.map((p) => ({
+        ...p,
+        isFavorite: favoriteIds.includes(p.id),
+      })),
+      total,
+      limit,
+      offset,
+    };
   }
 
   async findFavorites(user: User) {
@@ -113,7 +143,7 @@ export class PartitionsService {
       relations: ['partition', 'partition.user'],
     });
 
-    return favorites.map(f => ({
+    return favorites.map((f) => ({
       ...f.partition,
       isFavorite: true,
     }));
@@ -152,7 +182,8 @@ export class PartitionsService {
       // 1. Il est l'auteur
       if (partition.created_by === user.id) hasAccess = true;
       // 2. Il est Premium
-      if (user.is_premium && (!user.premium_until || user.premium_until > new Date())) hasAccess = true;
+      if (user.is_premium && (!user.premium_until || user.premium_until > new Date()))
+        hasAccess = true;
       // 3. Il a acheté cette partition
       if (!hasAccess) {
         const purchase = await this.userPartitionRepository.findOneBy({
@@ -163,25 +194,87 @@ export class PartitionsService {
       }
     }
 
-    // Si pas d'accès, on cache les URLs de téléchargement et audio
+    // Si pas d'accès, on cache les chemins de stockage
     if (!hasAccess) {
-      delete partition.audio_url;
-      delete partition.download_url;
-      delete partition.storage_path;
-      delete partition.audio_storage_path;
+      partition.audio_url = null;
+      partition.download_url = null;
+      partition.storage_path = null;
+      partition.audio_storage_path = null;
+    } else {
+      partition.download_url = null;
+      partition.storage_path = null;
+      partition.audio_storage_path = null;
+      partition.audio_url = partition.audio_url ? 'available' : null;
     }
 
     // Info favorite
-    const favorite = user ? await this.favoriteRepository.findOneBy({
-      user_id: user.id,
-      partition_id: partition.id,
-    }) : null;
+    const favorite = user
+      ? await this.favoriteRepository.findOneBy({
+          user_id: user.id,
+          partition_id: partition.id,
+        })
+      : null;
 
     return {
       ...partition,
       hasAccess,
       isFavorite: !!favorite,
     };
+  }
+
+  /**
+   * Génère une URL signée temporaire (15 min) pour télécharger une partition.
+   * Vérifie les droits d'accès avant de générer l'URL.
+   */
+  async getDownloadUrl(id: number, user: User): Promise<{ url: string; expiresIn: number }> {
+    const partition = await this.partitionRepository.findOneBy({ id });
+    if (!partition) throw new NotFoundException('Partition non trouvée');
+
+    // Vérification des droits
+    let hasAccess = partition.created_by === user.id;
+    if (!hasAccess && user.is_premium && (!user.premium_until || user.premium_until > new Date())) {
+      hasAccess = true;
+    }
+    if (!hasAccess) {
+      const purchase = await this.userPartitionRepository.findOneBy({
+        user_id: user.id,
+        partition_id: id,
+      });
+      if (purchase) hasAccess = true;
+    }
+
+    if (!hasAccess) {
+      throw new ForbiddenException('Accès non autorisé à cette partition');
+    }
+
+    if (!partition.storage_path) {
+      throw new NotFoundException('Fichier introuvable pour cette partition');
+    }
+
+    const EXPIRES_IN_MS = 15 * 60 * 1000; // 15 minutes
+    const url = await this.firebaseService.getSignedUrl(partition.storage_path, EXPIRES_IN_MS);
+
+    // Incrémenter le compteur de téléchargements
+    await this.partitionRepository.increment({ id }, 'download_count', 1);
+
+    return { url, expiresIn: 15 * 60 };
+  }
+
+  /**
+   * Génère une URL signée temporaire pour l'audio (preview).
+   * Accessible à tous les utilisateurs authentifiés (c'est un extrait de démo).
+   */
+  async getAudioUrl(id: number): Promise<{ url: string }> {
+    const partition = await this.partitionRepository.findOneBy({ id });
+    if (!partition) throw new NotFoundException('Partition non trouvée');
+    if (!partition.audio_storage_path)
+      throw new NotFoundException("Pas d'audio pour cette partition");
+
+    const url = await this.firebaseService.getSignedUrl(
+      partition.audio_storage_path,
+      60 * 60 * 1000,
+    ); // 1h pour l'audio
+    return { url };
   }
 
   async remove(id: number, user: User) {
@@ -193,7 +286,8 @@ export class PartitionsService {
 
     // Supprimer les fichiers sur Firebase
     if (partition.storage_path) await this.firebaseService.deleteFile(partition.storage_path);
-    if (partition.audio_storage_path) await this.firebaseService.deleteFile(partition.audio_storage_path);
+    if (partition.audio_storage_path)
+      await this.firebaseService.deleteFile(partition.audio_storage_path);
 
     return this.partitionRepository.remove(partition);
   }

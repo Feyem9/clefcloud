@@ -45,13 +45,15 @@ const apiService = {
 
   // Partitions
   getPartitions: async (filters = {}) => {
-    const { search, category, messePart } = filters;
-    let url = '/partitions?';
-    if (search) url += `search=${encodeURIComponent(search)}&`;
-    if (category) url += `category=${encodeURIComponent(category)}&`;
-    if (messePart) url += `messePart=${encodeURIComponent(messePart)}&`;
+    const { search, category, messePart, limit = 50, offset = 0 } = filters;
+    const params = new URLSearchParams();
+    if (search) params.append('search', search);
+    if (category) params.append('category', category);
+    if (messePart) params.append('messePart', messePart);
+    params.append('limit', String(limit));
+    params.append('offset', String(offset));
 
-    const response = await api.get(url);
+    const response = await api.get(`/partitions?${params.toString()}`);
     return response.data;
   },
 
@@ -72,6 +74,11 @@ const apiService = {
 
   getDownloadUrl: async (id) => {
     const response = await api.get(`/partitions/${id}/download`);
+    return response.data;
+  },
+
+  getAudioUrl: async (id) => {
+    const response = await api.get(`/partitions/${id}/audio`);
     return response.data;
   },
 

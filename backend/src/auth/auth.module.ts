@@ -19,11 +19,7 @@ import { FirebaseAuthGuard } from './guards/firebase-auth.guard';
     FirebaseModule,
     MailModule,
   ],
-  providers: [
-    AuthService,
-    FirebaseAuthStrategy,
-    FirebaseAuthGuard,
-  ],
+  providers: [AuthService, FirebaseAuthStrategy, FirebaseAuthGuard],
   controllers: [AuthController],
   exports: [AuthService, FirebaseAuthGuard, PassportModule],
 })

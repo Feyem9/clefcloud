@@ -78,13 +78,15 @@ const apiService = {
 
   // Partitions
   getPartitions: async (filters = {}) => {
-    const { search, category, messePart } = filters;
+    const { search, category, messePart, page = 1, limit = 20 } = filters;
     let url = '/partitions?';
     if (search) url += `search=${encodeURIComponent(search)}&`;
     if (category) url += `category=${encodeURIComponent(category)}&`;
     if (messePart) url += `messePart=${encodeURIComponent(messePart)}&`;
+    url += `page=${page}&limit=${limit}`;
 
     const response = await api.get(url);
+    // Retourne { data: [...], meta: { total, page, limit, totalPages, hasNextPage, hasPrevPage } }
     return response.data;
   },
 

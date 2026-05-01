@@ -14,6 +14,7 @@ const Library = () => {
   const { currentUser, isAdmin, isPremium } = useAuth();
   const [partitions, setPartitions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [messePartFilter, setMessePartFilter] = useState('all');
@@ -23,6 +24,9 @@ const Library = () => {
   const [viewingPDF, setViewingPDF] = useState(null);
   const [buyingId, setBuyingId] = useState(null);
   const [isTogglingFavorite, setIsTogglingFavorite] = useState(null);
+  const [page, setPage] = useState(1);
+  const [hasNextPage, setHasNextPage] = useState(false);
+  const [totalCount, setTotalCount] = useState(0);
   // Mémoriser la vue dans le localStorage
   const [viewMode, setViewMode] = useState(
     () => localStorage.getItem('clefcloud_view_mode') || 'grid'
@@ -32,37 +36,65 @@ const Library = () => {
     localStorage.setItem('clefcloud_view_mode', viewMode);
   }, [viewMode]);
 
+  // Reset page quand les filtres changent
+  useEffect(() => {
+    setPage(1);
+    setPartitions([]);
+  }, [searchTerm, categoryFilter, messePartFilter, showFavorites]);
+
   // Fetch partitions avec filtres
   useEffect(() => {
     if (!currentUser) return;
 
     const timer = setTimeout(() => {
-      fetchData();
+      fetchData(1, false);
     }, searchTerm ? 500 : 0);
 
     return () => clearTimeout(timer);
   }, [currentUser, searchTerm, categoryFilter, messePartFilter, showFavorites]);
 
-  const fetchData = async () => {
+  const fetchData = async (pageNum = 1, append = false) => {
     try {
-      setLoading(true);
-      let data;
+      if (append) setLoadingMore(true);
+      else setLoading(true);
+
+      let newPartitions;
       if (showFavorites) {
-        data = await apiService.getFavorites();
+        const data = await apiService.getFavorites();
+        newPartitions = data || [];
+        setHasNextPage(false);
+        setTotalCount(newPartitions.length);
       } else {
-        data = await apiService.getPartitions({
+        const result = await apiService.getPartitions({
           search: searchTerm,
           category: categoryFilter,
-          messePart: messePartFilter
+          messePart: messePartFilter,
+          page: pageNum,
+          limit: 20,
         });
+        newPartitions = result.data || [];
+        setHasNextPage(result.meta?.hasNextPage || false);
+        setTotalCount(result.meta?.total || 0);
       }
-      setPartitions(data || []);
+
+      if (append) {
+        setPartitions(prev => [...prev, ...newPartitions]);
+      } else {
+        setPartitions(newPartitions);
+      }
     } catch (error) {
       console.error('❌ Erreur lors du chargement des partitions:', error);
       toast.error('Erreur lors du chargement des partitions');
     } finally {
       setLoading(false);
+      setLoadingMore(false);
     }
+  };
+
+  const handleLoadMore = () => {
+    const nextPage = page + 1;
+    setPage(nextPage);
+    fetchData(nextPage, true);
   };
 
   const handleDelete = async (id) => {
@@ -197,7 +229,7 @@ const Library = () => {
             Bibliothèque de Partitions
           </h1>
           <p className="text-on-surface-variant text-sm">
-            {partitions.length} partition{partitions.length > 1 ? 's' : ''} au total
+            {totalCount} partition{totalCount > 1 ? 's' : ''} au total
           </p>
         </div>
 
@@ -708,6 +740,34 @@ const Library = () => {
           <div className="mt-6 text-center text-on-surface-variant">
             {sortedAndFilteredPartitions.length} partition{sortedAndFilteredPartitions.length > 1 ? 's' : ''} affichée{sortedAndFilteredPartitions.length > 1 ? 's' : ''}
           </div>
+
+          {/* Bouton Charger plus */}
+          {hasNextPage && !showFavorites && (
+            <div className="mt-8 flex justify-center">
+              <button
+                onClick={handleLoadMore}
+                disabled={loadingMore}
+                className="flex items-center gap-2 px-8 py-3 bg-surface-container-high text-on-surface font-semibold rounded-xl hover:bg-surface-container-highest transition-all active:scale-95 disabled:opacity-50"
+              >
+                {loadingMore ? (
+                  <>
+                    <svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                    </svg>
+                    Chargement...
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                    Charger plus
+                  </>
+                )}
+              </button>
+            </div>
+          )}
         </>
       )}
 

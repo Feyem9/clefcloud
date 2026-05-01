@@ -44,11 +44,11 @@ const Messe = () => {
     const fetchPartitions = async () => {
       setLoading(true);
       try {
-        const data = await apiService.getPartitions({
+        const result = await apiService.getPartitions({
           category: 'messe',
           messePart: selectedPart
         });
-        setPartitions(data);
+        setPartitions(result.data || []);
       } catch (err) {
         console.error('Erreur chargement partitions messe:', err);
         toast.error('Impossible de charger les partitions');

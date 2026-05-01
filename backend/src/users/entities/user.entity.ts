@@ -4,6 +4,7 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  DeleteDateColumn,
   OneToMany,
 } from 'typeorm';
 import { Partition } from '../../partitions/entities/partition.entity';
@@ -15,7 +16,7 @@ export class User {
   id: number;
 
   @Column({ unique: true })
-  cognito_sub: string;
+  firebase_uid: string;
 
   @Column({ unique: true })
   email: string;
@@ -58,4 +59,8 @@ export class User {
 
   @UpdateDateColumn()
   updated_at: Date;
+
+  // Soft delete — l'utilisateur n'est pas supprimé physiquement de la DB
+  @DeleteDateColumn()
+  deleted_at: Date;
 }

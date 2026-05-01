@@ -30,12 +30,12 @@ export class AuthService {
       const { uid, email, name, picture } = decodedToken;
 
       let user = await this.userRepository.findOne({
-        where: { cognito_sub: uid },
+        where: { firebase_uid: uid },
       });
 
       if (!user) {
         user = this.userRepository.create({
-          cognito_sub: uid, // UID Firebase
+          firebase_uid: uid, // UID Firebase
           email: email,
           name: name || email?.split('@')[0],
           avatar_url: picture,

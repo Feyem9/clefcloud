@@ -5,8 +5,13 @@ import { AppModule } from './app.module';
 import { Logger } from '@nestjs/common';
 import * as dns from 'node:dns';
 import { DataSource } from 'typeorm';
+import helmet from 'helmet';
+import { validateEnv } from './config/env.validation';
 
 async function bootstrap() {
+  // Valider les variables d'environnement avant tout démarrage
+  validateEnv();
+
   // Force IPv4 for DNS resolution to avoid ENETUNREACH in Render Free Tier
   dns.setDefaultResultOrder('ipv4first');
   
@@ -14,6 +19,9 @@ async function bootstrap() {
   // Tell express to trust the proxy (important for Render to get real client IPs)
   app.getHttpAdapter().getInstance().set('trust proxy', 1);
   const logger = new Logger('Bootstrap');
+
+  // Sécurité HTTP headers (helmet)
+  app.use(helmet());
 
   // Fix: PostgreSQL ENUM Migration for 'expired' status
   const dataSource = app.get(DataSource);
@@ -33,9 +41,13 @@ async function bootstrap() {
     }),
   );
 
-  // CORS
+  // CORS — restreint à l'origine configurée, jamais '*' en production
+  const corsOrigin = process.env.CORS_ORIGIN;
+  if (!corsOrigin || corsOrigin === '*') {
+    logger.warn('⚠️  CORS_ORIGIN non défini ou trop permissif — restreindre en production !');
+  }
   app.enableCors({
-    origin: process.env.CORS_ORIGIN || '*',
+    origin: corsOrigin || 'http://localhost:5173',
     credentials: true,
   });
 
@@ -47,7 +59,7 @@ async function bootstrap() {
     .setTitle('ClefCloud API')
     .setDescription('API Backend pour ClefCloud - Gestion de partitions musicales')
     .setVersion('1.0')
-    .addTag('auth', 'Authentification avec AWS Cognito')
+    .addTag('auth', 'Authentification Firebase')
     .addTag('partitions', 'Gestion des partitions')
     .addTag('users', 'Gestion des utilisateurs')
     .addBearerAuth()

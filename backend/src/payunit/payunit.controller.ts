@@ -1,5 +1,6 @@
-import { Controller, Post, Body, Get, Req, BadRequestException, Logger, Param } from '@nestjs/common';
+import { Controller, Post, Body, Get, Req, BadRequestException, Logger, Param, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { AdminGuard } from '../common/guards/admin.guard';
 import { PayunitService } from './payunit.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -202,10 +203,9 @@ export class PayunitController {
   /**
    * ADMIN : Récupère toutes les transactions du système
    */
+  @UseGuards(AdminGuard)
   @Get('admin/transactions')
-  async getAllTransactionsAdmin(@Req() req: RequestWithUser) {
-    if (!req.user.is_admin) throw new BadRequestException('Accès refusé');
-
+  async getAllTransactionsAdmin() {
     return this.transactionRepository.find({
       order: { created_at: 'DESC' },
       relations: ['user', 'partition'],
@@ -215,10 +215,9 @@ export class PayunitController {
   /**
    * ADMIN : Force le déblocage d'une transaction, indépendamment de son statut PayUnit
    */
+  @UseGuards(AdminGuard)
   @Post('admin/force-unlock/:id')
-  async forceUnlockAdmin(@Param('id') id: string, @Req() req: RequestWithUser) {
-    if (!req.user.is_admin) throw new BadRequestException('Accès refusé');
-    
+  async forceUnlockAdmin(@Param('id') id: string) {
     return this.paymentVerificationService.forceUnlock(parseInt(id));
   }
 }

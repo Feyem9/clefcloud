@@ -1,7 +1,7 @@
-import { Controller, Get, Put, Body, Param, UseGuards, Req, ForbiddenException } from '@nestjs/common';
+import { Controller, Get, Put, Body, Param, UseGuards } from '@nestjs/common';
 import { ContentService } from './content.service';
 import { UpdateSiteContentDto } from './dto/content.dto';
-import { AuthGuard } from '../auth/guards/auth.guard';
+import { AdminGuard } from '../common/guards/admin.guard';
 import { Public } from '../common/decorators/public.decorator';
 
 @Controller('content')
@@ -15,9 +15,8 @@ export class ContentController {
   }
 
   @Put(':section')
-  @UseGuards(AuthGuard)
-  updateSection(@Param('section') section: string, @Body() updateDto: UpdateSiteContentDto, @Req() req) {
-    if (!req.user.is_admin) throw new ForbiddenException("Accès refusé");
+  @UseGuards(AdminGuard)
+  updateSection(@Param('section') section: string, @Body() updateDto: UpdateSiteContentDto) {
     return this.contentService.updateSection(section, updateDto);
   }
 }

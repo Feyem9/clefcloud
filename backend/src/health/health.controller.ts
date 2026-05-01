@@ -2,7 +2,7 @@ import { Controller, Get } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { MailService } from './mail.service';
+import { MailService } from '../mail.service';
 import { HealthStatus, DatabaseStatus } from '../common/enums/health.enum';
 import { Public } from '../common/decorators/public.decorator';
 
@@ -30,7 +30,6 @@ export class HealthController {
     };
 
     try {
-      // Check database connection
       await this.dataSource.query('SELECT 1');
       health.services.database = DatabaseStatus.CONNECTED;
     } catch (error) {
@@ -46,13 +45,14 @@ export class HealthController {
     };
   }
 
-  @Public()
+  // Endpoint de test email — disponible uniquement en développement
   @Get('test-email')
-  @ApiOperation({ summary: 'Send a test email' })
+  @ApiOperation({ summary: 'Send a test email (dev only, requires auth)' })
   async testEmail() {
-    // Remplacez par une vraie adresse pour un test en production,
-    // ou n'importe quoi pour maildev
+    if (process.env.NODE_ENV === 'production') {
+      return { message: 'Non disponible en production' };
+    }
     await this.mailService.sendTestEmail('test@example.com');
-    return { message: 'Test email sent. Check MailDev UI.' };
+    return { message: 'Test email envoyé.' };
   }
 }

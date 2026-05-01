@@ -1,4 +1,0 @@
-TRUNCATE TABLE favorites CASCADE;
-TRUNCATE TABLE transactions CASCADE;
-DELETE FROM partitions;
-ALTER SEQUENCE partitions_id_seq RESTART WITH 1;

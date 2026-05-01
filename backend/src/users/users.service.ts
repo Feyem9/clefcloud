@@ -62,28 +62,25 @@ export class UsersService {
   async getProfileStats(user: User) {
     const userId = user.id;
 
-    // 1. Statistiques des partitions créées par l'utilisateur
-    const partitions = await this.partitionRepository.find({
-      where: { created_by: userId },
-    });
+    // Calcul des stats en une seule requête SQL (plus efficace qu'en mémoire)
+    const statsResult = await this.partitionRepository
+      .createQueryBuilder('p')
+      .select('COUNT(p.id)', 'totalPartitions')
+      .addSelect('COALESCE(SUM(p.download_count), 0)', 'totalDownloads')
+      .addSelect('COALESCE(SUM(p.view_count), 0)', 'totalViews')
+      .where('p.created_by = :userId', { userId })
+      .getRawOne();
 
-    const totalPartitions = partitions.length;
-    const totalDownloads = partitions.reduce((sum, p) => sum + (p.download_count || 0), 0);
-    const totalViews = partitions.reduce((sum, p) => sum + (p.view_count || 0), 0);
-
-    // 2. Nombre de favoris (partitions que l'utilisateur a likées)
     const totalFavorites = await this.favoriteRepository.count({
       where: { user_id: userId },
     });
 
-    // 3. Partitions récentes de l'utilisateur
     const recentUploads = await this.partitionRepository.find({
       where: { created_by: userId },
       order: { created_at: 'DESC' },
       take: 5,
     });
 
-    // 4. Historique des achats
     const purchases = await this.userPartitionRepository.find({
       where: { user_id: userId },
       relations: ['partition', 'partition.user'],
@@ -91,9 +88,9 @@ export class UsersService {
     });
 
     return {
-      totalPartitions,
-      totalDownloads,
-      totalViews,
+      totalPartitions: parseInt(statsResult.totalPartitions) || 0,
+      totalDownloads: parseInt(statsResult.totalDownloads) || 0,
+      totalViews: parseInt(statsResult.totalViews) || 0,
       totalFavorites,
       recentUploads,
       purchases: purchases.map(p => ({

@@ -39,17 +39,23 @@ export class PartitionsController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Récupérer toutes les partitions (avec filtres)' })
+  @ApiOperation({ summary: 'Récupérer les partitions (avec filtres et pagination)' })
   @ApiQuery({ name: 'search', required: false })
   @ApiQuery({ name: 'category', required: false })
   @ApiQuery({ name: 'messePart', required: false })
+  @ApiQuery({ name: 'page', required: false, description: 'Numéro de page (défaut: 1)' })
+  @ApiQuery({ name: 'limit', required: false, description: 'Nombre de résultats par page (défaut: 20, max: 50)' })
   async findAll(
     @Req() req,
     @Query('search') search?: string,
     @Query('category') category?: string,
     @Query('messePart') messePart?: string,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
   ) {
-    return this.partitionsService.findAll(req.user, search, category, messePart);
+    const pageNum = Math.max(1, parseInt(page) || 1);
+    const limitNum = Math.min(50, Math.max(1, parseInt(limit) || 20));
+    return this.partitionsService.findAll(req.user, search, category, messePart, pageNum, limitNum);
   }
 
   @Get('favorites')

@@ -76,14 +76,9 @@ export class PartitionsService {
     }
   }
 
-  async findAll(user: User, search?: string, category?: string, messePart?: string) {
-    // Vérification premium robuste
+  async findAll(user: User, search?: string, category?: string, messePart?: string, page = 1, limit = 20) {
     const now = new Date();
     const isPremium = user.is_premium && (!user.premium_until || new Date(user.premium_until) > now);
-    
-    if (user.is_premium) {
-      this.logger.log(`Vérification accès pour user premium ${user.email} (Expire le: ${user.premium_until})`);
-    }
 
     const query = this.partitionRepository.createQueryBuilder('partition')
       .leftJoinAndSelect('partition.user', 'user')
@@ -106,41 +101,50 @@ export class PartitionsService {
 
     query.orderBy('partition.created_at', 'DESC');
 
-    const partitions = await query.getMany();
+    // Pagination
+    const total = await query.getCount();
+    const partitions = await query
+      .skip((page - 1) * limit)
+      .take(limit)
+      .getMany();
 
-    // Ajouter l'info isFavorite pour chaque partition
     const favoriteIds = await this.favoriteRepository.find({
       where: { user_id: user.id },
       select: ['partition_id'],
     }).then(favs => favs.map(f => f.partition_id));
 
-    // Récupérer les IDs des partitions achetées individuellement
     const purchasedIds = await this.userPartitionRepository.find({
       where: { user_id: user.id },
       select: ['partition_id'],
     }).then(ups => ups.map(up => up.partition_id));
 
-    return partitions.map(p => {
+    const data = partitions.map(p => {
       const isOwner = p.created_by === user.id;
       const isPurchased = purchasedIds.includes(p.id);
-      // UN SEUL ENDROIT POUR LE CALCUL DE L'ACCÈS
-      const hasAccess = isPremium || isOwner || user.is_admin || isPurchased; 
-      
-      if (!hasAccess && p.price > 0) {
-        this.logger.debug(`Accès refusé pour ${user.email} sur partition ${p.id} (${p.title})`);
-      }
+      const hasAccess = isPremium || isOwner || user.is_admin || isPurchased;
 
       return {
         ...p,
         isFavorite: favoriteIds.includes(p.id),
         hasAccess,
-        // On cache les URLs si pas d'accès
         download_url: hasAccess ? p.download_url : null,
         audio_url: hasAccess ? p.audio_url : null,
         storage_path: hasAccess ? p.storage_path : null,
         audio_storage_path: hasAccess ? p.audio_storage_path : null,
       };
     });
+
+    return {
+      data,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+        hasNextPage: page * limit < total,
+        hasPrevPage: page > 1,
+      },
+    };
   }
 
   async findFavorites(user: User) {

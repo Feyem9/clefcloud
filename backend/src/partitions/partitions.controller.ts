@@ -22,17 +22,24 @@ export class PartitionsController {
   constructor(private readonly partitionsService: PartitionsService) {}
 
   @Post()
-  @ApiOperation({ summary: 'Créer une partition avec PDF et Audio' })
+  @ApiOperation({ summary: 'Créer une partition avec PDF, Paroles, Audio et Couverture' })
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(
     FileFieldsInterceptor([
       { name: 'pdf', maxCount: 1 },
+      { name: 'lyrics', maxCount: 1 },
       { name: 'audio', maxCount: 1 },
+      { name: 'cover', maxCount: 1 },
     ]),
   )
   async create(
     @Body() createPartitionDto: CreatePartitionDto,
-    @UploadedFiles() files: { pdf?: Express.Multer.File[]; audio?: Express.Multer.File[] },
+    @UploadedFiles() files: {
+      pdf?: Express.Multer.File[];
+      lyrics?: Express.Multer.File[];
+      audio?: Express.Multer.File[];
+      cover?: Express.Multer.File[];
+    },
     @Req() req,
   ) {
     return this.partitionsService.create(createPartitionDto, req.user, files);

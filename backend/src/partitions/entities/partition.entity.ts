@@ -42,6 +42,13 @@ export class Partition {
   @Column({ nullable: true })
   download_url: string;
 
+  // Fichier PDF des paroles
+  @Column({ nullable: true })
+  lyrics_storage_path: string;
+
+  @Column({ nullable: true })
+  lyrics_url: string;
+
   // Fichier Audio
   @Column({ nullable: true })
   audio_url: string;

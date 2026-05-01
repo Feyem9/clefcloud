@@ -27,13 +27,17 @@ const Upload = () => {
 
   const [file, setFile] = useState(null);
   const [audioFile, setAudioFile] = useState(null);
+  const [lyricsFile, setLyricsFile] = useState(null);
+  const [coverFile, setCoverFile] = useState(null);
+  const [coverPreview, setCoverPreview] = useState(null);
 
   // Cleanup effect for preview URLs
   useEffect(() => {
     return () => {
       if (audioPreviewUrl) URL.revokeObjectURL(audioPreviewUrl);
+      if (coverPreview) URL.revokeObjectURL(coverPreview);
     };
-  }, [audioPreviewUrl]);
+  }, [audioPreviewUrl, coverPreview]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -68,7 +72,23 @@ const Upload = () => {
     }
   };
 
-  const handleAudioChange = (e) => {
+  const handleLyricsChange = (e) => {
+    const selectedFile = e.target.files[0];
+    if (selectedFile && validateFile(selectedFile, ['application/pdf'])) {
+      setLyricsFile(selectedFile);
+      toast.success(`📝 Paroles ${selectedFile.name} sélectionnées`);
+    }
+  };
+
+  const handleCoverChange = (e) => {
+    const selectedFile = e.target.files[0];
+    if (selectedFile && validateFile(selectedFile, ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'])) {
+      setCoverFile(selectedFile);
+      if (coverPreview) URL.revokeObjectURL(coverPreview);
+      setCoverPreview(URL.createObjectURL(selectedFile));
+      toast.success(`🖼️ Couverture ${selectedFile.name} sélectionnée`);
+    }
+  };
     const selectedAudio = e.target.files[0];
     if (selectedAudio) {
       if (selectedAudio.size > 20 * 1024 * 1024) {
@@ -87,8 +107,8 @@ const Upload = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!file) {
-      toast.error('Veuillez sélectionner au moins une partition (PDF/Image)');
+    if (!file && !lyricsFile) {
+      toast.error('Veuillez sélectionner au moins un PDF (partition ou paroles)');
       return;
     }
 
@@ -97,8 +117,10 @@ const Upload = () => {
 
     try {
       const data = new FormData();
-      data.append('pdf', file);
+      if (file) data.append('pdf', file);
+      if (lyricsFile) data.append('lyrics', lyricsFile);
       if (audioFile) data.append('audio', audioFile);
+      if (coverFile) data.append('cover', coverFile);
 
       data.append('title', formData.title);
       data.append('composer', formData.composer);
@@ -188,20 +210,37 @@ const Upload = () => {
               </h3>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Zone de Drop PDF */}
+                {/* Zone de Drop PDF Partition */}
                 <div className="relative group flex flex-col items-center justify-center p-8 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-2xl hover:border-primary-500 dark:hover:border-primary-400 transition-all duration-300 bg-white/50 dark:bg-gray-800/80 hover:bg-primary-50/50 dark:hover:bg-primary-900/20 text-center overflow-hidden min-h-[160px]">
-                  <input type="file" accept="application/pdf,image/*" required onChange={handleFileChange} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
+                  <input type="file" accept="application/pdf,image/*" onChange={handleFileChange} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
                   <div className="w-14 h-14 rounded-full bg-primary-100 dark:bg-primary-900/50 flex items-center justify-center group-hover:scale-110 group-hover:bg-primary-200 transition-all duration-300 mb-3 shadow-ambient">
                     <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
                   </div>
-                  <p className="text-sm font-bold text-on-surface font-display">Partition (PDF/Img) <span className="text-red-500">*</span></p>
+                  <p className="text-sm font-bold text-on-surface font-display">Partition (PDF/Img)</p>
                   <p className="text-xs text-outline-variant mt-1">Glissez ou cliquez</p>
-
                   {file && (
                     <div className="absolute inset-x-0 bottom-0 bg-primary-500/10 backdrop-blur-md p-2 border-t border-primary-500/20">
                       <p className="text-xs font-semibold text-primary-container dark:text-primary-300 truncate px-4 flex justify-center items-center gap-1">
                         <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
                         {file.name}
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Zone de Drop PDF Paroles */}
+                <div className="relative group flex flex-col items-center justify-center p-8 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-2xl hover:border-green-500 dark:hover:border-green-400 transition-all duration-300 bg-white/50 dark:bg-gray-800/80 hover:bg-green-50/50 dark:hover:bg-green-900/20 text-center overflow-hidden min-h-[160px]">
+                  <input type="file" accept="application/pdf" onChange={handleLyricsChange} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
+                  <div className="w-14 h-14 rounded-full bg-green-100 dark:bg-green-900/50 flex items-center justify-center group-hover:scale-110 group-hover:bg-green-200 transition-all duration-300 mb-3 shadow-ambient">
+                    <svg className="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                  </div>
+                  <p className="text-sm font-bold text-on-surface font-display">Paroles (PDF) <span className="text-outline-variant font-normal ml-1">Optionnel</span></p>
+                  <p className="text-xs text-outline-variant mt-1">Glissez ou cliquez</p>
+                  {lyricsFile && (
+                    <div className="absolute inset-x-0 bottom-0 bg-green-500/10 backdrop-blur-md p-2 border-t border-green-500/20">
+                      <p className="text-xs font-semibold text-green-700 dark:text-green-300 truncate px-4 flex justify-center items-center gap-1">
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                        {lyricsFile.name}
                       </p>
                     </div>
                   )}
@@ -215,7 +254,6 @@ const Upload = () => {
                   </div>
                   <p className="text-sm font-bold text-on-surface font-display">Audio (MP3) <span className="text-outline-variant font-normal ml-1">Optionnel</span></p>
                   <p className="text-xs text-outline-variant mt-1">Glissez ou cliquez</p>
-
                   {audioFile && (
                     <div className="absolute inset-x-0 bottom-0 bg-orange-500/10 backdrop-blur-md p-2 border-t border-orange-500/20">
                       <p className="text-xs font-semibold text-orange-700 dark:text-orange-300 truncate px-4 flex justify-center items-center gap-1">
@@ -225,7 +263,38 @@ const Upload = () => {
                     </div>
                   )}
                 </div>
+
+                {/* Zone de Drop Image de couverture */}
+                <div className="relative group flex flex-col items-center justify-center p-8 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-2xl hover:border-purple-500 dark:hover:border-purple-400 transition-all duration-300 bg-white/50 dark:bg-gray-800/80 hover:bg-purple-50/50 dark:hover:bg-purple-900/20 text-center overflow-hidden min-h-[160px]">
+                  <input type="file" accept="image/*" onChange={handleCoverChange} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
+                  {coverPreview ? (
+                    <img src={coverPreview} alt="Couverture" className="absolute inset-0 w-full h-full object-cover opacity-40 rounded-2xl" />
+                  ) : null}
+                  <div className="relative z-10 flex flex-col items-center">
+                    <div className="w-14 h-14 rounded-full bg-purple-100 dark:bg-purple-900/50 flex items-center justify-center group-hover:scale-110 group-hover:bg-purple-200 transition-all duration-300 mb-3 shadow-ambient">
+                      <svg className="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                    </div>
+                    <p className="text-sm font-bold text-on-surface font-display">Couverture (Image) <span className="text-outline-variant font-normal ml-1">Optionnel</span></p>
+                    <p className="text-xs text-outline-variant mt-1">Glissez ou cliquez</p>
+                  </div>
+                  {coverFile && (
+                    <div className="absolute inset-x-0 bottom-0 bg-purple-500/10 backdrop-blur-md p-2 border-t border-purple-500/20 z-10">
+                      <p className="text-xs font-semibold text-purple-700 dark:text-purple-300 truncate px-4 flex justify-center items-center gap-1">
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                        {coverFile.name}
+                      </p>
+                    </div>
+                  )}
+                </div>
               </div>
+
+              {/* Note : au moins un PDF requis */}
+              {!file && !lyricsFile && (
+                <p className="mt-3 text-xs text-amber-600 dark:text-amber-400 flex items-center gap-1">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                  Au moins un PDF (partition ou paroles) est requis
+                </p>
+              )}
 
               {/* Audio Preview en dessous de la grille s'il est chargé */}
               <div className="relative z-20">

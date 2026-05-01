@@ -25,53 +25,71 @@ export class PartitionsService {
   async create(
     createPartitionDto: CreatePartitionDto,
     user: User,
-    files: { pdf?: Express.Multer.File[]; audio?: Express.Multer.File[] },
+    files: {
+      pdf?: Express.Multer.File[];
+      lyrics?: Express.Multer.File[];
+      audio?: Express.Multer.File[];
+      cover?: Express.Multer.File[];
+    },
   ) {
     if (!user.is_admin) {
       throw new ForbiddenException('Seul l\'administrateur peut ajouter des partitions');
     }
 
+    if (!files.pdf?.[0] && !files.lyrics?.[0]) {
+      throw new ForbiddenException('Au moins un fichier PDF (partition ou paroles) est requis');
+    }
+
     const partition = this.partitionRepository.create({
       ...createPartitionDto,
-      price: 599, // Prix fixe imposé
+      price: 599,
       user,
       created_by: user.id,
     });
 
-    // On sauvegarde d'abord pour avoir l'ID
     const savedPartition = await this.partitionRepository.save(partition);
     const partitionId = savedPartition.id;
-
-    // Dossier structuré : partitions/{userId}/{partitionId}/
     const baseFolder = `partitions/${user.id}/${partitionId}`;
 
     try {
-      // 1. Gérer le PDF
-      if (files.pdf && files.pdf[0]) {
+      // 1. PDF Partition
+      if (files.pdf?.[0]) {
         const { storagePath, downloadUrl } = await this.r2Service.uploadFile(
-          user.id,
-          files.pdf[0],
-          `${baseFolder}/partition.pdf`,
+          user.id, files.pdf[0], `${baseFolder}/partition.pdf`,
         );
         savedPartition.storage_path = storagePath;
         savedPartition.download_url = downloadUrl;
       }
 
-      // 2. Gérer l'Audio
-      if (files.audio && files.audio[0]) {
+      // 2. PDF Paroles
+      if (files.lyrics?.[0]) {
         const { storagePath, downloadUrl } = await this.r2Service.uploadFile(
-          user.id,
-          files.audio[0],
-          `${baseFolder}/demo.mp3`,
+          user.id, files.lyrics[0], `${baseFolder}/paroles.pdf`,
+        );
+        savedPartition.lyrics_storage_path = storagePath;
+        savedPartition.lyrics_url = downloadUrl;
+      }
+
+      // 3. Audio
+      if (files.audio?.[0]) {
+        const { storagePath, downloadUrl } = await this.r2Service.uploadFile(
+          user.id, files.audio[0], `${baseFolder}/demo.mp3`,
         );
         savedPartition.audio_storage_path = storagePath;
         savedPartition.audio_url = downloadUrl;
       }
 
+      // 4. Image de couverture
+      if (files.cover?.[0]) {
+        const { storagePath, downloadUrl } = await this.r2Service.uploadFile(
+          user.id, files.cover[0], `${baseFolder}/cover.jpg`,
+        );
+        savedPartition.cover_url = downloadUrl;
+      }
+
       return await this.partitionRepository.save(savedPartition);
     } catch (error) {
       this.logger.error(`Erreur upload fichiers : ${error.message}`);
-      // Optionnel : supprimer l'entrée DB si l'upload échoue
       throw error;
     }
   }
@@ -131,6 +149,8 @@ export class PartitionsService {
         audio_url: hasAccess ? p.audio_url : null,
         storage_path: hasAccess ? p.storage_path : null,
         audio_storage_path: hasAccess ? p.audio_storage_path : null,
+        lyrics_url: hasAccess ? p.lyrics_url : null,
+        lyrics_storage_path: hasAccess ? p.lyrics_storage_path : null,
       };
     });
 
@@ -209,6 +229,8 @@ export class PartitionsService {
       delete partition.download_url;
       delete partition.storage_path;
       delete partition.audio_storage_path;
+      delete partition.lyrics_url;
+      delete partition.lyrics_storage_path;
     }
 
     // Info favorite

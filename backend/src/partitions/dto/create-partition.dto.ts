@@ -31,19 +31,21 @@ export class CreatePartitionDto {
   @IsArray()
   @IsString({ each: true })
   @Transform(({ value }) => {
-    // Si c'est déjà un array, le retourner
     if (Array.isArray(value)) return value;
-    // Si c'est une string JSON, la parser
     if (typeof value === 'string') {
       try {
         const parsed = JSON.parse(value);
         return Array.isArray(parsed) ? parsed : [];
       } catch {
-        // Si ce n'est pas du JSON, split par virgule
         return value.split(',').map(tag => tag.trim()).filter(tag => tag);
       }
     }
     return [];
   })
   tags?: string[];
+
+  @ApiProperty({ example: 'Kyrie eleison\nChriste eleison...', required: false })
+  @IsOptional()
+  @IsString()
+  lyrics_text?: string;
 }

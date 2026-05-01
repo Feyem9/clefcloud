@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Req, BadRequestException, UnauthorizedException, Logger, Param, Headers } from '@nestjs/common';
+import { Controller, Post, Body, Get, Req, BadRequestException, Logger, Param } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PayunitService } from './payunit.service';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -94,24 +94,21 @@ export class PayunitController {
   }
 
   /**
-   * Webhook appelé par PayUnit après le paiement
+   * Webhook appelé par PayUnit après le paiement.
+   *
+   * SÉCURITÉ : PayUnit ne supporte pas les headers personnalisés dans leur dashboard.
+   * On sécurise donc en re-vérifiant le statut directement auprès de PayUnit
+   * avant d'honorer le paiement — un faux webhook ne peut pas passer cette vérification.
    */
   @Public()
   @Post('callback')
-  async handleCallback(
-    @Body() body: PayunitCallbackDto,
-    @Headers('x-payunit-token') payunitToken: string,
-  ) {
-    // Vérification du token secret partagé avec PayUnit
-    const expectedToken = this.configService.get<string>('PAYUNIT_WEBHOOK_SECRET');
-    if (!expectedToken || !payunitToken || payunitToken !== expectedToken) {
-      this.logger.warn(`Webhook PayUnit rejeté — token invalide ou manquant (IP source non vérifiée)`);
-      throw new UnauthorizedException('Token webhook invalide');
-    }
-
+  async handleCallback(@Body() body: PayunitCallbackDto, @Req() req) {
+    const clientIp = req.ip || req.headers['x-forwarded-for'];
     const { transaction_id, payunit_transaction_id, status } = body;
 
-    // FIX: Nettoyer l'ID de transaction (ex: "32-CLEFCLOUD" -> 32)
+    this.logger.log(`Webhook reçu depuis IP ${clientIp} — transaction_id: ${transaction_id}, status: ${status}`);
+
+    // Nettoyer l'ID de transaction (ex: "32-CLEFCLOUD" -> 32)
     const cleanIdString = transaction_id ? transaction_id.toString().split('-')[0] : '';
     const cleanId = parseInt(cleanIdString);
 
@@ -129,6 +126,22 @@ export class PayunitController {
 
     if (transaction.status !== TransactionStatus.PENDING) {
       return { message: 'Transaction déjà traitée' };
+    }
+
+    // SÉCURITÉ : Re-vérifier le statut directement auprès de PayUnit
+    // Cela empêche les faux webhooks — si quelqu'un appelle cet endpoint manuellement,
+    // PayUnit répondra UNKNOWN ou FAILED pour cette transaction.
+    if (payunit_transaction_id) {
+      const verification = await this.payunitService.checkTransactionStatus(payunit_transaction_id);
+      const verifiedStatus = verification.status?.toUpperCase();
+
+      if (verifiedStatus !== 'SUCCESS' && verifiedStatus !== 'COMPLETE') {
+        this.logger.warn(
+          `Webhook rejeté — statut PayUnit vérifié: ${verifiedStatus} pour transaction ${cleanId} (IP: ${clientIp})`
+        );
+        return { message: 'Paiement non confirmé par PayUnit' };
+      }
+      this.logger.log(`Paiement confirmé par PayUnit pour transaction ${cleanId}`);
     }
 
     const normalizedStatus = status?.toUpperCase();

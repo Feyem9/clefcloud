@@ -89,6 +89,8 @@ const Upload = () => {
       toast.success(`🖼️ Couverture ${selectedFile.name} sélectionnée`);
     }
   };
+
+  const handleAudioChange = (e) => {
     const selectedAudio = e.target.files[0];
     if (selectedAudio) {
       if (selectedAudio.size > 20 * 1024 * 1024) {

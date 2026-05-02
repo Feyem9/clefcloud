@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { UnauthorizedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { AuthService } from './auth.service';
 import { User } from '../users/entities/user.entity';
 import { UsersService } from '../users/users.service';
@@ -27,6 +28,10 @@ const mockUsersService = {
   deleteUser: jest.fn(),
 };
 
+const mockConfigService = {
+  get: jest.fn().mockReturnValue('admin@example.com'),
+};
+
 describe('AuthService', () => {
   let service: AuthService;
 
@@ -38,6 +43,7 @@ describe('AuthService', () => {
         { provide: FirebaseService, useValue: mockFirebaseService },
         { provide: MailService, useValue: mockMailService },
         { provide: UsersService, useValue: mockUsersService },
+        { provide: ConfigService, useValue: mockConfigService },
       ],
     }).compile();
 

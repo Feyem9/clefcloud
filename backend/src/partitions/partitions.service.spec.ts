@@ -98,8 +98,9 @@ describe('PartitionsService', () => {
       const result = await service.findOne(42, user);
 
       expect(result.hasAccess).toBe(false);
-      expect(result.storage_path).toBeNull();
-      expect(result.download_url).toBeNull();
+      // Les URLs sont supprimées (undefined) quand pas d'accès
+      expect(result.storage_path).toBeUndefined();
+      expect(result.download_url).toBeUndefined();
     });
 
     it('retourne hasAccess=true pour un utilisateur premium actif', async () => {
@@ -140,10 +141,10 @@ describe('PartitionsService', () => {
       const user = mockUser({ id: 1 });
       const partition = mockPartition({ created_by: 1 });
 
-      mockPartitionRepository.findOneBy.mockResolvedValue(partition);
-      mockPartitionRepository.increment.mockResolvedValue(undefined);
+      // getDownloadUrl appelle findOne qui utilise findOne (pas findOneBy)
+      mockPartitionRepository.findOne.mockResolvedValue(partition);
+      mockFavoriteRepository.findOneBy.mockResolvedValue(null);
 
-      // Mock r2Service via le service
       const r2Service = (service as any).r2Service;
       r2Service.getPresignedUrl = jest.fn().mockResolvedValue('https://signed-url.example.com/file');
 
@@ -156,8 +157,9 @@ describe('PartitionsService', () => {
       const user = mockUser({ id: 99 });
       const partition = mockPartition({ created_by: 1 });
 
-      mockPartitionRepository.findOneBy.mockResolvedValue(partition);
+      mockPartitionRepository.findOne.mockResolvedValue(partition);
       mockUserPartitionRepository.findOneBy.mockResolvedValue(null);
+      mockFavoriteRepository.findOneBy.mockResolvedValue(null);
 
       await expect(service.getDownloadUrl(42, user)).rejects.toThrow(ForbiddenException);
     });
@@ -166,7 +168,8 @@ describe('PartitionsService', () => {
       const user = mockUser({ id: 1 });
       const partition = mockPartition({ created_by: 1, storage_path: null });
 
-      mockPartitionRepository.findOneBy.mockResolvedValue(partition);
+      mockPartitionRepository.findOne.mockResolvedValue(partition);
+      mockFavoriteRepository.findOneBy.mockResolvedValue(null);
 
       await expect(service.getDownloadUrl(42, user)).rejects.toThrow(NotFoundException);
     });

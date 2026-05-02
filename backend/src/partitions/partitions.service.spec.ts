@@ -139,9 +139,12 @@ describe('PartitionsService', () => {
   describe('getDownloadUrl', () => {
     it('génère une URL signée pour l\'auteur', async () => {
       const user = mockUser({ id: 1 });
-      const partition = mockPartition({ created_by: 1 });
+      const partition = mockPartition({ 
+        created_by: 1, 
+        storage_path: 'partitions/1/42/partition.pdf',
+        download_url: 'https://pub-xxx.r2.dev/partitions/1/42/partition.pdf',
+      });
 
-      // getDownloadUrl appelle findOne qui utilise findOne (pas findOneBy)
       mockPartitionRepository.findOne.mockResolvedValue(partition);
       mockFavoriteRepository.findOneBy.mockResolvedValue(null);
 

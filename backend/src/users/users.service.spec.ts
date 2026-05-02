@@ -11,11 +11,13 @@ const mockUserRepository = {
   findOne: jest.fn(),
   save: jest.fn(),
   softDelete: jest.fn(),
+  createQueryBuilder: jest.fn(),
 };
 
 const mockPartitionRepository = {
   find: jest.fn(),
   findAndCount: jest.fn(),
+  createQueryBuilder: jest.fn(),
 };
 
 const mockFavoriteRepository = {
@@ -69,7 +71,7 @@ describe('UsersService', () => {
       mockUserRepository.findOne.mockResolvedValue(user);
       mockUserRepository.save.mockResolvedValue(updatedUser);
 
-      const result = await service.update(1, 'Nouveau Nom');
+      const result = await service.update(1, { name: 'Nouveau Nom' });
 
       expect(result.name).toBe('Nouveau Nom');
       expect(mockUserRepository.save).toHaveBeenCalled();
@@ -92,14 +94,17 @@ describe('UsersService', () => {
   describe('getProfileStats', () => {
     it('retourne les statistiques correctes', async () => {
       const user = { id: 1 } as User;
-      const partitions = [
-        { download_count: 5, view_count: 10 },
-        { download_count: 3, view_count: 7 },
-      ] as Partition[];
 
-      mockPartitionRepository.find.mockResolvedValue(partitions);
+      const mockQB = {
+        select: jest.fn().mockReturnThis(),
+        addSelect: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        getRawOne: jest.fn().mockResolvedValue({ totalPartitions: '2', totalDownloads: '8', totalViews: '17' }),
+      };
+      mockPartitionRepository.createQueryBuilder.mockReturnValue(mockQB);
       mockFavoriteRepository.count.mockResolvedValue(4);
       mockUserPartitionRepository.find.mockResolvedValue([]);
+      mockPartitionRepository.find.mockResolvedValue([]);
 
       const result = await service.getProfileStats(user);
 

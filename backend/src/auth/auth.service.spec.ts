@@ -92,9 +92,9 @@ describe('AuthService', () => {
       const user = { id: 1 } as User;
       mockUsersService.update.mockResolvedValue({ id: 1, name: 'Nouveau Nom' });
 
-      await service.updateProfile(user, 'Nouveau Nom');
+      await service.updateProfile(user, { name: 'Nouveau Nom' });
 
-      expect(mockUsersService.update).toHaveBeenCalledWith(1, 'Nouveau Nom');
+      expect(mockUsersService.update).toHaveBeenCalledWith(1, { name: 'Nouveau Nom' });
     });
   });
 
